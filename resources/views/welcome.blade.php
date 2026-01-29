@@ -19,17 +19,18 @@
             transform: translateY(-8px);
             box-shadow: 0 20px 40px rgba(251, 191, 36, 0.3);
         }
-        .snake-pattern {
-            background-image: 
-                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(251, 191, 36, 0.05) 10px, rgba(251, 191, 36, 0.05) 20px),
-                repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(251, 191, 36, 0.05) 10px, rgba(251, 191, 36, 0.05) 20px);
-        }
     </style>
   </head>
-  <body class="bg-white text-white">
-    
+  <body class="text-white relative antialiased">
+
+    <div class="fixed inset-0 -z-50 overflow-hidden">
+  <img src="{{ asset('IMAGES\BG.png') }}" alt="Luxury background" class="w-full h-full object-cover"/>
+
+  <!-- Dark luxury overlay -->
+  <div class="absolute inset-0 bg-linear-to-b from-amber-300/20 via-black/70 to-black/90"></div>
+</div>
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-90 backdrop-blur-md border-b border-gray-800">
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-opacity-90 backdrop-blur-md border-b-3 border-amber-300">
         <div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
             <div class="flex items-center justify-between">
                 <!-- Logo -->
@@ -44,10 +45,10 @@
 
                 <!-- Navigation Links - Desktop -->
                 <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
-                    <a href="#" class="text-gray-300 hover:text-amber-300 transition-colors duration-300 text-sm lg:text-base">Home</a>
-                    <a href="#" class="text-gray-300 hover:text-amber-300 transition-colors duration-300 text-sm lg:text-base">Collections</a>
-                    <a href="#" class="text-gray-300 hover:text-amber-300 transition-colors duration-300 text-sm lg:text-base">About</a>
-                    <a href="#" class="text-gray-300 hover:text-amber-300 transition-colors duration-300 text-sm lg:text-base">Contact</a>
+                    <a href="#" class="text-white hover:text-amber-300 transition-colors duration-300 lg:text-lg font-playfair font-semibold">Home</a>
+                    <a href="{{ route('products.index') }}" class="text-white hover:text-amber-300 transition-colors duration-300 lg:text-lg  font-playfair font-semibold">Collections</a>
+                    <a href="#features" class="text-white hover:text-amber-300 transition-colors duration-300 lg:text-lg  font-playfair font-semibold">About</a>
+                    <a href="#" class="text-white hover:text-amber-300 transition-colors duration-300  lg:text-lg font-playfair font-semibold">Contact</a>
                 </div>
 
                 <!-- Icons -->
@@ -68,6 +69,20 @@
                         </svg>
                         <span class="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-amber-300 text-black text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center font-semibold">3</span>
                     </button>
+
+                    <!---->
+                    <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
+                        @auth
+                            <a href="{{ url('/dashboard') }}" class="text-amber-300">My Account</a>
+                        @else
+                            <button onclick="openAuthModal('login')" class="text-white hover:text-amber-300 transition-colors">
+                                Login
+                            </button>
+                            <button onclick="openAuthModal('register')" class="px-4 py-2 bg-amber-300 text-black rounded-lg hover:bg-opacity-90 transition-colors">
+                                Sign Up
+                            </button>
+                        @endauth
+                    </div>
                     
                     <!-- Mobile Menu Button -->
                     <button class="md:hidden text-gray-300 hover:text-amber-300 transition-colors duration-300" onclick="toggleMobileMenu()">
@@ -104,70 +119,90 @@
 
     <!-- Hero Section -->
     <section class="relative min-h-screen pt-20 overflow-hidden">
-        <div class="container mx-auto px-4 sm:px-6 py-8 sm:py-16">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-                
-                <!-- Left Content -->
-                <div class="space-y-6 sm:space-y-8 z-10 order-2 lg:order-1">
-                    <!-- Logo Repeat -->
+        <div class="container mx-auto px-4 sm:px-6 py-8 ">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative">
+    <!-- LEFT — LUXURY PRODUCT CAROUSEL -->
+                <div class="order-1 relative">
+                    <div class="swiper heroSwiper">
+                        <div class="swiper-wrapper">
+                            @foreach($featuredProducts as $product)
+                            <div class="swiper-slide flex justify-center">
+                                <div class="relative group">
+
+                                    <!-- Glow Background -->
+                                    <div class="absolute inset-0 bg-linear-to-tr from-amber-300/20 via-transparent to-transparent blur-2xl opacity-60 group-hover:opacity-100 transition"></div>
+
+                                    <!-- Product Image -->
+                                    <img src="{{ asset('storage/' . $product->image) }}" class="relative z-10 w-[320px] lg:w-105 object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.6)] transition duration-700 group-hover:scale-105">
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+
+                        <!-- Arrows -->
+                        <div class="swiper-button-next text-amber-300!"></div>
+                        <div class="swiper-button-prev text-amber-300!"></div>
+
+                        <!-- Dots -->
+                        <div class="swiper-pagination"></div>
+
+                    </div>
+
+                    <!-- Luxury Floating Glow -->
+                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-amber-300/10 rounded-full blur-3xl"></div>
+                    <div class="absolute -bottom-10 -left-10 w-52 h-52 bg-amber-300/10 rounded-full blur-3xl"></div>
+
+                </div>
+
+
+    <!-- RIGHT — TEXT CONTENT -->
+                    <div class="space-y-8 order-2">
+
+        <!-- Logo -->
                     <div class="flex items-center space-x-2">
                         <div class="flex space-x-1">
-                            <div class="w-2 h-6 bg-amber-300 rounded-full transform -rotate-12"></div>
+                            <div class="w-2 h-6 bg-amber-300 rounded-full -rotate-12"></div>
                             <div class="w-2 h-6 bg-amber-300 rounded-full"></div>
-                            <div class="w-2 h-6 bg-amber-300 rounded-full transform rotate-12"></div>
+                            <div class="w-2 h-6 bg-amber-300 rounded-full rotate-12"></div>
                         </div>
                         <span class="text-xl font-playfair font-semibold text-gold">Lumina</span>
                     </div>
 
-                    <!-- Main Heading -->
+        <!-- Heading -->
                     <div>
-                        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-playfair font-bold leading-tight">
+                        <h1 class="text-5xl md:text-6xl lg:text-7xl font-playfair font-bold leading-tight">
                             Your dream<br>
                             <span class="text-gold">Jewellery</span>
                         </h1>
-                        <p class="mt-4 sm:mt-6 text-gray-400 text-base sm:text-lg max-w-md">
+
+                        <p class="mt-6 text-white text-lg max-w-md">
                             Discover the finest collection of handcrafted jewelry that tells your unique story with elegance and sophistication.
                         </p>
                     </div>
 
-                    <!-- CTA Buttons -->
-                    <div class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
-                        <button class="w-full sm:w-auto px-6 sm:px-8 py-3 bg-amber-300 text-black font-semibold rounded-lg hover:bg-opacity-90 transition-all duration-300 transform hover:scale-105">
+        <!-- Buttons -->
+                    <div class="flex flex-wrap gap-4">
+                        <a href="{{ route('products.index') }}"
+                        class="px-10 py-4 bg-amber-300 text-black font-bold rounded-full hover:scale-105 transition duration-300 shadow-lg shadow-amber-300/20">
                             Explore Now
-                        </button>
-                        <button class="w-full sm:w-auto px-6 sm:px-8 py-3 border-2 border-amber-300 text-amber-300 font-semibold rounded-lg hover:bg-amber-300 hover:text-black transition-all duration-300">
-                            Collections
-                        </button>
+                        </a>
+
+                        <a href="{{ route('products.index', ['category' => 'necklaces']) }}"
+                        class="px-10 py-4 border border-amber-300/40 text-white rounded-full hover:bg-amber-300/10 transition">
+                            View Collections
+                        </a>
                     </div>
+
                 </div>
 
-                <!-- Right Content - Snake Image -->
-                <div class="relative order-1 lg:order-2">
-
-  <!-- Glow background -->
-  <div class="absolute inset-0 bg-linear-to-t from-amber-300/30 via-transparent to-transparent"></div>
-
-  <!-- Image wrapper -->
-  <div class="relative flex justify-center items-center py-12 lg:py-0">
-    <img
-      src="IMAGES/IMG_0843-removebg-preview.png"
-      alt="Luxury Jewelry"
-      class="w-64 sm:w-80 md:w-96 lg:w-112.5 xl:w-150 rotate-12 drop-shadow-2xl transition-transform duration-300 hover:scale-105"
-    />
-  </div>
-
-  <!-- Floating glow elements -->
-  <div class="absolute -top-8 -right-8 w-32 h-32 bg-amber-300/10 rounded-full blur-3xl"></div>
-  <div class="absolute -bottom-8 -left-8 w-40 h-40 bg-amber-300/10 rounded-full blur-3xl"></div>
-
-</div>
+            </div>
             </div>
 
             <!-- Featured Products Section -->
             <div class="mt-16 sm:mt-20 lg:mt-24 space-y-6 sm:space-y-8">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <h2 class="text-2xl sm:text-3xl font-playfair font-bold">Featured Collections</h2>
-                    <a href="#" class="text-amber-300 hover:underline flex items-center gap-2 text-sm sm:text-base">
+                    <a href="{{ route('products.index') }}" class="text-amber-300 hover:underline flex items-center gap-2 text-sm sm:text-base">
                         View All
                         <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -181,7 +216,7 @@
                     <!-- Product Card 1 -->
                     <div class="bg-gray-900 rounded-2xl overflow-hidden hover-lift cursor-pointer group">
                         <div class="relative h-48 sm:h-56 md:h-64 bg-linear-to-br from-gray-800 to-gray-900 flex items-center justify-center p-6 sm:p-8">
-                            <div class="absolute inset-0 bg-amber-300 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                            <div class="absolute inset-0 bg-amber-300 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
                             <!-- Product Image -->
                             <img class="w-full h-full object-cover" src="{{ asset('IMAGES/ring_1.jpeg') }}" alt="Classic Gold Ring">
                         </div>
@@ -200,7 +235,7 @@
                     <!-- Product Card 2 -->
                     <div class="bg-gray-900 rounded-2xl overflow-hidden hover-lift cursor-pointer group">
                         <div class="relative h-48 sm:h-56 md:h-64 bg-linear-to-br from-gray-800 to-gray-900 flex items-center justify-center p-6 sm:p-8">
-                            <div class="absolute inset-0 bg-amber-300 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                            <div class="absolute inset-0 bg-amber-300 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
                             <!-- Product Image -->
                             <svg class="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 text-gold" fill="currentColor" viewBox="0 0 100 100">
                                 <line x1="50" y1="10" x2="50" y2="40" stroke="currentColor" stroke-width="2" fill="none"/>
@@ -223,7 +258,7 @@
                     <!-- Product Card 3 -->
                     <div class="bg-gray-900 rounded-2xl overflow-hidden hover-lift cursor-pointer group">
                         <div class="relative h-48 sm:h-56 md:h-64 bg-linear-to-br from-gray-800 to-gray-900 flex items-center justify-center p-6 sm:p-8">
-                            <div class="absolute inset-0 bg-amber-300 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                            <div class="absolute inset-0 bg-amber-300 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
                             <!-- Diamond Ring Icon -->
                             <svg class="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 text-gold" fill="currentColor" viewBox="0 0 100 100">
                                 <circle cx="50" cy="55" r="25" fill="none" stroke="currentColor" stroke-width="3"/>
@@ -246,7 +281,7 @@
                     <!-- Product Card 4 -->
                     <div class="bg-gray-900 rounded-2xl overflow-hidden hover-lift cursor-pointer group">
                         <div class="relative h-48 sm:h-56 md:h-64 bg-linear-to-br from-gray-800 to-gray-900 flex items-center justify-center p-6 sm:p-8">
-                            <div class="absolute inset-0 bg-amber-300 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                            <div class="absolute inset-0 bg-amber-300 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
                             <!-- Emerald Ring Icon -->
                             <svg class="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 text-gold" fill="currentColor" viewBox="0 0 100 100">
                                 <circle cx="50" cy="55" r="25" fill="none" stroke="currentColor" stroke-width="3"/>
@@ -277,12 +312,12 @@
     </section>
 
     <!-- Features Section -->
-    <section class="py-12 sm:py-16 lg:py-20 border-t border-gray-800">
+    <section id="features" class="py-12 sm:py-16 lg:py-20 border-t border-gray-800">
         <div class="container mx-auto px-4 sm:px-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 lg:gap-12">
                 <div class="text-center space-y-3 sm:space-y-4">
                     <div class="w-14 h-14 sm:w-16 sm:h-16 mx-auto bg-amber-300 bg-opacity-10 rounded-full flex items-center justify-center">
-                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>
                         </svg>
                     </div>
@@ -291,7 +326,7 @@
                 </div>
                 <div class="text-center space-y-3 sm:space-y-4">
                     <div class="w-14 h-14 sm:w-16 sm:h-16 mx-auto bg-amber-300 bg-opacity-10 rounded-full flex items-center justify-center">
-                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                         </svg>
                     </div>
@@ -312,7 +347,7 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 border-t border-gray-800 py-8 sm:py-12">
+    <footer id="contact" class="bg-gray-900 border-t border-gray-800 py-8 sm:py-12">
         <div class="container mx-auto px-4 sm:px-6">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div>
@@ -328,7 +363,7 @@
                 </div>
                 <div>
                     <h4 class="font-semibold mb-3 sm:mb-4 text-base sm:text-lg">Quick Links</h4>
-                    <ul class="space-y-2 text-gray-400 text-sm">
+                    <ul class="space-y-2 text-gray-400 text-sm item">
                         <li><a href="#" class="hover:text-amber-300 transition-colors">About Us</a></li>
                         <li><a href="#" class="hover:text-amber-300 transition-colors">Collections</a></li>
                         <li><a href="#" class="hover:text-amber-300 transition-colors">Custom Design</a></li>
@@ -360,13 +395,218 @@
             </div>
         </div>
     </footer>
+    <footer id="contact" class="bg-[#faf7ef] border-t border-gray-200 py-10">
+  <div class="container mx-auto px-4 sm:px-6 text-center">
 
-    <script>
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            menu.classList.toggle('hidden');
-        }
-    </script>
+<footer id="contact" class="bg-amber-200 border-t border-gray-200 py-8 sm:py-10">
+  <div class="container mx-auto px-4 sm:px-6 text-center">
+    <div>
+         <div class="flex items-center space-x-2 mb-4">
+            <div class="flex space-x-1">
+                <div class="w-2 h-6 bg-amber-300 rounded-full transform -rotate-12"></div>
+                <div class="w-2 h-6 bg-amber-300 rounded-full"></div>
+                <div class="w-2 h-6 bg-amber-300 rounded-full transform rotate-12"></div>
+            </div>
+                <span class="text-lg sm:text-xl font-playfair font-semibold text-gold">Lumina</span>
+        </div>
+            <p class="text-gray-400 text-sm">Crafting dreams into reality, one jewel at a time.</p>
+    </div>
+
+    <!-- Title -->
+    <h4 class="text-base sm:text-lg font-medium text-gray-800 mb-4 sm:mb-5">
+      Quick links
+    </h4>
+
+    <!-- Links -->
+    <ul
+      class="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-y-2 gap-x-4 sm:gap-x-6 text-xs sm:text-sm text-gray-600">
+      <li><a href="#" class="hover:text-gray-900 transition-colors">About Us</a></li>
+      <li><a href="#" class="hover:text-gray-900 transition-colors">Collections</a></li>
+      <li><a href="#" class="hover:text-gray-900 transition-colors">Custom Design</a></li>
+      <li><a href="#" class="hover:text-gray-900 transition-colors">Contact</a></li>
+    </ul>
+
+    <h4 class="text-base sm:text-lg font-medium text-gray-800 mb-4 sm:mb-5">
+      Customer Care
+    </h4>
+
+    <!-- Links -->
+    <ul
+      class="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-y-2 gap-x-4 sm:gap-x-6 text-xs sm:text-sm text-gray-600">
+      <li><a href="#" class="hover:text-gray-900 transition-colors">Shipping Info</a></li>
+      <li><a href="#" class="hover:text-gray-900 transition-colors">Returns</a></li>
+      <li><a href="#" class="hover:text-gray-900 transition-colors">Warranty</a></li>
+      <li><a href="#" class="hover:text-gray-900 transition-colors">FAQ</a></li>
+    </ul>
+
+  </div>
+</footer>
+
+
+
+            <div id="authModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+                <!-- Backdrop -->
+            <div class="fixed inset-0 bg-black/75" onclick="closeAuthModal()"></div>
+                <!-- Modal wrapper -->
+                <div class="flex min-h-full items-center justify-center p-4">
+                    <div class="relative w-full max-w-md sm:max-w-lg lg:max-w-xl rounded-xl bg-gray-900 border border-gray-700 shadow-xl">
+
+                        <!-- Close button -->
+                        <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                            ✕
+                        </button>
+                        
+                        <!-- Tabs -->
+                    <div class="flex border-b border-gray-700">
+                        <button id="tabLogin" onclick="switchTab('login')" class="w-1/2 py-3 sm:py-4 text-sm sm:text-base font-semibold text-amber-300 border-b-2 border-amber-300">
+                            Login
+                        </button>
+                        <button id="tabRegister" onclick="switchTab('register')" class="w-1/2 py-3 sm:py-4 text-sm sm:text-base font-semibold text-gray-400 hover:text-white">
+                            Register
+                        </button>
+                    </div>
+                    
+        <!-- Content -->
+                <div class="p-6 sm:p-8 lg:p-10">
+
+        <!-- LOGIN -->
+                    <form id="loginForm" action="{{ route('login') }}" method="POST" class="space-y-4 sm:space-y-5 lg:space-y-6">
+                    @csrf
+                    <div>
+                        <label class="block text-sm text-gray-400">Email</label>
+                        <input type="email" name="email" required class="mt-1 w-full h-11 sm:h-12 lg:h-14 px-4 text-sm sm:text-base rounded-md bg-gray-800 border-gray-700 text-white focus:border-amber-300 focus:ring-amber-300">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400">Password</label>
+                        <input type="password" name="password" required class="mt-1 w-full h-11 sm:h-12 lg:h-14 px-4 text-sm sm:text-base rounded-md bg-gray-800 border-gray-700 text-white focus:border-amber-300 focus:ring-amber-300">
+                    </div>
+
+                    <button class="w-full h-11 sm:h-12 lg:h-14 bg-amber-300 text-black font-bold rounded-lg hover:bg-opacity-90 transition">
+                        Login
+                    </button>
+                    </form>
+
+                    <!-- REGISTER -->
+                    <form id="registerForm" action="{{ route('register') }}" method="POST" class="space-y-4 sm:space-y-5 lg:space-y-6 hidden">
+                    @csrf
+                    <div>
+                        <label class="block text-sm text-gray-400">Full Name</label>
+                        <input type="text" name="name" required class="mt-1 w-full h-11 sm:h-12 lg:h-14 px-4 text-sm sm:text-base rounded-md bg-gray-800 border-gray-700 text-white focus:border-amber-300 focus:ring-amber-300">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-400">Phone</label>
+                        <input type="text" name="phone" required class="mt-1 w-full h-11 sm:h-12 lg:h-14 px-4 text-sm sm:text-base rounded-md bg-gray-800 border-gray-700 text-white focus:border-amber-300 focus:ring-amber-300">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-400">Email</label>
+                        <input type="email" name="email" required class="mt-1 w-full h-11 sm:h-12 lg:h-14 px-4 text-sm sm:text-base rounded-md bg-gray-800 border-gray-700 text-white focus:border-amber-300 focus:ring-amber-300">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-400">Password</label>
+                        <input type="password" name="password" required class="mt-1 w-full h-11 sm:h-12 lg:h-14 px-4 text-sm sm:text-base rounded-md bg-gray-800 border-gray-700 text-white focus:border-amber-300 focus:ring-amber-300">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-400">Confirm Password</label>
+                        <input type="password" name="password_confirmation" required
+                        class="mt-1 w-full h-11 sm:h-12 lg:h-14 px-4 text-sm sm:text-base rounded-md bg-gray-800 border-gray-700 text-white focus:border-amber-300 focus:ring-amber-300">
+                    </div>
+
+                    <button class="w-full h-11 sm:h-12 lg:h-14 bg-amber-300 text-black font-bold rounded-lg hover:bg-opacity-90 transition">
+                        Create Account
+                    </button>
+                    </form>
+                </div>
+                </div>
+            </div>
+            </div>  
+
+            <script>
+                function openAuthModal(mode = 'login'){
+                    document.getElementById('authModal').classList.remove('hidden');
+                    switchTab(mode);
+                }
+
+                function closeAuthModal() {
+                    document.getElementById('authModal').classList.add('hidden');
+                }
+
+                function switchTab(tab) {
+                    const loginForm = document.getElementById('loginForm');
+                    const registerForm = document.getElementById('registerForm');
+                    const tabLogin = document.getElementById('tabLogin');
+                    const tabRegister = document.getElementById('tabRegister');
+
+                    if (tab === 'login') {
+                        loginForm.classList.remove('hidden');
+                        registerForm.classList.add('hidden');
+
+                        tabLogin.classList.add('text-amber-300', 'border-b-2', 'border-amber-300');
+                        tabLogin.classList.remove('text-gray-400');
+
+                        tabRegister.classList.remove('text-amber-300', 'border-b-2', 'border-amber-300');
+                        tabRegister.classList.add('text-gray-400');
+                    } else {
+                        loginForm.classList.add('hidden');
+                        registerForm.classList.remove('hidden');
+
+                        tabRegister.classList.add('text-amber-300', 'border-b-2', 'border-amber-300');
+                        tabRegister.classList.remove('text-gray-400');
+
+                        tabLogin.classList.remove('text-amber-300', 'border-b-2', 'border-amber-300');
+                        tabLogin.classList.add('text-gray-400');
+                    }
+
+                    @if($errors->any())
+                        document.addEventListener('DOMContentLoaded', function(){
+                            openAuthModal('login');
+                        });
+                    @endif
+                }
+
+                function toggleMobileMenu() {
+                    const menu = document.getElementById('mobileMenu');
+                    menu.classList.toggle('hidden');
+                }
+
+                document.addEventListener('DOMContentLoaded', function () {
+
+                new Swiper('.heroSwiper', {
+                    modules: [
+                        SwiperModules.Navigation,
+                        SwiperModules.Pagination,
+                        SwiperModules.Autoplay
+                    ],
+
+                loop: true,
+
+                autoplay: {
+                    delay: 4000,
+                    disableOnInteraction: false,
+                },
+
+                speed: 1200,
+
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+
+                grabCursor: true,
+                centeredSlides: true,
+                slidesPerView: 1,
+                });
+
+            });
+            </script>
 
 </body>
 </html>
