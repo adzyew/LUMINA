@@ -4,48 +4,28 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Models\Product; // <--- IMPORT THIS LINE
 
 class HomeController extends Controller
 {
+    public function home()
+    {
+    $featuredProducts = Product::where('is_featured', 1)
+        ->latest()
+        ->take(6)
+        ->get();
+
+    return view('welcome', compact('featuredProducts'));
+    }
     /**
      * Display the homepage with featured products
      */
     public function index(): View
     {
-        $featuredProducts = [
-            [
-                'id' => 1,
-                'name' => 'Classic Gold Ring',
-                'description' => 'Timeless elegance in 18K gold',
-                'price' => 2499,
-                'image' => 'ring',
-                'category' => 'rings'
-            ],
-            [
-                'id' => 2,
-                'name' => 'Ruby Pendant',
-                'description' => 'Exquisite ruby centerpiece',
-                'price' => 3899,
-                'image' => 'public\IMAGES\watch_1',
-                'category' => 'pendants'
-            ],
-            [
-                'id' => 3,
-                'name' => 'Diamond Ring',
-                'description' => 'Brilliant cut perfection',
-                'price' => 8999,
-                'image' => 'diamond-1.jpg',
-                'category' => 'rings'
-            ],
-            [
-                'id' => 4,
-                'name' => 'Emerald Luxury Ring',
-                'description' => 'Natural emerald statement piece',
-                'price' => 6799,
-                'image' => 'emerald-1.jpg',
-                'category' => 'rings'
-            ]
-        ];
+        // OLD: $featuredProducts = [ ... ];
+        
+        // NEW: Fetch 4 random products (or latest) from the database
+        $featuredProducts = Product::inRandomOrder()->take(4)->get();
 
         return view('welcome', compact('featuredProducts'));
     }
@@ -55,9 +35,8 @@ class HomeController extends Controller
      */
     public function collections(): View
     {
-        $products = [
-            // Add more products here
-        ];
+        // Fetch ALL products, or paginate them (12 per page)
+        $products = Product::paginate(12);
 
         return view('collections', compact('products'));
     }
@@ -67,35 +46,44 @@ class HomeController extends Controller
      */
     public function show($id): View
     {
-        // Fetch product from database
-        $product = [
-            'id' => $id,
-            'name' => 'Product Name',
-            'description' => 'Product Description',
-            'price' => 2999,
-            'images' => [],
-            'specifications' => []
-        ];
+        // Fetch the specific product by ID, or show 404 error if missing
+        $product = Product::findOrFail($id);
 
-        return view('product', compact('product'));
+        return view('products.show', compact('product')); 
+        // Note: Make sure your view file is named 'products/show.blade.php' 
+        // or update this to 'product' if your file is 'product.blade.php'
     }
 
     /**
      * Add product to cart
+     * (It is cleaner to keep this in CartController, but here is how to do it properly)
      */
     public function addToCart(Request $request)
     {
         $validated = $request->validate([
-            'product_id' => 'required|integer',
+            'product_id' => 'required|exists:products,id', // Check if ID exists in DB
             'quantity' => 'required|integer|min:1'
         ]);
 
-        // Add to cart logic here
-        // You might want to use session or database
+        $product = Product::find($validated['product_id']);
+        
+        // Save to Session
+        $cart = session()->get('cart', []);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Product added to cart successfully'
-        ]);
+        if(isset($cart[$product->id])) {
+            $cart[$product->id]['quantity'] += $validated['quantity'];
+        } else {
+            $cart[$product->id] = [
+                "name" => $product->name,
+                "quantity" => $validated['quantity'],
+                "price" => $product->price,
+                "image" => $product->image_path // Use the DB column name
+            ];
+        }
+
+        session()->put('cart', $cart);
+
+        // Redirect back so the user sees the page reload
+        return redirect()->back()->with('success', 'Product added to cart successfully!');
     }
 }

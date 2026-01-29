@@ -62,4 +62,9 @@ class Product extends Model
     {
         return $query->where('category', $category);
     }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }
