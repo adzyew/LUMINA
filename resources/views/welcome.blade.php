@@ -30,7 +30,7 @@
   <div class="absolute inset-0 bg-linear-to-b from-amber-300/20 via-black/70 to-black/90"></div>
 </div>
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-opacity-90 backdrop-blur-md border-b-3 border-amber-300">
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-opacity-90 backdrop-blur-md border-b border-amber-300">
         <div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
             <div class="flex items-center justify-between">
                 <!-- Logo -->
@@ -172,7 +172,7 @@
                     <div>
                         <h1 class="text-5xl md:text-6xl lg:text-7xl font-playfair font-bold leading-tight">
                             Your dream<br>
-                            <span class="text-gold">Jewellery</span>
+                            <span class="text-gold">Jewelry</span>
                         </h1>
 
                         <p class="mt-6 text-white text-lg max-w-md">
