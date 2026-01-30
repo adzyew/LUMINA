@@ -444,7 +444,10 @@
 
 
 
-            <div id="authModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+                <div id="authModal"
+                    class="fixed inset-0 z-50 hidden overflow-y-auto transition-opacity duration-300">
+
+
                 <!-- Backdrop -->
             <div class="fixed inset-0 bg-black/75" onclick="closeAuthModal()"></div>
                 <!-- Modal wrapper -->
@@ -525,14 +528,31 @@
             </div>  
 
             <script>
-                function openAuthModal(mode = 'login'){
-                    document.getElementById('authModal').classList.remove('hidden');
-                    switchTab(mode);
-                }
+                function openAuthModal(mode = 'login') {
+                const modal = document.getElementById('authModal');
+                const card = document.getElementById('authCard');
 
-                function closeAuthModal() {
-                    document.getElementById('authModal').classList.add('hidden');
-                }
+                modal.classList.remove('hidden');
+
+                setTimeout(() => {
+                    card.classList.remove('scale-95', 'opacity-0');
+                    card.classList.add('scale-100', 'opacity-100');
+                }, 10);
+
+                switchTab(mode);
+            }
+
+            function closeAuthModal() {
+                const modal = document.getElementById('authModal');
+                const card = document.getElementById('authCard');
+
+                card.classList.add('scale-95', 'opacity-0');
+
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+
 
                 function switchTab(tab) {
                     const loginForm = document.getElementById('loginForm');
