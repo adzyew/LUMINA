@@ -33,53 +33,10 @@
     </div>
 
     <!-- Navigation / Header -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-opacity-90 backdrop-blur-md border-b border-amber-300">
-        <div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
-            <!-- Logo -->
-            <div class="flex items-center space-x-2">
-                <div class="flex space-x-1">
-                    <div class="w-2 h-6 sm:w-3 sm:h-8 bg-amber-300 rounded-full transform -rotate-12"></div>
-                    <div class="w-2 h-6 sm:w-3 sm:h-8 bg-amber-300 rounded-full"></div>
-                    <div class="w-2 h-6 sm:w-3 sm:h-8 bg-amber-300 rounded-full transform rotate-12"></div>
-                </div>
-                <span class="font-playfair font-black text-2xl sm:text-3xl">Lumina</span>
-            </div>
-
-            <!-- Navigation Links -->
-            <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
-                <a href="{{ route('home') }}" class="text-white hover:text-amber-300 transition-colors duration-300 lg:text-lg font-playfair font-semibold">Home</a>
-                <a href="{{ route('products.index') }}" class="text-white hover:text-amber-300 transition-colors duration-300 lg:text-lg font-playfair font-semibold">Collections</a>
-                <a href="#features" class="text-white hover:text-amber-300 transition-colors duration-300 lg:text-lg font-playfair font-semibold">About</a>
-                <a href="#contact" class="text-white hover:text-amber-300 transition-colors duration-300 lg:text-lg font-playfair font-semibold">Contact</a>
-            </div>
-
-            <!-- Icons -->
-            <div class="flex items-center space-x-4 sm:space-x-6">
-                <!-- Search Icon -->
-                <button class="hidden sm:block text-gray-300 hover:text-amber-300 transition-colors duration-300">
-                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                </button>
-                <!-- Account Icon -->
-                <button class="hidden sm:block text-gray-300 hover:text-amber-300 transition-colors duration-300">
-                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
-                </button>
-                <!-- Cart Icon -->
-                <button class="text-gray-300 hover:text-amber-300 transition-colors duration-300 relative">
-                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                    <span class="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-amber-300 text-black text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center font-semibold">3</span>
-                </button>
-            </div>
-        </div>
-    </nav>
+    @include ('partials.navbar')
 
     <!-- Hero Section / Header Text -->
-    <section class="relative min-h-[300px] pt-20 flex items-center justify-center">
+    <section class="relative min-h-75 pt-20 flex items-center justify-center">
         <div class="container mx-auto px-4 text-center">
             <h1 class="text-5xl sm:text-6xl font-playfair font-bold leading-tight">
                 Explore <span class="text-gold">Our Collection</span>
@@ -111,12 +68,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-5 gap-5 items-stretch px-4 lg:px-8">
 
     <!-- WATCHES -->
-    <a href="{{ route('products.index', ['category' => 'watches']) }}" class="group h-full bg-white/5 p-5 rounded-2xl border border-white/10
-                transition-all duration-300
-                hover:-translate-y-1
-                hover:border-amber-300/40
-                hover:shadow-xl
-                hover:shadow-amber-500/20">
+    <a href="{{ route('products.index', ['category' => 'watches']) }}" class="group h-full bg-white/5 p-5 rounded-2xl border border-white/10 transition-all duration-300 hover:-translate-y-1 hover:border-amber-300/40 hover:shadow-xl hover:shadow-amber-500/20">
         <h3 class="text-lg font-playfair font-bold text-amber-300 mb-3">Watches</h3>
         <img src="{{ asset('IMAGES/Watches.jpg') }}"
              class="rounded-xl w-full h-36 object-cover mb-4" alt="Watches">

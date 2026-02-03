@@ -17,6 +17,8 @@
         "vite": "^7.0.7"
     },
     "dependencies": {
+        "cloudinary": "^2.9.0",
+        "dotenv": "^17.2.3",
         "swiper": "^12.1.0"
     }
 }
