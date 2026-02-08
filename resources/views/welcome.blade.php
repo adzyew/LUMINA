@@ -148,28 +148,28 @@
             <div class="swiper-slide flex items-center justify-center">
                 <div class="relative group w-full flex items-center justify-center py-6">
                     <div class="absolute inset-0 bg-amber-300/20 blur-3xl opacity-40 group-hover:opacity-80 transition duration-700"></div>
-                    <img src="{{ asset('IMAGES/Bracelet.jpg') }}" class="relative z-10 w-full max-h-[280px] sm:max-h-[320px] md:max-h-[360px] lg:max-h-[420px] object-contain drop-shadow-2xl hover:scale-105 transition duration-700 rounded-xl">
+                    <img src="{{ asset('IMAGES/Bracelet.jpg') }}" class="relative z-10 w-full max-h-70 sm:max-h-80 md:max-h-90 lg:max-h-105 object-contain drop-shadow-2xl hover:scale-105 transition duration-700 rounded-xl">
                 </div>
             </div>
 
             <div class="swiper-slide flex items-center justify-center">
                 <div class="relative group w-full flex items-center justify-center py-6">
                     <div class="absolute inset-0 bg-amber-300/20 blur-3xl opacity-40 group-hover:opacity-80 transition duration-700"></div>
-                    <img src="{{ asset('IMAGES/Necklace.jpg') }}" class="relative z-10 w-full max-h-[280px] sm:max-h-[320px] md:max-h-[360px] lg:max-h-[420px] object-contain drop-shadow-2xl hover:scale-105 transition duration-700 rounded-xl">
+                    <img src="{{ asset('IMAGES/Necklace.jpg') }}" class="relative z-10 w-full max-h-70 sm:max-h-80 md:max-h-90 lg:max-h-105 object-contain drop-shadow-2xl hover:scale-105 transition duration-700 rounded-xl">
                 </div>
             </div>
 
             <div class="swiper-slide flex items-center justify-center">
                 <div class="relative group w-full flex items-center justify-center py-6">
                     <div class="absolute inset-0 bg-amber-300/20 blur-3xl opacity-40 group-hover:opacity-80 transition duration-700"></div>
-                    <img src="{{ asset('IMAGES/Earrings.jpg') }}" class="relative z-10 w-full max-h-[280px] sm:max-h-[320px] md:max-h-[360px] lg:max-h-[420px] object-contain drop-shadow-2xl hover:scale-105 transition duration-700 rounded-xl">
+                    <img src="{{ asset('IMAGES/Earrings.jpg') }}" class="relative z-10 w-full max-h-70 sm:max-h-80 md:max-h-90 lg:max-h-105 object-contain drop-shadow-2xl hover:scale-105 transition duration-700 rounded-xl">
                 </div>
             </div>
 
             <div class="swiper-slide flex items-center justify-center">
                 <div class="relative group w-full flex items-center justify-center py-6">
                     <div class="absolute inset-0 bg-amber-300/20 blur-3xl opacity-40 group-hover:opacity-80 transition duration-700"></div>
-                    <img src="{{ asset('IMAGES/group-jewelry.jpg') }}" onerror="this.src='{{ asset('IMAGES/ring_1.jpeg') }}'" class="relative z-10 w-full max-h-[280px] sm:max-h-[320px] md:max-h-[360px] lg:max-h-[420px] object-contain drop-shadow-2xl hover:scale-105 transition duration-700 rounded-xl">
+                    <img src="{{ asset('IMAGES/group-jewelry.jpg') }}" onerror="this.src='{{ asset('IMAGES/ring_1.jpeg') }}'" class="relative z-10 w-full max-h-70 sm:max-h-80 md:max-h-90 lg:max-h-105 object-contain drop-shadow-2xl hover:scale-105 transition duration-700 rounded-xl">
                 </div>
             </div>
 

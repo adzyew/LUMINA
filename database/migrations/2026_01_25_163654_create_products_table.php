@@ -17,7 +17,8 @@ return new class extends Migration
             $table->text('description');
             $table->decimal('price', 10, 2);
             $table->string('category');
-            $table->string('image')->nullable();
+            $table->string('image_url');
+            $table->string('image_public_id');
             $table->integer('stock')->default(0);
             $table->boolean('featured')->default(false);
             $table->json('specifications')->nullable();
