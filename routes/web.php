@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     });
 
+
 // --- 3. PUBLIC ROUTES ---
 
 // Cart
@@ -45,7 +46,7 @@ Route::get('/add-to-cart/{id}', [CartController::class, 'addToCart'])->name('car
 Route::delete('/remove-from-cart', [CartController::class, 'remove'])->name('cart.remove');
 
 // Products Resource
-Route::resource('products', ProductController::class);
+
 
 // Homepage (Consolidated)
 Route::get('/', function () {
@@ -59,8 +60,9 @@ Route::get('/', function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/admin_dashboard', [AdminController::class, 'dashboard'])->name('admin.admin_dashboard');
     
-    // You can add more admin routes here later:
-    // Route::resource('products', ProductController::class);
+    Route::delete('/products/{product}', [App\Http\Controllers\ProductController::class, 'destroy'])->name('products.destroy');
+    Route::get('/products', [App\Http\Controllers\ProductController::class, 'index'])->name('products.index');
+    Route::resource('products', ProductController::class);
     // Route::get('/orders', [AdminController::class, 'orders']);
 });
 

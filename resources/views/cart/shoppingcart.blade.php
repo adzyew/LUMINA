@@ -38,7 +38,7 @@
                                         
                                         <td class="p-4 sm:p-6">
                                             <div class="flex items-center gap-4">
-                                                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gray-800 rounded-lg overflow-hidden flex-shrink-0 border border-white/5">
+                                                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gray-800 rounded-lg overflow-hidden shrink-0 border border-white/5">
                                                     <img src="{{ asset($details['image']) }}" class="w-full h-full object-cover">
                                                 </div>
                                                 <div>

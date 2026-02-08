@@ -1,3 +1,14 @@
+@if ($errors->any())
+    <div class="bg-red-500 text-white p-4 rounded mb-4">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -61,7 +72,10 @@
             <div>
                 <label class="block text-sm font-medium text-gray-400 mb-2">Product Image</label>
                 <div class="border-2 border-dashed border-white/10 rounded-lg p-8 text-center hover:border-amber-300/50 transition-colors bg-gray-900/50">
-                    <input type="file" name="image" required onchange="previewImage(event)" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-300 file:text-black hover:file:bg-amber-400 cursor-pointer">
+                <input type="file" name="image" required accept="image/*" onchange="previewImage(event)" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-300 file:text-black hover:file:bg-amber-400 cursor-pointer">                  
+                  @error('image')
+                    <div class="text-danger mt-1">{{ $message }}</div>
+                    @enderror
                     <img id="preview" class="mt-4 hidden w-40 rounded-lg"/>
                     <p class="text-xs text-gray-500 mt-2">Recommended: Square JPG or PNG, max 2MB.</p>
                     
@@ -81,10 +95,46 @@
 </body>
 
 <script>
-function previewImage(event) {
-    const img = document.getElementById('preview');
-    img.src = URL.createObjectURL(event.target.files[0]);
-    img.classList.remove('hidden');
-}
+    let previewUrl = null;
+
+    function previewImage(event) {
+        const input = event.target;
+        const img = document.getElementById('preview');
+
+        if (!input.files || !input.files[0]) {
+            img.classList.add('hidden');
+            return;
+        }
+
+        const file = input.files[0];
+
+        // Client-side validation
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+        const maxSize = 2 * 1024 * 1024; // 2MB
+
+        if (!allowedTypes.includes(file.type)) {
+            alert('Only JPG, PNG, or GIF images are allowed.');
+            input.value = '';
+            img.classList.add('hidden');
+            return;
+        }
+
+        if (file.size > maxSize) {
+            alert('Image must be smaller than 2MB.');
+            input.value = '';
+            img.classList.add('hidden');
+            return;
+        }
+
+        // Cleanup previous preview
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+        }
+
+        previewUrl = URL.createObjectURL(file);
+        img.src = previewUrl;
+        img.classList.remove('hidden');
+    }
 </script>
+
 </html>

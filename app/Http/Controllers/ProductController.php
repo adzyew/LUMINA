@@ -2,110 +2,125 @@
 
 namespace App\Http\Controllers;
 
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use App\Models\Product;
-use App\Models\Category; // Assuming you made this model
-
+use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::paginate(10);
-        $categories = []; 
-        return view('products.index', compact('products', 'categories'));
+        $products = Product::query();
+
+        if ($request->filled('category')) {
+            $products->where('category', $request->input('category'));
+        }
+
+        if ($request->filled('search')) {
+            $products->where('name', 'like', "%{$request->input('search')}%");
+        }
+
+        $products = $products->paginate(10);
+
+        return view('admin.products_management.products_index', compact('products'));
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name'     => 'required|string',
-            'price'    => 'required|numeric',
-            'category' => 'nullable|string',
-            'image'    => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-        // ✅ THIS IS THE CORRECT METHOD FOR v3
-        $uploadedFile = Cloudinary::uploadImage(
-            $request->file('image')->getRealPath(),
-            [
-                'folder'        => 'products',
-                'upload_preset' => config('cloudinary.upload_preset'),
-            ]
-        );
-
-        dd([
-            'secure_url' => $uploadedFile->getSecurePath(),
-            'public_id'  => $uploadedFile->getPublicId(),
-        ]);
-        dd(config('cloudinary.cloud_url'));
-
-        Product::create([
-            'name' => $validated['name'],
-            'description' => $request->description,
-            'price' => $validated['price'],
-            'category' => $validated['category'] ?? null,
-            'stock_quantity' => $request->stock_quantity ?? 0,
-            'is_featured' => $request->boolean('is_featured'),
-            'image_path' => $uploadedFile->getSecurePath(),
-        ]);
-
-        return redirect()
-            ->route('admin.admin_dashboard')
-            ->with('success', 'Product created successfully!');
-
-            
-    }
-
-    
     public function create()
     {
         return view('admin.products_management.create');
     }
 
-    public function edit(Product $product)
+    public function store(Request $request, CloudinaryService $cloudinary)
     {
-        return view('admin.products_management.edit', compact('product'));
-    }
-
-    public function update(Request $request, Product $product)
-    {
-        $validateRequest = $request->validate([
-            'name' => ['sometimes','required', 'max:255'],
-            'image' => ['sometimes','required', 'image', 'max:2048'],
-            'price' => ['sometimes','required', 'numeric'],
-            'description' => ['sometimes','required'],
+        $validated = $request->validate([
+            'name'           => 'required|string|max:255',
+            'price'          => 'required|numeric|min:0',
+            'category'       => 'nullable|string|max:255',
+            'description'    => 'nullable|string',
+            'stock_quantity' => 'required|integer|min:0',
+            'image'          => 'required|image|max:2048',
         ]);
 
-        if($request->hasFile('image')){
-            Cloudinary::destroy($product->image_public_id);
-            $cloudinaryImage = $request->file('image')->storeOnCloudinary('products');
-            $url = $cloudinaryImage->getSecurePath();
-            $public_id = $cloudinaryImage->getPublicId();
+        try {
+            $image = $cloudinary->uploadImage(
+                $request->file('image')->getRealPath()
+            );
+            
 
-            $product->update([
-                'image_url' => $url,
-                'image_public_id' => $public_id,
+
+            Product::create([
+                'name'           => $validated['name'],
+                'description'    => $validated['description'] ?? null,
+                'price'          => $validated['price'],
+                'category'       => $validated['category'] ?? null,
+                'stock_quantity' => $validated['stock_quantity'],
+                'is_featured'    => $request->boolean('is_featured'),
+                'image_url'      => $image['url'],
+                'image_public_id'=> $image['public_id'],
             ]);
 
+            return redirect()
+                ->route('products.index')
+                ->with('success', 'Product created successfully!');
+        } catch (\Throwable $e) {
+            return back()
+                ->withInput()
+                ->withErrors(['image' => 'Upload failed. Please try again.']);
+        }
+    }
+
+     public function update(
+        Request $request,
+        Product $product,
+        CloudinaryService $cloudinary
+    ) {
+        $validated = $request->validate([
+            'name'           => 'required|string|max:255',
+            'price'          => 'required|numeric|min:0',
+            'category'       => 'nullable|string|max:255',
+            'description'    => 'nullable|string',
+            'stock_quantity' => 'required|integer|min:0',
+            'image'          => 'nullable|image|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            // delete old image
+            $cloudinary->deleteImage($product->image_public_id);
+
+            // upload new
+            $image = $cloudinary->uploadImage(
+                $request->file('image')->getRealPath()
+            );
+
+            $product->image_url = $image['url'];
+            $product->image_public_id = $image['public_id'];
+            $product->save();
+
+            
         }
 
         $product->update([
-            'name' => $request->name,
-            'description' => $request->description,
-            'price' => $request->price
+            'name'           => $validated['name'],
+            'description'    => $validated['description'] ?? null,
+            'price'          => $validated['price'],
+            'category'       => $validated['category'] ?? null,
+            'stock_quantity' => $validated['stock_quantity'],
+            'is_featured'    => $request->boolean('is_featured'),
         ]);
 
-        return redirect()->route('products.index')->with('message', 'Updated successfully');
+        return redirect()
+            ->route('products.index')
+            ->with('success', 'Product updated successfully!');
     }
 
-    public function destroy(Product $product)
+    public function destroy(Product $product, CloudinaryService $cloudinary)
     {
-        Cloudinary::destroy($product->image_public_id);
+        $cloudinary->deleteImage($product->image_public_id);
+
         $product->delete();
 
-        return redirect()->route('products.index')->with('message', 'Deleted Successfully');
-
+        return redirect()
+            ->route('products.index')
+            ->with('success', 'Product deleted successfully!');
     }
 }
