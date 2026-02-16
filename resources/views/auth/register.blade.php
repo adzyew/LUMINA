@@ -4,10 +4,11 @@
     <title>Register | Lumina</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @include('partials.theme_init')
     @vite('resources/css/app.css')
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-black text-white font-sans antialiased flex flex-col min-h-screen">
+<body class="bg-gray-50 text-gray-900 dark:bg-black dark:text-white font-sans antialiased flex flex-col min-h-screen transition-colors">
 
     @include('partials.navbar')
 
@@ -112,7 +113,7 @@
                 <div class="mt-8 text-center">
                     <p class="text-gray-300 text-sm">
                         Already have an account? 
-                        <a href="{{ route('login.form') }}" class="text-amber-300 hover:text-white font-medium transition-colors">Log in here</a>
+                        <a href="{{ route('login') }}" class="text-amber-300 hover:text-white font-medium transition-colors">Log in here</a>
                     </p>
                 </div>
             </div>

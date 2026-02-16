@@ -1,74 +1,86 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\ReviewController;
 use App\Models\Feature;
 use App\Models\Product;
 
-// --- 1. GUEST ROUTES (Login/Register/OTP) ---
-Route::middleware('guest')->group(function () {
-    
-    // Login
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login.form');
-    Route::post('/login', [AuthController::class, 'loginPost'])->name('login.post');
 
-    // Register
-    Route::get('/register', [AuthController::class, 'showRegister'])->name('register.form');
-    Route::post('/register', [AuthController::class, 'registerPost'])->name('register.post');
-
-    // OTP Verification
-    Route::get('/verify-sms', function () { 
-        return view('auth.verify-sms'); 
-    })->name('verify-sms');
-    
-    Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])->name('verify.otp');
-    
-    // *** FIX IS HERE ***
-    Route::post('/resend-otp', [AuthController::class, 'resendOtp'])->name('otp.resend');
-    });
-
-// --- 2. AUTHENTICATED ROUTES (Dashboard/Logout) ---
-Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [AuthController::class, 'user_dashboard'])->name('dashboard');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    });
-
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 // --- 3. PUBLIC ROUTES ---
 
-// Cart
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::get('/add-to-cart/{id}', [CartController::class, 'addToCart'])->name('cart.add');
 Route::delete('/remove-from-cart', [CartController::class, 'remove'])->name('cart.remove');
 
-// Products Resource
-
-
-// Homepage (Consolidated)
-Route::get('/', function () {
-    $features = Feature::all(); 
-    $featuredProducts = Product::take(4)->get(); // Fetches 4 products for the grid
-    return view('welcome', compact('features', 'featuredProducts'));
-})->name('home');
-
-
-// --- 4. ADMIN ROUTES ---
-Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-    Route::get('/admin_dashboard', [AdminController::class, 'dashboard'])->name('admin.admin_dashboard');
-    
-    Route::delete('/products/{product}', [App\Http\Controllers\ProductController::class, 'destroy'])->name('products.destroy');
-    Route::get('/products', [App\Http\Controllers\ProductController::class, 'index'])->name('products.index');
-    Route::resource('products', ProductController::class);
-    // Route::get('/orders', [AdminController::class, 'orders']);
+Route::middleware('auth')->group(function () {
+    Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
+    Route::post('/place-order', [CartController::class, 'placeOrder'])->name('place.order');
 });
 
-Route::get('/cloudinary-test', function () {
-    return [
-        'cloudinary_url' => config('cloudinary.cloud_url'),
-        'env_cloudinary_url' => env('CLOUDINARY_URL'),
-    ];
+Route::get('/', [HomeController::class, 'index']);
+Route::get('/collection', [CollectionController::class, 'index'])->name('collection');
+
+Route::get('/products', [ProductsController::class, 'index'])
+    ->name('products.index');
+
+Route::get('/products/{product}', [ProductsController::class, 'show'])
+    ->name('products.show');
+
+// Wishlist routes
+Route::post('/wishlist/toggle/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+Route::middleware('auth')->group(function () {
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
 });
+
+// Review routes
+Route::middleware('auth')->group(function () {
+    Route::post('/products/{product}/review', [ReviewController::class, 'store'])->name('reviews.store');
+});
+
+// --- 1. GUEST ROUTES ---
+Route::middleware('guest')->group(function () {
+
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'loginPost'])->name('login.post');
+
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register.form');
+    Route::post('/register', [AuthController::class, 'registerPost'])->name('register.post');
+
+    Route::get('/verify-sms', fn () => view('auth.verify-sms'))->name('verify-sms');
+
+    Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])->name('verify.otp');
+    Route::post('/resend-otp', [AuthController::class, 'resendOtp'])->name('otp.resend');
+
+    // Forgot password with OTP
+    Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('password.email');
+    Route::get('/forgot-password/verify', [AuthController::class, 'showVerifyPasswordReset'])->name('password.verify');
+    Route::post('/forgot-password/verify', [AuthController::class, 'verifyPasswordResetOtp'])->name('password.verify-otp');
+    Route::post('/forgot-password/resend-otp', [AuthController::class, 'resendPasswordResetOtp'])->name('password.resend-otp');
+    Route::get('/reset-password', [AuthController::class, 'showResetPassword'])->name('password.reset');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
+});
+
+//  AUTHENTICATED USER ROUTES ---
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [AuthController::class, 'user_dashboard'])->name('dashboard');
+    Route::get('/dashboard/profile/edit', [AuthController::class, 'editProfile'])->name('profile.edit');
+    Route::put('/dashboard/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+});
+
+
+// Cloudinary test
+Route::get('/cloudinary-test', fn () => [
+    'cloudinary_url' => config('cloudinary.cloud_url'),
+    'env_cloudinary_url' => env('CLOUDINARY_URL'),
+]);

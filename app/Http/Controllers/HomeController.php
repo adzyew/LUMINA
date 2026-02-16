@@ -10,24 +10,24 @@ class HomeController extends Controller
 {
     public function home()
     {
-    $featuredProducts = Product::where('is_featured', 1)
-        ->latest()
-        ->take(6)
-        ->get();
-
-    return view('welcome', compact('featuredProducts'));
+        $featuredProducts = Product::where('is_featured', 1)->latest()->take(6)->get();
+        $heroSlides = Product::whereNotNull('image_url')->inRandomOrder()->take(6)->get();
+        return view('welcome', compact('featuredProducts', 'heroSlides'));
     }
     /**
      * Display the homepage with featured products
      */
     public function index(): View
     {
-        // OLD: $featuredProducts = [ ... ];
-        
-        // NEW: Fetch 4 random products (or latest) from the database
-        $featuredProducts = Product::inRandomOrder()->take(4)->get();
+        $featuredProducts = Product::where('is_featured', 1)->latest()->take(8)->get();
+        if ($featuredProducts->isEmpty()) {
+            $featuredProducts = Product::inRandomOrder()->take(8)->get();
+        }
+        $latestProducts = Product::latest()->take(8)->get();
+        $browseProducts = Product::inRandomOrder()->take(12)->get();
+        $heroSlides = Product::whereNotNull('image_url')->inRandomOrder()->take(6)->get();
 
-        return view('welcome', compact('featuredProducts'));
+        return view('welcome', compact('featuredProducts', 'latestProducts', 'browseProducts', 'heroSlides'));
     }
 
     /**
