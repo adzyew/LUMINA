@@ -18,13 +18,11 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next)
     {
-        /** @var \App\Models\User|null $user */
-            $user = Auth::user(); // <--- Changed from auth()->user()
+        if (!Auth::check() || !Auth::user()->is_admin) {
+            abort(403, 'Unauthorized');
+        }
 
-            if ($user && $user->is_admin) {
-                return $next($request);
-            }
-
-            return redirect('/')->with('error', 'You do not have admin access.');
+        return $next($request);
     }
 }
+

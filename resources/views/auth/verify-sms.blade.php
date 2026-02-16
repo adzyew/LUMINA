@@ -4,6 +4,7 @@
     <title>Verify Account | Lumina</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @include('partials.theme_init')
     @vite('resources/css/app.css')
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -39,7 +40,7 @@
 
     </style>
 </head>
-<body class=" text-white font-sans antialiased flex flex-col min-h-screen">
+<body class="bg-gray-50 text-gray-900 dark:bg-black dark:text-white font-sans antialiased flex flex-col min-h-screen transition-colors">
 
     @include('partials.navbar')
 
@@ -94,7 +95,7 @@
                         </form>
                     @endif
                 </p>
-                <a href="{{ route('login.form') }}" class="block mt-4 text-xs text-gray-600 hover:text-gray-400">Back to Login</a>
+                <a href="{{ route('login') }}" class="block mt-4 text-xs text-gray-600 hover:text-gray-400">Back to Login</a>
             </div>
         </div>
     </div>

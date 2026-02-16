@@ -4,10 +4,11 @@
     <title>Your Cart | Lumina</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @include('partials.theme_init')
     @vite('resources/css/app.css')
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-black text-white font-sans antialiased flex flex-col min-h-screen">
+<body class="bg-gray-50 text-gray-900 dark:bg-black dark:text-white font-sans antialiased flex flex-col min-h-screen transition-colors">
 
     @include('partials.navbar')
 
@@ -99,9 +100,15 @@
                             <span class="text-2xl font-playfair font-bold text-amber-300">${{ number_format($total, 2) }}</span>
                         </div>
 
-                        <button class="w-full py-4 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-300/20">
+                        @auth
+                        <a href="{{ route('checkout') }}" class="block w-full py-4 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-300/20 text-center">
                             Proceed to Checkout
-                        </button>
+                        </a>
+                        @else
+                        <a href="{{ route('login') }}" class="block w-full py-4 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-300/20 text-center">
+                            Login to Checkout
+                        </a>
+                        @endauth
                         
                         <a href="{{ route('products.index') }}" class="block text-center mt-4 text-sm text-gray-500 hover:text-white transition-colors">
                             Continue Shopping

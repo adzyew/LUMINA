@@ -4,10 +4,11 @@
     <title>Login | Lumina</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @include('partials.theme_init')
     @vite('resources/css/app.css')
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body class=" text-white font-sans antialiased flex flex-col min-h-screen">
+<body class="bg-gray-50 text-gray-900 dark:bg-black dark:text-white font-sans antialiased flex flex-col min-h-screen transition-colors">
     <div class="fixed inset-0 -z-50 overflow-hidden">
         <img src="{{ asset('IMAGES\BG.png') }}" alt="Luxury background" class="w-full h-full object-cover"/>
         <div class="absolute inset-0 bg-linear-to-b from-amber-300/20 via-black/70 to-black/90"></div>
@@ -30,9 +31,10 @@
                     <form method="POST" action="{{ route('login.post') }}" class="space-y-6">
                         @csrf
                         @session("error")
-                            <div class="bg-red-500/20 border border-red-500 text-red-300 px-4 py-3 rounded-lg mb-4">
-                                {{ $value }}
-                            </div>
+                            <div class="bg-red-500/20 border border-red-500 text-red-300 px-4 py-3 rounded-lg mb-4">{{ $value }}</div>
+                        @endsession
+                        @session("success")
+                            <div class="bg-green-500/20 border border-green-500 text-green-300 px-4 py-3 rounded-lg mb-4">{{ $value }}</div>
                         @endsession
                         <div>
                             <label class="block text-lg text-gray-100 mb-2">Email Address</label>
@@ -62,7 +64,7 @@
                                 @enderror
                                 
                             <div>
-                                <a href="#" class="text-xs text-amber-300 hover:text-white transition-colors">Forgot password?</a></div>
+                                <a href="{{ route('password.request') }}" class="text-xs text-amber-300 hover:text-white transition-colors">Forgot password?</a></div>
                             </div>
 
                             <div>

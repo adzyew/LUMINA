@@ -1,72 +1,139 @@
-<nav class="fixed top-0 left-0 right-0 z-50 bg-opacity-90 backdrop-blur-md border-b border-amber-300 ">
+<nav class="{{ ($welcomeLayout ?? false) ? 'w-full bg-white/95 backdrop-blur-md border-b border-gray-200 text-gray-900' : 'fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-black/95 backdrop-blur-md border-b border-gray-200 dark:border-amber-300 text-gray-900 dark:text-white' }} transition-colors">
         <div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
             <div class="flex items-center justify-between">
                 <!-- Logo -->
-                <div class="flex items-center space-x-2">
+            <a href="{{ url('/') }}" class="flex items-center space-x-2 group">
                     <div class="flex space-x-1">
                         <div class="w-2 h-6 sm:w-3 sm:h-8 bg-amber-300 rounded-full transform -rotate-12"></div>
                         <div class="w-2 h-6 sm:w-3 sm:h-8 bg-amber-300 rounded-full"></div>
                         <div class="w-2 h-6 sm:w-3 sm:h-8 bg-amber-300 rounded-full transform rotate-12"></div>
                     </div>
-                    <span class="font-serif font-black text-2xl sm:text-3xl">Lumina</span>
-                </div>
+                <span class="font-serif font-black text-2xl sm:text-3xl text-inherit">Lumina</span>
+            </a>
 
                 <!-- Navigation Links - Desktop -->
                 <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
-                    <a href="{{ url('/') }}" class="text-white hover:text-amber-300 transition-colors duration-300 lg:text-lg font-playfair font-semibold">Home</a>
-                    <a href="{{ route('products.index') }}" class="text-white hover:text-amber-300 transition-colors duration-300 lg:text-lg  font-playfair font-semibold">Collections</a>
-                    <a href="#features" class="text-white hover:text-amber-300 transition-colors duration-300 lg:text-lg  font-playfair font-semibold">About</a>
-                    <a href="#" class="text-white hover:text-amber-300 transition-colors duration-300  lg:text-lg font-playfair font-semibold">Contact</a>
+                <a href="{{ url('/') }}" class="text-inherit hover:text-amber-500 transition-colors duration-300 lg:text-lg font-playfair font-semibold">Home</a>
+                <a href="{{ route('products.index') }}" class="text-inherit hover:text-amber-500 transition-colors duration-300 lg:text-lg font-playfair font-semibold">Collections</a>
+                <a href="{{ url('/#features') }}" class="text-inherit hover:text-amber-500 transition-colors duration-300 lg:text-lg font-playfair font-semibold">About</a>
+                <a href="{{ url('/#contact') }}" class="text-inherit hover:text-amber-500 transition-colors duration-300 lg:text-lg font-playfair font-semibold">Contact</a>
                 </div>
 
-                <!-- Icons -->
-                <div class="flex items-center space-x-4 sm:space-x-6">
-                    <button class="hidden sm:block text-gray-300 hover:text-amber-300 transition-colors duration-300">
-                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
+            <!-- Icons & Actions - Desktop -->
+            <div class="flex items-center gap-2 sm:gap-4">
+                @include('partials.theme_toggle')
+                <button class="hidden sm:block p-2 rounded-lg text-gray-500 dark:text-gray-300 hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors" aria-label="Search">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </button>
+
+                {{-- User dropdown (auth) or Login/Sign Up (guest) --}}
+                @auth
+                    @if(auth()->user()->hasRole('admin') || (auth()->user()->is_admin ?? false) || auth()->user()->can('inventory.view') || auth()->user()->can('sales.view') || auth()->user()->can('deliveries.manage'))
+                        @php
+                            $adminLink = (auth()->user()->hasRole('admin') || (auth()->user()->is_admin ?? false)) ? route('admin.admin_dashboard') : route('admin.staff.dashboard');
+                        @endphp
+                        <a href="{{ $adminLink }}" class="hidden md:inline-flex px-4 py-2 text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors">
+                            {{ auth()->user()->hasRole('admin') || (auth()->user()->is_admin ?? false) ? 'Admin Panel' : 'Staff Panel' }}
+                        </a>
+                    @endif
+                    <div class="relative" id="userDropdownWrapper">
+                        <button type="button" onclick="toggleUserDropdown()" class="flex items-center gap-2 p-2 rounded-lg text-gray-500 dark:text-gray-300 hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors" aria-expanded="false" aria-haspopup="true" id="userMenuButton">
+                            <span class="hidden sm:inline text-sm font-medium text-inherit">{{ auth()->user()->name }}</span>
+                            @if(auth()->user()->profile_photo_url ?? null)
+                                <img src="{{ auth()->user()->profile_photo_url }}" alt="" class="w-8 h-8 rounded-full object-cover border border-amber-300/30">
+                            @else
+                                <div class="w-8 h-8 rounded-full bg-amber-300 flex items-center justify-center text-black font-bold text-sm">
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                </div>
+                            @endif
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
-                    <button class="hidden sm:block text-gray-300 hover:text-amber-300 transition-colors duration-300">
-                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-56 rounded-xl bg-white dark:bg-gray-900 shadow-xl border border-gray-200 dark:border-white/10 py-1 z-50 transition-opacity duration-150">
+                            <div class="px-4 py-3 border-b border-gray-100 dark:border-white/10">
+                                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ auth()->user()->name }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ auth()->user()->email }}</p>
+                            </div>
+                            <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                View Profile
+                            </a>
+                            <a href="{{ route('dashboard') }}#orders" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                                Orders
+                            </a>
+                            <a href="{{ route('dashboard') }}#settings" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                Settings
+                            </a>
+                            <div class="border-t border-gray-100 dark:border-white/10 my-1"></div>
+                            <form method="POST" action="{{ route('logout') }}" onsubmit="return confirm('Are you sure you want to logout?');">
+                                @csrf
+                                <button type="submit" class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                    Logout
                     </button>
-                    <a href="{{ route('cart.index') }}" class="relative text-gray-300 hover:text-amber-300 transition-colors group">
+                            </form>
+                        </div>
+                    </div>
+                @else
+                    <a href="{{ route('login') }}" class="hidden md:inline-flex px-4 py-2 text-sm font-semibold text-inherit hover:text-amber-500 transition-colors">Log In</a>
+                    <a href="{{ route('register.form') }}" class="hidden md:inline-flex px-4 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors text-sm">Sign Up</a>
+                @endauth
+
+                @auth
+                    <a href="{{ route('wishlist.index') }}" class="relative p-2 rounded-lg text-gray-500 dark:text-gray-300 hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors group">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                    </a>
+                @endauth
+                <a href="{{ route('cart.index') }}" class="relative p-2 rounded-lg text-gray-500 dark:text-gray-300 hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors group">
                         <svg class="w-5 h-5 sm:w-6 sm:h-6 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                         </svg>
-
                         @if(session('cart') && count(session('cart')) > 0)
-                            <span class="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-amber-300 text-black text-[10px] sm:text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center font-bold animate-pulse">
+                        <span class="absolute -top-0.5 -right-0.5 sm:top-0 sm:right-0 bg-amber-300 text-black text-[10px] sm:text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-bold">
                                 {{ count(session('cart')) }}
                             </span>
                         @endif
                     </a>
         
-        <div id="mobileMenu" class="hidden md:hidden mt-4 pt-4 border-t border-gray-800 bg-black/95 absolute left-0 right-0 px-6 pb-6 shadow-2xl">
-            <div class="flex flex-col space-y-4">
-                <a href="{{ url('/') }}" class="text-lg text-gray-300 hover:text-amber-300 transition-colors border-b border-gray-800 pb-2">Home</a>
-                <a href="{{ route('products.index') }}" class="text-lg text-gray-300 hover:text-amber-300 transition-colors border-b border-gray-800 pb-2">Collections</a>
-                <a href="{{ url('/#features') }}" class="text-lg text-gray-300 hover:text-amber-300 transition-colors border-b border-gray-800 pb-2">About</a>
-                <a href="{{ url('/#contact') }}" class="text-lg text-gray-300 hover:text-amber-300 transition-colors border-b border-gray-800 pb-2">Contact</a>
-                
-                <div class="flex flex-col gap-3 pt-2">
-                     @auth
-                            @if(Auth::user()->is_admin)
-                                <a href="{{ route('admin.admin_dashboard') }}" class="text-amber-300 hover:text-white font-medium transition-colors">
-                                    Admin Panel
-                                </a>
-                            @else
-                                <a href="{{ route('dashboard') }}" class="text-amber-300 hover:text-white font-medium transition-colors">
-                                    My Account
-                                </a>
-                            @endif
-                        @else
-                            <a href="{{ route('login.form') }}" class="text-amber-300 hover:text-white font-medium transition-colors">
-                                Log In
+                {{-- Mobile menu button --}}
+                <button type="button" onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg text-gray-500 dark:text-gray-300 hover:text-amber-500" aria-label="Menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        {{-- Mobile Menu --}}
+        <div id="mobileMenu" class="hidden md:hidden mt-4 pt-4 border-t border-gray-200 dark:border-white/10">
+            <div class="flex flex-col space-y-1">
+                <a href="{{ url('/') }}" class="px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">Home</a>
+                <a href="{{ route('products.index') }}" class="px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">Collections</a>
+                <a href="{{ url('/#features') }}" class="px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">About</a>
+                <a href="{{ url('/#contact') }}" class="px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">Contact</a>
+                <div class="pt-3 mt-3 border-t border-gray-200 dark:border-white/10 space-y-1">
+                 @auth   
+                        @if(auth()->user()->hasRole('admin') || (auth()->user()->is_admin ?? false) || auth()->user()->can('inventory.view') || auth()->user()->can('sales.view') || auth()->user()->can('deliveries.manage'))
+                            @php
+                                $adminLinkMobile = (auth()->user()->hasRole('admin') || (auth()->user()->is_admin ?? false)) ? route('admin.admin_dashboard') : route('admin.staff.dashboard');
+                                $adminLabel = auth()->user()->hasRole('admin') || (auth()->user()->is_admin ?? false) ? 'Admin Panel' : 'Staff Panel';
+                            @endphp
+                            <a href="{{ $adminLinkMobile }}" class="flex items-center gap-3 px-4 py-3 text-amber-500 hover:bg-amber-500/10 rounded-lg transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                                {{ $adminLabel }}
                             </a>
-                        <button onclick="openAuthModal('login'); toggleMobileMenu()" class="text-left text-gray-300 hover:text-amber-300 py-2">Login</button>
-                        <button onclick="openAuthModal('register'); toggleMobileMenu()" class="w-full py-3 bg-amber-300 text-black font-bold rounded-lg">Sign Up</button>
+                        @endif
+                        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">View Profile</a>
+                        <a href="{{ route('dashboard') }}#orders" class="flex items-center gap-3 px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">Orders</a>
+                        <a href="{{ route('dashboard') }}#settings" class="flex items-center gap-3 px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">Settings</a>
+                            <form method="POST" action="{{ route('logout') }}" onsubmit="return confirm('Are you sure you want to logout?');">
+                                @csrf
+                            <button type="submit" class="flex items-center gap-3 w-full px-4 py-3 text-left text-red-500 dark:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">Logout</button>
+                            </form>
+                    @else
+                        <a href="{{ route('login') }}" class="block px-4 py-3 text-amber-500 font-medium hover:bg-amber-500/10 rounded-lg transition-colors">Log In</a>
+                        <a href="{{ route('register.form') }}" class="block px-4 py-3 bg-amber-300 text-black font-bold rounded-lg text-center">Sign Up</a>
                     @endauth
                 </div>
             </div>
@@ -76,7 +143,15 @@
 
 <script>
     function toggleMobileMenu() {
-        const menu = document.getElementById('mobileMenu');
-        menu.classList.toggle('hidden');
-    }
+    document.getElementById('mobileMenu').classList.toggle('hidden');
+}
+function toggleUserDropdown() {
+    var d = document.getElementById('userDropdown');
+    if (d) d.classList.toggle('hidden');
+}
+document.addEventListener('click', function(e) {
+    var w = document.getElementById('userDropdownWrapper');
+    var d = document.getElementById('userDropdown');
+    if (w && d && !w.contains(e.target)) d.classList.add('hidden');
+});
 </script>
