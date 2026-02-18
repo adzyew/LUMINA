@@ -30,15 +30,20 @@ class AuthController extends Controller
     public function registerPost(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8|confirmed',
+            'terms' => 'accepted',
         ]);
+
+        // Combine first and last name
+        $fullName = trim($request->first_name . ' ' . $request->last_name);
 
         // 1️⃣ Create user (NOT logged in yet)
         $user = User::create([
-            'name' => $request->name,
+            'name' => $fullName,
             'phone' => $request->phone,
             'email' => $request->email,
             'password' => bcrypt($request->password),
