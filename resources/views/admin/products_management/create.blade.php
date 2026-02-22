@@ -92,7 +92,7 @@
 
 <script>
     const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 8 * 1024 * 1024; // 8MB
 
     function previewImages(event) {
         const input = event.target;

@@ -59,7 +59,7 @@
     {{-- Hero Section - Carousel background --}}
     <section class="relative pt-24 sm:pt-28 min-h-[85vh] lg:min-h-[90vh] overflow-hidden">
         <div class="absolute inset-0 -z-10 hero-carousel">
-            <div class="swiper heroBgSwiper w-full h-full">
+            <div class="swiper heroBgSwiper w-full h-full contrast-50">
                 <div class="swiper-wrapper">
                     <div class="swiper-slide">
                         <img src="{{ asset('IMAGES/BG.png') }}" alt="" />
@@ -100,19 +100,19 @@
     <section id="features" class="py-16 bg-white border-t border-gray-100 scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale">
-                    <div class="shrink-0 w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
-                        <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale hover:bg-gray-100 transition-colors duration-700 ease-in-out rounded-lg p-4 hover:shadow-md ">
+                    <div class="shrink-0 w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
                     </div>
                     <div>
-                        <h3 class="font-playfair font-bold text-gray-900 mb-1">Worldwide Shipping</h3>
+                        <h3 class="font-playfair font-bold text-gray-900 mb-1">Nationwide Shipping</h3>
                         <p class="text-gray-500 text-sm">Free shipping on all orders</p>
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale">
-                    <div class="shrink-0 w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
-                        <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale hover:bg-gray-100 transition-colors duration-700 ease-in-out rounded-lg p-4 hover:shadow-md pointer-events-auto ">
+                    <div class="shrink-0 w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
                     <div>
                         <h3 class="font-playfair font-bold text-gray-900 mb-1">Money Back Guarantee</h3>
@@ -120,9 +120,9 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale">
-                    <div class="shrink-0 w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
-                        <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale hover:bg-gray-100 transition-colors duration-700 ease-in-out rounded-lg p-4 hover:shadow-md ">
+                    <div class="shrink-0 w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
                     </div>
                     <div>
                         <h3 class="font-playfair font-bold text-gray-900 mb-1">Offers And Discounts</h3>
@@ -130,9 +130,9 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale">
-                    <div class="shrink-0 w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
-                        <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale hover:bg-gray-100 transition-colors duration-700 ease-in-out rounded-lg p-4 hover:shadow-md ">
+                    <div class="shrink-0 w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                     </div>
                     <div>
                         <h3 class="font-playfair font-bold text-gray-900 mb-1">24/7 Support Services</h3>
@@ -199,20 +199,7 @@
                 <p class="text-lg text-gray-600 leading-relaxed mb-8">
                     We believe that true luxury lies in the details. Each piece undergoes meticulous quality checks, ensuring you receive nothing but the finest. Experience the Lumina difference—where artistry meets excellence, and every jewel becomes a cherished memory.
                 </p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-                    <div class="text-center">
-                        <div class="text-4xl font-bold text-amber-600 mb-2">10+</div>
-                        <p class="text-gray-600">Years of Excellence</p>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-4xl font-bold text-amber-600 mb-2">50K+</div>
-                        <p class="text-gray-600">Happy Customers</p>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-4xl font-bold text-amber-600 mb-2">100%</div>
-                        <p class="text-gray-600">Handcrafted Quality</p>
-                    </div>
-                </div>
+               
             </div>
         </div>
     </section>

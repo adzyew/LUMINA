@@ -78,12 +78,12 @@ class AuthController extends Controller
 
     public function editProfile()
     {
-        return view('user.profile_edit', ['user' => auth()->user()]);
+        return view('user.profile_edit', ['user' => Auth::user()]);
     }
 
     public function updateProfile(Request $request, CloudinaryService $cloudinary)
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -168,61 +168,67 @@ class AuthController extends Controller
     }
 
     public function loginPost(Request $request)
-    {
-        // 1. Validate Input
-        $request->validate([
-            "email" => "required|email",
-            "password" => "required"
+{
+    // 1. Validate Input
+    $request->validate([
+        "email" => "required|email",
+        "password" => "required"
+    ]);
+
+    // 2. Find the User
+    $user = User::where('email', $request->email)->first();
+
+    // 3. SECURITY CHECK: Validate Password BEFORE checking verification
+    if (!$user || !Hash::check($request->password, $user->password)) {
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.'
         ]);
-
-        // 2. Find the User
-        $user = User::where('email', $request->email)->first();
-
-        // 3. SECURITY CHECK: Validate Password BEFORE checking verification
-        // If user doesn't exist OR password is wrong, stop here.
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return back()->withErrors([
-                'email' => 'The provided credentials do not match our records.'
-            ]);
-        }
-
-        // 4. CHECK VERIFICATION STATUS
-        // If the user is ALREADY verified, skip OTP and log them in directly.
-        if ($user->is_verified) {
-            Auth::login($user);
-            $request->session()->regenerate();
-
-            if ($user->is_admin || $user->hasRole('admin')) {
-                return redirect()->route('admin.admin_dashboard'); // Go to Admin Panel
-            }
-            if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('deliveries.manage')) {
-                return redirect()->route('admin.staff.dashboard'); // Staff dashboard (inventory/sales/delivery)
-            }
-
-            return redirect()->intended("dashboard")
-                ->with("success", "Logged in Successfully!");
-        }
-
-        // 5. IF NOT VERIFIED: Send OTP
-        // (This code only runs if $user->is_verified is false)
-        $otp = rand(100000, 999999);
-        $expiresAt = now()->addMinutes(5);
-
-        Cache::put('otp_' . $user->email, $otp, $expiresAt);
-        Cache::put('otp_expires_' . $user->email, $expiresAt, $expiresAt);
-
-        try {
-            Mail::to($user->email)->send(new TestMail($otp));
-        } catch (\Exception $e) {
-            // Ignore email errors to prevent crashing
-        }
-
-        // Save email to session so the verify page knows who it is
-        session(['email' => $user->email]);
-
-        return redirect()->route('verify-sms')
-            ->with('info', 'Your account is not verified. Please enter the code sent to your email.');
     }
+
+    // 4. CHECK VERIFICATION STATUS
+    // If the user is ALREADY verified, skip OTP and log them in directly.
+    if ($user->is_verified) {
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        // Mark session as verified for your custom middleware
+        session(['otp_verified' => true]); 
+
+        if ($user->is_admin || $user->hasRole('admin')) {
+            return redirect()->route('admin.admin_dashboard'); // Go to Admin Panel
+        }
+        if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('deliveries.manage')) {
+            return redirect()->route('admin.staff.dashboard'); // Staff dashboard
+        }
+
+        return redirect()->intended("dashboard")
+            ->with("success", "Logged in Successfully!");
+    }
+
+    // 5. IF NOT VERIFIED: Send OTP
+    
+    // --> FIX: Log the user in so they can access the auth-protected verify-sms route
+    Auth::login($user);
+    
+    // --> FIX: Tell your custom middleware they are NOT verified yet
+    session(['otp_verified' => false]); 
+    session(['email' => $user->email]);
+
+    $otp = rand(100000, 999999);
+    $expiresAt = now()->addMinutes(5);
+
+    Cache::put('otp_' . $user->email, $otp, $expiresAt);
+    Cache::put('otp_expires_' . $user->email, $expiresAt, $expiresAt);
+
+    try {
+        Mail::to($user->email)->send(new TestMail($otp));
+    } catch (\Exception $e) {
+        // Ignore email errors to prevent crashing
+    }
+
+    return redirect()->route('verify-sms')
+        ->with('info', 'Your account is not verified. Please enter the code sent to your email.');
+}
 
 
 
@@ -242,55 +248,57 @@ class AuthController extends Controller
     }
 
     public function verifyOtp(Request $request)
-    {
-        // 1. Validate Input
-        $request->validate([
-            'code' => 'required|array|size:6',
-        ]);
+{
+    // 1. Validate Input
+    $request->validate([
+        'code' => 'required|array|size:6',
+    ]);
 
-        // 2. Get Email from Session
-        $email = session('email'); 
-        if (!$email) {
-            return redirect()->route('login')->with('error', 'Session expired.');
-        }
-
-        // 3. Verify OTP Matches Cache
-        $enteredOtp = implode('', $request->code);
-        $cachedOtp = Cache::get('otp_' . $email);
-
-        if (!$cachedOtp || $enteredOtp != $cachedOtp) {
-            return back()->withErrors(['otp' => 'Invalid or expired verification code.']);
-        }
-
-        // 4. Find User
-        $user = User::where('email', $email)->first();
-
-        if ($user) {
-            // ✅ A. Mark User as Verified
-            $user->is_verified = true;
-            $user->email_verified_at = now();
-            $user->save();
-            
-            // ✅ B. Log the User In
-            Auth::login($user);
-            
-            // ✅ C. Clean Up (Remove OTP & Session Email)
-            Cache::forget('otp_' . $email);
-            Cache::forget('otp_expires_' . $email);
-            $request->session()->forget('email');
-
-            // ✅ D. Redirect to Dashboard
-            if (($user->is_admin ?? false) || $user->hasRole('admin')) {
-                return redirect()->route('admin.admin_dashboard')->with('success', 'Account verified!');
-            }
-            if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('deliveries.manage')) {
-                return redirect()->route('admin.staff.dashboard')->with('success', 'Account verified!');
-            }
-            return redirect()->route('dashboard')->with('success', 'Account verified!');
-        }
-
-        return back()->with('error', 'User not found.');
+    // 2. Get Email from Session
+    $email = session('otp_email'); // ✅ fixed key
+    if (!$email) {
+        return redirect()->route('login')->with('error', 'Session expired.');
     }
+
+    // 3. Verify OTP Matches Cache
+    $enteredOtp = implode('', $request->code);
+    $cachedOtp  = Cache::get('otp_' . $email);
+
+    if (!$cachedOtp || $enteredOtp != $cachedOtp) {
+        return back()->withErrors(['otp' => 'Invalid or expired verification code.']);
+    }
+
+    // 4. Find User
+    $user = User::where('email', $email)->first();
+
+    if ($user) {
+        // ✅ A. Mark User as Verified
+        $user->is_verified      = true;
+        $user->email_verified_at = now();
+        $user->save();
+
+        // ✅ B. Log the User In
+        Auth::login($user);
+
+        // ✅ C. Clean Up
+        Cache::forget('otp_' . $email);
+        Cache::forget('otp_expires_' . $email);
+        session(['otp_verified' => true]);
+        $request->session()->forget('otp_email'); // ✅ fixed key
+
+        // ✅ D. Redirect based on role
+        if (($user->is_admin ?? false) || $user->hasRole('admin')) {
+            return redirect()->route('admin.admin_dashboard')->with('success', 'Account verified!');
+        }
+        if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('deliveries.manage')) {
+            return redirect()->route('admin.staff.dashboard')->with('success', 'Account verified!');
+        }
+
+        return redirect()->route('dashboard')->with('success', 'Account verified!');
+    }
+
+    return back()->with('error', 'User not found.');
+}
     
 
 
