@@ -42,7 +42,6 @@
 </head>
 <body class="bg-gray-50 text-gray-900 dark:bg-black dark:text-white font-sans antialiased flex flex-col min-h-screen transition-colors">
 
-    @include('partials.navbar')
 
     <div class="grow flex items-center justify-center py-24 px-4 sm:px-6 relative">
         
@@ -65,7 +64,11 @@
                     <span class="text-white font-medium">{{ session('email') }}</span>
                 </p>
             </div>
-
+            @if (session('success'))
+                <div class="alert alert-success" style="color: green; margin-bottom: 15px;">
+                    {{ session('success') }}
+                </div>
+            @endif
             <form method="POST" action="{{ route('verify.otp') }}" id="otpForm">
                 @csrf
                 
@@ -100,7 +103,6 @@
         </div>
     </div>
 
-    @include('partials.footer')
 
    <script>
     document.addEventListener('DOMContentLoaded', () => {

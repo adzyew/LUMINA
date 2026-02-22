@@ -13,10 +13,10 @@
 
                 <!-- Navigation Links - Desktop -->
                 <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
-                <a href="{{ url('/') }}" class="text-inherit hover:text-amber-500 transition-colors duration-300 lg:text-lg font-playfair font-semibold">Home</a>
-                <a href="{{ route('products.index') }}" class="text-inherit hover:text-amber-500 transition-colors duration-300 lg:text-lg font-playfair font-semibold">Collections</a>
-                <a href="{{ url('/#features') }}" class="text-inherit hover:text-amber-500 transition-colors duration-300 lg:text-lg font-playfair font-semibold">About</a>
-                <a href="{{ url('/#contact') }}" class="text-inherit hover:text-amber-500 transition-colors duration-300 lg:text-lg font-playfair font-semibold">Contact</a>
+                <a href="{{ url('/') }}" class="text-inherit hover:text-amber-500 transition-colors duration-300 lg:text-lg font-sans font-semibold">Home</a>
+                <a href="{{ route('products.index') }}" class="text-inherit hover:text-amber-500 transition-colors duration-300 lg:text-lg font-sans font-semibold">Collections</a>
+                <a href="{{ url('/#features') }}" class="text-inherit hover:text-amber-500 transition-colors duration-300 lg:text-lg font-sans font-semibold">About</a>
+                <a href="{{ url('/#contact') }}" class="text-inherit hover:text-amber-500 transition-colors duration-300 lg:text-lg font-sans font-semibold">Contact</a>
                 </div>
 
             <!-- Icons & Actions - Desktop -->
@@ -79,8 +79,8 @@
                     </div>
                 @else
                     @if(!($authPage ?? false))
-                        <a href="{{ route('login') }}" class="hidden md:inline-flex px-4 py-2 text-sm font-semibold text-inherit hover:text-amber-500 transition-colors">Log In</a>
-                        <a href="{{ route('register.form') }}" class="hidden md:inline-flex px-4 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors text-sm">Sign Up</a>
+                        <a href="{{ route('login') }}" class="hidden md:inline-flex px-4 py-2 text-base font-semibold text-inherit hover:text-amber-500 transition-colors border border-white rounded-lg hover:bg-amber-400 ">Log In</a>
+                        <a href="{{ route('register.form') }}" class="hidden md:inline-flex px-4 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors text-base">Sign Up</a>
                     @endif
                 @endauth
 

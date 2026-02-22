@@ -17,12 +17,12 @@
     <div class="fixed inset-0 -z-50 overflow-hidden">
         <img src="{{ asset('IMAGES/BG.png') }}" alt="Luxury background" class="w-full h-full object-cover"/>
         <div class="absolute inset-0 bg-gray-900/20 dark:bg-black/40 backdrop-blur-sm transition-colors"></div>
-        <div class="absolute inset-0 bg-gradient-to-b from-amber-300/10 via-white/50 to-gray-100/80 dark:from-amber-300/20 dark:via-black/70 dark:to-black/90 transition-colors"></div>
+        <div class="absolute inset-0 bg-linear-to-b from-amber-300/10 via-white/50 to-gray-100/80 dark:from-amber-300/20 dark:via-black/70 dark:to-black/90 transition-colors"></div>
     </div>
 
     @include('partials.navbar')
 
-    <section class="relative min-h-[12rem] pt-20 flex items-center justify-center">
+    <section class="relative min-h-48 pt-20 flex items-center justify-center">
         <div class="container mx-auto px-4 text-center">
             <h1 class="text-4xl sm:text-5xl font-playfair font-bold leading-tight">
                 Explore <span class="text-gold">Our Collection</span>
@@ -61,7 +61,7 @@
             @foreach($filterCategories as $cat)
                 <a href="{{ route('products.index', array_merge(request()->only('search'), ['category' => $cat])) }}"
                     class="group bg-white/5 p-4 rounded-2xl border border-white/10 transition-all duration-300 hover:-translate-y-1 hover:border-amber-300/40 hover:shadow-lg hover:shadow-amber-500/10">
-                    <h3 class="text-sm font-playfair font-bold text-amber-300 mb-2 capitalize">{{ $cat }}</h3>
+                    <h3 class=" flex justify-center text-base font-sans font-bold text-amber-300 mb-2 capitalize">{{ $cat }}</h3>
                     @php
                         $img = match($cat) {
                             'watches' => 'Watches.jpg',
@@ -72,8 +72,8 @@
                             default => 'Ring.jpg',
                         };
                     @endphp
-                    <img src="{{ asset('IMAGES/' . $img) }}" alt="{{ $cat }}" class="rounded-xl w-full h-24 object-cover mb-2">
-                    <p class="text-xs text-gray-400">View collection</p>
+                    <img src="{{ asset('IMAGES/' . $img) }}" alt="{{ $cat }}" class="rounded-xl w-full h-45 object-cover mb-2">
+                    
                 </a>
                     @endforeach
             </div>

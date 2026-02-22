@@ -5,13 +5,16 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CollectionController;
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Socialite\ProviderController;
+use App\Http\Controllers\Socialite\ProviderCallbackController;
 use App\Models\Feature;
 use App\Models\Product;
 
+Route::get('/auth/{provider}', ProviderController::class)->name('auth.redirect');
+Route::get('/auth/{provider}/callback', ProviderCallbackController::class)->name('auth.callback');
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
@@ -55,11 +58,6 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register.form');
     Route::post('/register', [AuthController::class, 'registerPost'])->name('register.post');
 
-    Route::get('/verify-sms', fn () => view('auth.verify-sms'))->name('verify-sms');
-
-    Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])->name('verify.otp');
-    Route::post('/resend-otp', [AuthController::class, 'resendOtp'])->name('otp.resend');
-
     // Forgot password with OTP
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('password.email');
@@ -72,6 +70,10 @@ Route::middleware('guest')->group(function () {
 
 //  AUTHENTICATED USER ROUTES ---
 Route::middleware('auth')->group(function () {
+    Route::get('/verify-sms', fn () => view('auth.verify-sms'))->name('verify-sms');
+    Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])->name('verify.otp');
+    Route::post('/resend-otp', [AuthController::class, 'resendOtp'])->name('otp.resend');
+    
     Route::get('/dashboard', [AuthController::class, 'user_dashboard'])->name('dashboard');
     Route::get('/dashboard/profile/edit', [AuthController::class, 'editProfile'])->name('profile.edit');
     Route::put('/dashboard/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
