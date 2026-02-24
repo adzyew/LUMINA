@@ -79,6 +79,43 @@
                     class="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-amber-300 focus:ring-1 focus:ring-amber-300 transition-colors">
             </div>
 
+            <div class="mt-4">
+                <label class="block text-sm font-medium text-gray-400 mb-2">
+                    Default Shipping Address (Metro Manila Only)
+                </label>
+
+                <!-- Street -->
+                <input type="text" name="shipping_street"
+                    value="{{ old('shipping_street', $user->shipping_street) }}"
+                    placeholder="Street, building, house no."
+                    class="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white">
+
+                <!-- City (NCR only) -->
+                <select id="city" name="shipping_city" required
+                    class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white">
+                    <option value="">Loading cities...</option>
+                </select>
+
+                <!-- Barangay -->
+                <select id="barangay" name="shipping_barangay" required
+                    class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white">
+                    <option value="">Select Barangay</option>
+                </select>
+
+                <!-- ZIP -->
+                <input type="text" id="zip" name="shipping_postal_code" readonly class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white">
+
+                <!-- Hidden Fields -->
+                <input type="hidden" name="shipping_region" value="National Capital Region (NCR)">
+                <input type="hidden" name="shipping_province" value="Metro Manila">
+
+                <!-- Country -->
+                <input type="text" name="shipping_country"
+                    value="Philippines"
+                    readonly
+                    class="w-full mt-3 px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-gray-400">
+            </div>
+
             <div class="flex flex-col sm:flex-row gap-3 pt-4">
                 <button type="submit" class="px-6 py-3 bg-amber-300 text-black font-bold rounded-xl hover:bg-amber-400 transition-colors">
                     Save Changes
@@ -92,5 +129,87 @@
 
     @include('partials.footer')
 
+ <script>
+const citySelect = document.getElementById('city');
+const barangaySelect = document.getElementById('barangay');
+const zipInput = document.getElementById('zip');
+
+// ZIP Mapping for Metro Manila
+const zipCodes = {
+    "City of Manila": "1000",
+    "Quezon City": "1100",
+    "City of Caloocan": "1400",
+    "Makati City": "1200",
+    "Taguig City": "1630",
+    "Pasig City": "1600",
+    "Parañaque City": "1700",
+    "Las Piñas City": "1740",
+    "Mandaluyong City": "1550",
+    "Marikina City": "1800",
+    "Navotas City": "1485",
+    "Malabon City": "1470",
+    "Valenzuela City": "1440",
+    "San Juan City": "1500",
+    "Pateros": "1620"
+};
+
+// 🔹 Load Metro Manila Cities (NCR region code: 130000000)
+fetch('https://psgc.gitlab.io/api/regions/130000000/cities-municipalities/')
+    .then(response => response.json())
+    .then(data => {
+
+        citySelect.innerHTML = '<option value="">Select City</option>';
+
+        data.forEach(city => {
+            const option = document.createElement('option');
+
+            option.value = city.name;        // Save city NAME to DB
+            option.textContent = city.name;
+            option.dataset.code = city.code; // Store PSGC code for API use
+
+            citySelect.appendChild(option);
+        });
+    });
+
+// 🔹 When City Changes → Load Barangays
+citySelect.addEventListener('change', function () {
+
+    const selectedOption = this.selectedOptions[0];
+    if (!selectedOption) return;
+
+    const cityCode = selectedOption.dataset.code;  // ← Already included here
+    const cityName = selectedOption.value;
+
+    barangaySelect.innerHTML = '<option value="">Loading barangays...</option>';
+
+    // Auto fill ZIP
+    zipInput.value = zipCodes[cityName] ?? '';
+
+    if (!cityCode) {
+        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+        return;
+    }
+
+    fetch(`https://psgc.gitlab.io/api/cities-municipalities/${cityCode}/barangays/`)
+        .then(response => response.json())
+        .then(data => {
+
+            barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+
+            data.forEach(brgy => {
+                const option = document.createElement('option');
+                option.value = brgy.name;
+                option.textContent = brgy.name;
+                barangaySelect.appendChild(option);
+            });
+
+        })
+        .catch(error => {
+            console.error('Error loading barangays:', error);
+            barangaySelect.innerHTML = '<option value="">Failed to load</option>';
+        });
+
+});
+</script>
 </body>
 </html>

@@ -10,8 +10,8 @@
                 <h1 class="text-3xl font-playfair font-bold text-gray-900 dark:text-white">Add User</h1>
                 <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Create a new staff or customer account.</p>
             </div>
-            <a href="{{ route('admin.users.index') }}" class="text-sm text-gray-600 dark:text-gray-400 hover:text-amber-500 transition-colors">
-                &larr; Back to Users
+            <a href="{{ route('admin.roles.index') }}" class="text-sm text-gray-600 dark:text-gray-400 hover:text-amber-500 transition-colors">
+                &larr; Back to Roles & Permissions
             </a>
         </div>
     </header>

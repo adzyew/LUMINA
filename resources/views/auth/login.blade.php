@@ -57,14 +57,14 @@
                 <!-- Tabs -->
                 <div class="relative mb-8">
                     <div class="flex gap-8 border-b border-gray-200">
-                        <button type="button" onclick="showTab('login')" id="tab-login" class="pb-3 font-medium transition-colors text-amber-700">
+                        <button type="button" onclick="showTab('login')" id="tab-login" class="pb-3 font-medium transition-colors text-amber-400">
                             Sign In
                         </button>
                         <button type="button" onclick="showTab('register')" id="tab-register" class="pb-3 font-medium transition-colors text-gray-400 hover:text-gray-600">
                             Create Account
                         </button>
                     </div>
-                    <div id="tab-indicator" class="tab-indicator absolute bottom-0 left-0 h-0.5 bg-amber-700"></div>
+                    <div id="tab-indicator" class="tab-indicator absolute bottom-0 left-0 h-0.5 bg-amber-400"></div>
                 </div>
 
                 <!-- Slider container -->
@@ -95,7 +95,7 @@
                                             </svg>
                                         </span>
                                         <input type="email" name="email" value="{{ old('email') }}"
-                                            class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-600 text-gray-900 placeholder-gray-400 transition-all"
+                                            class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all"
                                             placeholder="Email address">
                                     </div>
                                     @error('email')
@@ -114,7 +114,7 @@
                                             </svg>
                                         </span>
                                         <input id="login-password" type="password" name="password"
-                                            class="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-600 text-gray-900 placeholder-gray-400 transition-all"
+                                            class="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-600 text-gray-900 placeholder-gray-400 transition-all"
                                             placeholder="Password">
                                         <button type="button" onclick="togglePasswordField('login-password', 'login-eye-open', 'login-eye-closed')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
                                             <svg id="login-eye-open" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,10 +139,10 @@
                                         <input type="checkbox" name="remember" class="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500">
                                         <span class="text-gray-600 text-sm">Remember me</span>
                                     </label>
-                                    <a href="{{ route('password.request') }}" class="text-amber-700 text-sm font-medium hover:text-amber-800 transition-colors">Forgot password?</a>
+                                    <a href="{{ route('password.request') }}" class="text-amber-400 text-sm font-medium hover:text-amber-800 transition-colors">Forgot password?</a>
                                 </div>
 
-                                <button type="submit" class="w-full py-4 bg-amber-700 text-white font-medium rounded-xl hover:bg-amber-800 transition-all flex items-center justify-center gap-2 group">
+                                <button type="submit" class="w-full py-4 bg-amber-400 text-white font-medium rounded-xl hover:bg-amber-800 transition-all flex items-center justify-center gap-2 group">
                                     Sign In
                                     <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
@@ -173,32 +173,8 @@
                                             </span>
                                         </a>
                                     @endif
-
-                                    @if (env('FACEBOOK_CLIENT_ID') && env('FACEBOOK_CLIENT_SECRET'))
-                                        <a class="bg-background text-foreground flex w-full items-center justify-center space-x-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors duration-200 hover:opacity-70" type="button" href="{{ route('auth.redirect', ['provider' => 'facebook'] + (request()->has('redirect') ? ['redirect' => request()->get('redirect')] : [])) }}">
-                                            <svg class="w-4.5 h-auto" xmlns="http://www.w3.org/2000/svg" viewBox="-204.79995 -341.33325 1774.9329 2047.9995">
-                                                <path d="M1365.333 682.667C1365.333 305.64 1059.693 0 682.667 0 305.64 0 0 305.64 0 682.667c0 340.738 249.641 623.16 576 674.373V880H402.667V682.667H576v-150.4c0-171.094 101.917-265.6 257.853-265.6 74.69 0 152.814 13.333 152.814 13.333v168h-86.083c-84.804 0-111.25 52.623-111.25 106.61v128.057h189.333L948.4 880H789.333v477.04c326.359-51.213 576-333.635 576-674.373" fill="#1877f2" />
-                                                <path d="M948.4 880l30.267-197.333H789.333V554.609C789.333 500.623 815.78 448 900.584 448h86.083V280s-78.124-13.333-152.814-13.333c-155.936 0-257.853 94.506-257.853 265.6v150.4H402.667V880H576v477.04a687.805 687.805 0 00106.667 8.293c36.288 0 71.91-2.84 106.666-8.293V880H948.4" fill="#fff" />
-                                            </svg>
-                                            <span>
-                                                {{ __('Continue with Facebook') }}
-                                            </span>
-                                        </a>
-                                    @endif
-
-                                    @if (env('GITHUB_CLIENT_ID') && env('GITHUB_CLIENT_SECRET'))
-                                        <a class="bg-background text-foreground flex w-full items-center justify-center space-x-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors duration-200 hover:opacity-70" type="button" href="{{ route('auth.redirect', ['provider' => 'github'] + (request()->has('redirect') ? ['redirect' => request()->get('redirect')] : [])) }}">
-                                            <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z" />
-                                            </svg>
-                                            <span>
-                                                {{ __('Continue with GitHub') }}
-                                            </span>
-                                        </a>
-                                    @endif
                                 </div>
 
-                                <div class="my-4 mb-3 flex items-center text-xs uppercase text-gray-400 before:me-6 before:flex-1 before:border-t before:border-gray-200 after:ms-6 after:flex-1 after:border-t after:border-gray-200 dark:text-neutral-500 dark:before:border-neutral-600 dark:after:border-neutral-600">{{ __('or') }}</div>
                             @endif
                         </div>
                         <!-- END LOGIN PANEL -->
@@ -219,7 +195,7 @@
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <input type="text" name="first_name" value="{{ old('first_name') }}"
-                                            class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-600 text-gray-900 placeholder-gray-400 transition-all"
+                                            class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all"
                                             placeholder="First Name">
                                         @error('first_name')
                                             @if(($activeTab ?? 'login') === 'register')
@@ -229,7 +205,7 @@
                                     </div>
                                     <div>
                                         <input type="text" name="last_name" value="{{ old('last_name') }}"
-                                            class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-600 text-gray-900 placeholder-gray-400 transition-all"
+                                            class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all"
                                             placeholder="Last Name">
                                         @error('last_name')
                                             @if(($activeTab ?? 'login') === 'register')
@@ -248,7 +224,7 @@
                                             </svg>
                                         </span>
                                         <input type="email" name="email" value="{{ old('email', session('email')) }}"
-                                            class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-600 text-gray-900 placeholder-gray-400 transition-all"
+                                            class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all"
                                             placeholder="Email address">
                                     </div>
                                     @error('email')
@@ -267,7 +243,7 @@
                                             </svg>
                                         </span>
                                         <input type="text" name="phone" value="{{ old('phone') }}"
-                                            class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-600 text-gray-900 placeholder-gray-400 transition-all"
+                                            class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all"
                                             placeholder="Mobile phone number"
                                             maxlength="11"
                                             oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length > 11) this.value = this.value.slice(0, 11);">
@@ -288,7 +264,7 @@
                                             </svg>
                                         </span>
                                         <input id="register-password" type="password" name="password"
-                                            class="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-600 text-gray-900 placeholder-gray-400 transition-all"
+                                            class="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all"
                                             placeholder="Create Password">
                                         <button type="button" onclick="togglePasswordField('register-password', 'register-eye-open', 'register-eye-closed')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
                                             <svg id="register-eye-open" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -316,7 +292,7 @@
                                             </svg>
                                         </span>
                                         <input id="register-password-confirm" type="password" name="password_confirmation"
-                                            class="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-600 focus:ring-1 focus:ring-amber-600 text-gray-900 placeholder-gray-400 transition-all"
+                                            class="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all"
                                             placeholder="Confirm Password">
                                         <button type="button" onclick="togglePasswordField('register-password-confirm', 'confirm-eye-open', 'confirm-eye-closed')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
                                             <svg id="confirm-eye-open" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -332,9 +308,9 @@
 
                                 <!-- Terms -->
                                 <div class="flex items-start gap-3">
-                                    <input type="checkbox" name="terms" id="terms" class="w-4 h-4 mt-0.5 rounded border-gray-300 text-amber-600 focus:ring-amber-500">
+                                    <input type="checkbox" name="terms" id="terms" class="w-4 h-4 mt-0.5 rounded border-gray-300 text-amber-400 focus:ring-amber-500">
                                     <label for="terms" class="text-gray-600 text-sm leading-tight">
-                                        I agree to the <a href="#" class="text-amber-700 hover:text-amber-800 underline">Terms of Service</a> and <a href="#" class="text-amber-700 hover:text-amber-800 underline">Privacy Policy</a>.
+                                        I agree to the <a href="#" class="text-amber-400 hover:text-amber-800 underline">Terms of Service</a> and <a href="#" class="text-amber-400 hover:text-amber-800 underline">Privacy Policy</a>.
                                     </label>
                                 </div>
                                 @error('terms')
@@ -343,7 +319,7 @@
                                     @endif
                                 @enderror
 
-                                <button type="submit" class="w-full py-4 bg-amber-700 text-white font-medium rounded-xl hover:bg-amber-800 transition-all flex items-center justify-center gap-2 group">
+                                <button type="submit" class="w-full py-4 bg-amber-400 text-white font-medium rounded-xl hover:bg-amber-800 transition-all flex items-center justify-center gap-2 group">
                                     Create Account
                                     <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
@@ -390,7 +366,7 @@
                 tabLogin.classList.remove('text-amber-700');
                 tabLogin.classList.add('text-gray-400');
                 tabRegister.classList.remove('text-gray-400');
-                tabRegister.classList.add('text-amber-700');
+                tabRegister.classList.add('text-amber-400');
                 indicator.style.transform = 'translateX(' + (tabLogin.offsetWidth + 32) + 'px)';
                 indicator.style.width = tabRegister.offsetWidth + 'px';
                 history.pushState({}, '', '{{ route('register.form') }}');
@@ -398,7 +374,7 @@
             } else {
                 track.classList.remove('show-register');
                 tabLogin.classList.remove('text-gray-400');
-                tabLogin.classList.add('text-amber-700');
+                tabLogin.classList.add('text-amber-400');
                 tabRegister.classList.remove('text-amber-700');
                 tabRegister.classList.add('text-gray-400');
                 indicator.style.transform = 'translateX(0)';

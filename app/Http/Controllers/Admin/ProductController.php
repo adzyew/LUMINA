@@ -44,51 +44,45 @@ class ProductController extends Controller
 
     public function store(Request $request, CloudinaryService $cloudinary)
     {
-        $validated = $request->validate([
+        $request->validate([
             'name'           => 'required|string|max:255',
             'price'          => 'required|numeric|min:0',
             'category'       => 'nullable|string|max:255',
             'description'    => 'nullable|string',
             'stock_quantity' => 'required|integer|min:0',
-            // 5MB per image
-            'images'         => 'required|array|min:1',
-            'images.*'       => 'required|image|max:5120',
+            'image'          => 'required|image|max:10240',
         ]);
 
+        $file = $request->file('image');
+
+        if (!$file || !$file->isValid()) {
+            return back()
+                ->withInput()
+                ->withErrors(['image' => 'Image upload failed. Please try again.']);
+        }
+
         try {
-            $uploaded = [];
-            foreach ($request->file('images', []) as $idx => $file) {
-                $uploaded[] = $cloudinary->uploadImage($file->getRealPath());
-            }
+            $uploaded = $cloudinary->uploadImage($file->getRealPath());
 
-            $main = $uploaded[0] ?? null;
-
-            $product = Product::create([
-                'name'           => $validated['name'],
-                'description'    => $validated['description'] ?? null,
-                'price'          => $validated['price'],
-                'category'       => $validated['category'] ?? null,
-                'stock_quantity' => $validated['stock_quantity'],
-                'is_featured'    => $request->boolean('is_featured'),
-                'image_url'      => $main['url'] ?? null,
-                'image_public_id'=> $main['public_id'] ?? null,
+            Product::create([
+                'name'            => $request->name,
+                'description'     => $request->description,
+                'price'           => $request->price,
+                'category'        => $request->category,
+                'stock_quantity'  => $request->stock_quantity,
+                'is_featured'     => $request->boolean('is_featured'),
+                'image_url'       => $uploaded['url'],
+                'image_public_id' => $uploaded['public_id'],
             ]);
-
-            foreach ($uploaded as $i => $img) {
-                $product->images()->create([
-                    'image_url' => $img['url'],
-                    'image_public_id' => $img['public_id'],
-                    'sort_order' => $i,
-                ]);
-            }
 
             return redirect()
                 ->route('admin.products.index')
                 ->with('success', 'Product created successfully!');
+
         } catch (\Throwable $e) {
             return back()
                 ->withInput()
-                ->withErrors(['images' => 'Upload failed. Please try again.']);
+                ->withErrors(['image' => 'Upload failed: ' . $e->getMessage()]);
         }
     }
 

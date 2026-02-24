@@ -22,61 +22,45 @@
 
     @include('partials.navbar')
 
-    <section class="relative min-h-48 pt-20 flex items-center justify-center">
-        <div class="container mx-auto px-4 text-center">
-            <h1 class="text-4xl sm:text-5xl font-playfair font-bold leading-tight">
-                Explore <span class="text-gold">Our Collection</span>
-            </h1>
-            <p class="mt-4 text-gray-700 dark:text-white">Discover the finest handcrafted jewelry.</p>
+    <section class="relative min-h-48 pt-20">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div class="sm:flex-1 text-left">
+                    <h1 class="text-4xl sm:text-5xl font-playfair font-bold mt-4">
+                        Explore <span class="text-gold">Our Collection</span>
+                    </h1>
+                    <p class="mt-4 text-gray-700 dark:text-white">Discover the finest handcrafted jewelry.</p>
+                </div>
+
+                <div class="mt-4 sm:mt-0 sm:ml-6 w-full sm:w-96">
+                    <form method="GET" action="{{ route('products.index') }}" class="flex items-center gap-2 w-full">
+                        <input type="hidden" name="category" value="{{ request('category') }}">
+                        <input type="text" name="search" placeholder="Search products..." value="{{ request('search') }}"
+                            class="w-full px-4 py-3 rounded-lg bg-gray-800/80 text-white placeholder-gray-400 border border-white/10 focus:outline-none focus:ring-2 focus:ring-amber-300 transition-all">
+                    </form>
+                </div>
+            </div>
         </div>
     </section>
 
     <main class="container mx-auto px-4 sm:px-6 pb-16">
-        {{-- Search --}}
-        <form method="GET" action="{{ route('products.index') }}" class="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto mb-8">
-            <input type="hidden" name="category" value="{{ request('category') }}">
-            <input type="text" name="search" placeholder="Search products..." value="{{ request('search') }}"
-                class="flex-1 px-5 py-3 rounded-2xl bg-gray-800/80 text-white placeholder-gray-400 border border-white/10 focus:outline-none focus:ring-2 focus:ring-amber-300 transition-all">
-            <button type="submit" class="px-6 py-3 bg-amber-300 text-black rounded-2xl font-bold hover:bg-amber-400 transition-colors">
-                Search
-            </button>
-        </form>
 
         {{-- Category Filter --}}
         <div class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-10">
             <a href="{{ route('products.index', request()->only('search')) }}"
-                class="px-4 py-2 rounded-xl text-sm font-semibold transition-all {{ !request('category') ? 'bg-amber-300 text-black' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10' }}">
+                class="px-4 py-2 rounded-lg text-sm font-semibold transition-all {{ !request('category') ? 'bg-amber-300 text-black' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10' }}">
                 All
             </a>
             @foreach($filterCategories as $cat)
                 <a href="{{ route('products.index', array_merge(request()->only('search'), ['category' => $cat])) }}"
-                    class="px-4 py-2 rounded-xl text-sm font-semibold capitalize transition-all {{ (request('category') ?? '') === $cat ? 'bg-amber-300 text-black' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10' }}">
+                    class="px-4 py-2 rounded-lg text-sm font-semibold capitalize transition-all {{ (request('category') ?? '') === $cat ? 'bg-amber-300 text-black' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10' }}">
                     {{ $cat }}
                 </a>
             @endforeach
-</div>
+        </div>
 
         {{-- Category Cards (visual filter) --}}
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-12">
-            @foreach($filterCategories as $cat)
-                <a href="{{ route('products.index', array_merge(request()->only('search'), ['category' => $cat])) }}"
-                    class="group bg-white/5 p-4 rounded-2xl border border-white/10 transition-all duration-300 hover:-translate-y-1 hover:border-amber-300/40 hover:shadow-lg hover:shadow-amber-500/10">
-                    <h3 class=" flex justify-center text-base font-sans font-bold text-amber-300 mb-2 capitalize">{{ $cat }}</h3>
-                    @php
-                        $img = match($cat) {
-                            'watches' => 'Watches.jpg',
-                            'rings' => 'Ring.jpg',
-                            'bracelets' => 'Bracelet.jpg',
-                            'necklaces' => 'Necklace.jpg',
-                            'earrings' => 'Earrings.jpg',
-                            default => 'Ring.jpg',
-                        };
-                    @endphp
-                    <img src="{{ asset('IMAGES/' . $img) }}" alt="{{ $cat }}" class="rounded-xl w-full h-45 object-cover mb-2">
-                    
-                </a>
-                    @endforeach
-            </div>
+        
 
         {{-- Products Grid --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

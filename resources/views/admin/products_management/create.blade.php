@@ -3,14 +3,14 @@
 @section('title', 'Add Product | Lumina Admin')
 
 @section('content')
-<div class="max-w-4xl w-full">
+<div class="max-w-4xl w-full align-middle mx-auto py-12">
     <header class="mb-8">
         <div class="flex justify-between items-center">
             <div>
                 <h1 class="text-3xl font-playfair font-bold text-black">Add New Product</h1>
                 <p class="text-gray-600 text-sm mt-1">Add items to your collection with images and details.</p>
             </div>
-            <a href="{{ route('admin.admin_dashboard') }}" class="text-sm text-gray-600 hover:text-black transition-colors">
+            <a href="{{ route('admin.admin_dashboard') }}" class="text-lg text-gray-600 hover:text-black transition-colors">
                 &larr; Back to Dashboard
             </a>
         </div>
@@ -26,7 +26,7 @@
     </div>
 @endif
 
-    <div class="bg-gray-900 border border-white/5 rounded-2xl p-6 sm:p-8">
+    <div class="bg-gray-900 border border-white/5 rounded-2xl p-4 sm:p-8 align-middle">
         <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
 
@@ -66,15 +66,12 @@
             <div>
                 <label class="block text-sm font-medium text-gray-400 mb-2">Product Images (Gallery)</label>
                 <div class="border-2 border-dashed border-white/10 rounded-lg p-8 text-center hover:border-amber-300/50 transition-colors bg-gray-800/50">
-                    <input type="file" name="images[]" multiple required accept="image/*" onchange="previewImages(event)" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-300 file:text-black hover:file:bg-amber-400 cursor-pointer">
-                    @error('images')
-                        <div class="text-red-400 mt-1 text-sm">{{ $message }}</div>
-                    @enderror
-                    @error('images.*')
+                    <input type="file" name="image" required accept="image/*" onchange="previewImages(event)" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-300 file:text-black hover:file:bg-amber-400 cursor-pointer">
+                    @error('image')
                         <div class="text-red-400 mt-1 text-sm">{{ $message }}</div>
                     @enderror
                     <div id="previews" class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 hidden"></div>
-                    <p class="text-xs text-gray-500 mt-2">You can upload multiple photos. Max 5MB per image.</p>
+                    <p class="text-xs text-gray-500 mt-2">Upload photo. Max 10MB per image.</p>
                 </div>
             </div>
 
@@ -92,12 +89,11 @@
 
 <script>
     const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
-    const maxSize = 8 * 1024 * 1024; // 8MB
+const maxSize = 10 * 1024 * 1024;
 
-    function previewImages(event) {
+function previewImages(event) {
         const input = event.target;
         const container = document.getElementById('previews');
-
         container.innerHTML = '';
 
         if (!input.files || input.files.length === 0) {
@@ -105,31 +101,29 @@
             return;
         }
 
-        for (const file of input.files) {
+        const file = input.files[0]; // single file only
+
         if (!allowedTypes.includes(file.type)) {
-                alert('Only JPG, PNG, GIF, or WEBP images are allowed.');
+            alert(`"${file.name}" is not allowed. Only JPG, PNG, GIF, or WEBP images are accepted.`);
             input.value = '';
-                container.classList.add('hidden');
+            container.classList.add('hidden');
             return;
         }
+
         if (file.size > maxSize) {
-                alert('Each image must be smaller than 5MB.');
+            alert(`"${file.name}" is too large. Max 10MB allowed.`);
             input.value = '';
-                container.classList.add('hidden');
+            container.classList.add('hidden');
             return;
         }
-        }
 
+        const url = URL.createObjectURL(file);
+        const img = document.createElement('img');
+        img.src = url;
+        img.className = 'w-full h-40 object-cover rounded-lg border border-white/10';
+        img.onload = () => URL.revokeObjectURL(url);
         container.classList.remove('hidden');
-
-        Array.from(input.files).forEach((file) => {
-            const url = URL.createObjectURL(file);
-            const img = document.createElement('img');
-            img.src = url;
-            img.className = 'w-full h-24 object-cover rounded-lg border border-white/10';
-            img.onload = () => URL.revokeObjectURL(url);
-            container.appendChild(img);
-        });
+        container.appendChild(img);
     }
 </script>
 @endsection

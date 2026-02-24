@@ -8,14 +8,7 @@
         <h1 class="text-3xl font-playfair font-bold text-gray-900 dark:text-white">Users</h1>
         <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Manage user accounts and roles.</p>
     </div>
-    <div class="flex gap-3">
-        <a href="{{ route('admin.users.create') }}" class="px-5 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors">
-            + Add Staff
-        </a>
-        <a href="{{ route('admin.roles.index') }}" class="px-5 py-2.5 bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10 transition-colors">
-            Roles & Permissions
-        </a>
-    </div>
+    
 </header>
 
 {{-- Filter tabs: All | Customers | Staff | Admin --}}
@@ -44,7 +37,7 @@
     </div>
 @endif
 
-<div class="bg-gray-900 rounded-2xl overflow-hidden border border-white/5">
+<div class="bg-gray-900 rounded-xl overflow-hidden border border-white/5">
     <table class="w-full text-left border-collapse">
         <thead>
             <tr class="bg-white/5 text-white border-b border-white/10 text-sm">

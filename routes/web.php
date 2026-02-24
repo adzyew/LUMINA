@@ -23,6 +23,7 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::get('/add-to-cart/{id}', [CartController::class, 'addToCart'])->name('cart.add');
 Route::delete('/remove-from-cart', [CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/update', [CartController::class, 'updateQuantity'])->name('cart.update');
 
 Route::middleware('auth')->group(function () {
     Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');

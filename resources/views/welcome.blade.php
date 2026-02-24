@@ -59,7 +59,7 @@
     {{-- Hero Section - Carousel background --}}
     <section class="relative pt-24 sm:pt-28 min-h-[85vh] lg:min-h-[90vh] overflow-hidden">
         <div class="absolute inset-0 -z-10 hero-carousel">
-            <div class="swiper heroBgSwiper w-full h-full contrast-50">
+            <div class="swiper heroBgSwiper w-full h-full ">
                 <div class="swiper-wrapper">
                     <div class="swiper-slide">
                         <img src="{{ asset('IMAGES/BG.png') }}" alt="" />
