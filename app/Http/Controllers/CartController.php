@@ -47,8 +47,71 @@ class CartController extends Controller
                 unset($cart[$request->id]);
                 session()->put('cart', $cart);
             }
+            if ($request->ajax() || $request->wantsJson()) {
+                $total = 0;
+                foreach ($cart as $item) {
+                    $total += $item['price'] * $item['quantity'];
+                }
+                return response()->json(['success' => true, 'message' => 'Removed!', 'total' => number_format($total,2)]);
+            }
             return redirect()->back()->with('success', 'Removed!');
         }
+    }
+
+    /**
+     * Update item quantity in the cart.
+     * Accepts `id` and `quantity` (int). If quantity <= 0 it removes the item.
+     */
+    public function updateQuantity(Request $request)
+    {
+        $request->validate([
+            'id' => 'required',
+            'quantity' => 'required|integer',
+        ]);
+
+        $cart = session()->get('cart', []);
+        $id = $request->id;
+        $quantity = (int) $request->quantity;
+
+        if (!isset($cart[$id])) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Item not found in cart.'], 404);
+            }
+            return redirect()->back()->with('error', 'Item not found in cart.');
+        }
+
+        if ($quantity <= 0) {
+            unset($cart[$id]);
+            session()->put('cart', $cart);
+            if ($request->ajax() || $request->wantsJson()) {
+                $total = 0;
+                foreach ($cart as $item) {
+                    $total += $item['price'] * $item['quantity'];
+                }
+                return response()->json(['success' => true, 'message' => 'Removed from cart.', 'removed' => true, 'total' => number_format($total,2)]);
+            }
+            return redirect()->back()->with('success', 'Removed from cart.');
+        }
+
+        $cart[$id]['quantity'] = $quantity;
+        session()->put('cart', $cart);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            $itemSubtotal = $cart[$id]['price'] * $cart[$id]['quantity'];
+            $total = 0;
+            foreach ($cart as $item) {
+                $total += $item['price'] * $item['quantity'];
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart updated.',
+                'quantity' => $cart[$id]['quantity'],
+                'item_subtotal' => number_format($itemSubtotal, 2),
+                'total' => number_format($total, 2),
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Cart updated.');
     }
 
     public function checkout()

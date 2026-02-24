@@ -40,14 +40,14 @@
 
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 dark:bg-black dark:text-white font-sans antialiased flex flex-col min-h-screen transition-colors">
+<body class="bg-gray-50 text-gray-400 dark:bg-black dark:text-white font-sans antialiased flex flex-col min-h-screen transition-colors">
 
 
     <div class="grow flex items-center justify-center py-24 px-4 sm:px-6 relative">
         
         <div class="fixed inset-0 -z-50 overflow-hidden">
             <img src="{{ asset('IMAGES/BG.png') }}" class="w-full h-full object-cover opacity-20" alt="">
-            <div class="absolute inset-0 bg-linear-to-b from-black/60 via-black/90 to-black"></div>
+            <div class="absolute inset-0 bg-linear-to-b from-black/30 via-black/50 to-black"></div>
         </div>
 
         <div class="w-full max-w-md bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-amber-300/20 p-8 sm:p-10 relative overflow-hidden">

@@ -7,35 +7,11 @@
     {{-- Top Bar --}}
     <div class="flex items-center justify-between mb-10 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl px-6 py-3 shadow-sm dark:shadow-none">
         {{-- Search --}}
-        <div class="flex items-center gap-3 bg-gray-100 dark:bg-white/5 rounded-xl px-4 py-2 w-72">
-            <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="8" stroke-width="2"/>
-                <path stroke-linecap="round" stroke-width="2" d="M21 21l-4.35-4.35"/>
-            </svg>
-            <input
-                type="text"
-                placeholder="Search..."
-                class="bg-transparent text-sm text-gray-600 dark:text-gray-300 placeholder-gray-400 outline-none w-full"
-            >
+        <div class="">
         </div>
-
         {{-- Right Side --}}
         <div class="flex items-center gap-5">
-            {{-- Notifications --}}
-            <button class="relative text-gray-500 dark:text-gray-400 hover:text-amber-500 dark:hover:text-amber-300 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                </svg>
-                <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-900"></span>
-            </button>
-
-            {{-- Messages --}}
-            <button class="text-gray-500 dark:text-gray-400 hover:text-amber-500 dark:hover:text-amber-300 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-            </button>
-
+           
             {{-- Divider --}}
             <div class="w-px h-6 bg-gray-200 dark:bg-white/10"></div>
 
@@ -78,16 +54,7 @@
                             Settings
                         </a>
                     </div>
-                    {{-- Logout --}}
-                    <div class="border-t border-gray-100 dark:border-white/10 py-1">
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                                Sign Out
-                            </button>
-                        </form>
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -124,6 +91,7 @@
                 chevron.classList.remove('rotate-180');
             }
         });
+        
     </script>
 
     {{-- Page Header --}}

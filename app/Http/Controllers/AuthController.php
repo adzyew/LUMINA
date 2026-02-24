@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\TestMail;
 use App\Services\CloudinaryService;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -67,6 +68,15 @@ class AuthController extends Controller
             'email' => $request->email,
         ]);
 
+        // 5️⃣ Log the user in so they can access the protected verify page
+        try {
+            Auth::login($user);
+            // mark session as not yet verified for middleware
+            session(['otp_verified' => false]);
+        } catch (\Throwable $e) {
+            // ignore login failures; user can still verify after logging in
+        }
+
         return redirect()->route('verify-sms');
     }
 
@@ -81,34 +91,35 @@ class AuthController extends Controller
         return view('user.profile_edit', ['user' => Auth::user()]);
     }
 
-    public function updateProfile(Request $request, CloudinaryService $cloudinary)
-    {
-        $user = Auth::user();
+    public function updateProfile(Request $request)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'phone' => 'required|string|max:20',
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'profile_photo' => 'nullable|image|max:2048',
-        ]);
+        'shipping_street' => 'nullable|string|max:255',
+        'shipping_city' => 'required|string|max:100',
+        'shipping_barangay' => 'required|string|max:100',
+        'shipping_postal_code' => 'required|string|max:20',
+    ]);
 
-        $data = [
-            'name' => $validated['name'],
-            'phone' => $validated['phone'],
-        ];
+    $user = auth()->user();
 
-        if ($request->hasFile('profile_photo')) {
-            if ($user->profile_photo_public_id) {
-                $cloudinary->deleteImage($user->profile_photo_public_id);
-            }
-            $upload = $cloudinary->uploadImage($request->file('profile_photo')->getRealPath(), 'profiles');
-            $data['profile_photo_url'] = $upload['url'];
-            $data['profile_photo_public_id'] = $upload['public_id'];
-        }
+    // ✅ BUILD FULL SHIPPING ADDRESS HERE
+    $validated['shipping_address'] = implode(', ', array_filter([
+        $validated['shipping_street'] ?? null,
+        $validated['shipping_barangay'],
+        $validated['shipping_city'],
+        'Metro Manila',
+        $validated['shipping_postal_code'],
+        'Philippines'
+    ]));
 
-        $user->update($data);
+    // ✅ SAVE EVERYTHING
+    $user->update($validated);
 
-        return redirect()->route('dashboard')->with('success', 'Profile updated successfully.');
-    }
+    return back()->with('success', 'Profile updated successfully.');
+}
 
     public function login(Request $request)
     {
@@ -255,7 +266,8 @@ class AuthController extends Controller
     ]);
 
     // 2. Get Email from Session
-    $email = session('otp_email'); // ✅ fixed key
+    // Use the same session key (`email`) that is set during register/login flows
+    $email = session('email');
     if (!$email) {
         return redirect()->route('login')->with('error', 'Session expired.');
     }
@@ -264,7 +276,15 @@ class AuthController extends Controller
     $enteredOtp = implode('', $request->code);
     $cachedOtp  = Cache::get('otp_' . $email);
 
+    // Log values to help debug verification issues
+    Log::info('verifyOtp attempt', [
+        'session_email' => $email,
+        'entered_otp' => $enteredOtp,
+        'cached_otp' => $cachedOtp,
+    ]);
+
     if (!$cachedOtp || $enteredOtp != $cachedOtp) {
+        Log::warning('verifyOtp failed: invalid or expired code', ['email' => $email]);
         return back()->withErrors(['otp' => 'Invalid or expired verification code.']);
     }
 
@@ -284,7 +304,10 @@ class AuthController extends Controller
         Cache::forget('otp_' . $email);
         Cache::forget('otp_expires_' . $email);
         session(['otp_verified' => true]);
-        $request->session()->forget('otp_email'); // ✅ fixed key
+        // Clear the `email` session key used while verifying
+        $request->session()->forget('email');
+
+        Log::info('verifyOtp success: user verified', ['email' => $email, 'user_id' => $user->id]);
 
         // ✅ D. Redirect based on role
         if (($user->is_admin ?? false) || $user->hasRole('admin')) {

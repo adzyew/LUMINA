@@ -37,6 +37,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'provider_name',
         'provider_token',
         'provider_refresh_token',
+        // Shipping defaults
+        'shipping_street',
+        'shipping_city',
+        'shipping_province',
+        'shipping_postal_code',
+        'shipping_country',
+        'shipping_address',
     ];
 
     /**
