@@ -52,7 +52,7 @@
         }
         </style>
     </head>
-<body class="bg-gray-50 text-gray-900 antialiased">
+<body class="bg-white dark:bg-black text-gray-900 dark:text-white antialiased transition-colors">
 
     @include('partials.navbar')
 
@@ -89,54 +89,54 @@
                 <p class="text-gray-200 text-lg mb-8 max-w-md drop-shadow">
                     Curated pieces that tell your story—from everyday sophistication to unforgettable occasions.
                 </p>
-                <a href="{{ route('products.index') }}" class="inline-flex items-center justify-center w-fit px-10 py-4 bg-amber-300 text-gray-900 font-bold text-sm uppercase tracking-wide rounded-lg hover:bg-amber-400 transition-colors shadow-lg">
+                <a href="{{ route('products.index') }}" class="inline-flex items-center justify-center w-fit px-12 py-4 bg-amber-300 hover:bg-amber-400 text-gray-900 font-bold text-sm uppercase tracking-widest rounded-xl transition-all shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
                     Explore Collection
-                            </a>
+                </a>
                         </div>
                     </div>
     </section>
 
     {{-- Services Footer Section (4 cards) --}}
-    <section id="features" class="py-16 bg-white border-t border-gray-100 scroll-fade-in">
+    <section id="features" class="py-20 bg-gradient-to-b from-white to-gray-50 dark:from-black dark:to-gray-900/50 border-t border-gray-200 dark:border-white/10 scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
                 <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale hover:bg-gray-100 transition-colors duration-700 ease-in-out rounded-lg p-4 hover:shadow-md ">
                     <div class="shrink-0 w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
                         <svg class="w-8 h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
                     </div>
                     <div>
-                        <h3 class="font-playfair font-bold text-gray-900 mb-1">Nationwide Shipping</h3>
-                        <p class="text-gray-500 text-sm">Free shipping on all orders</p>
+                        <h3 class="font-playfair font-bold text-gray-900 dark:text-white mb-1 text-lg">Nationwide Shipping</h3>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm">Free shipping on all orders</p>
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale hover:bg-gray-100 transition-colors duration-700 ease-in-out rounded-lg p-4 hover:shadow-md pointer-events-auto ">
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale bg-white dark:bg-white/5 hover:bg-amber-50 dark:hover:bg-amber-500/5 transition-all duration-500 rounded-2xl p-6 border border-gray-100 dark:border-white/10 hover:border-amber-200 dark:hover:border-amber-500/30 hover:shadow-lg dark:hover:shadow-amber-500/10">
                     <div class="shrink-0 w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
                         <svg class="w-8 h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
                     <div>
-                        <h3 class="font-playfair font-bold text-gray-900 mb-1">Money Back Guarantee</h3>
-                        <p class="text-gray-500 text-sm">Back guarantee in 7 days</p>
+                        <h3 class="font-playfair font-bold text-gray-900 dark:text-white mb-1 text-lg">Money Back Guarantee</h3>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm">Back guarantee in 7 days</p>
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale hover:bg-gray-100 transition-colors duration-700 ease-in-out rounded-lg p-4 hover:shadow-md ">
-                    <div class="shrink-0 w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
-                        <svg class="w-8 h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale bg-white dark:bg-white/5 hover:bg-amber-50 dark:hover:bg-amber-500/5 transition-all duration-500 rounded-2xl p-6 border border-gray-100 dark:border-white/10 hover:border-amber-200 dark:hover:border-amber-500/30 hover:shadow-lg dark:hover:shadow-amber-500/10">
+                    <div class="shrink-0 w-14 h-14 rounded-full bg-gradient-to-br from-amber-100 to-amber-50 dark:from-amber-500/20 dark:to-amber-500/10 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
                     </div>
                     <div>
-                        <h3 class="font-playfair font-bold text-gray-900 mb-1">Offers And Discounts</h3>
-                        <p class="text-gray-500 text-sm">On every order over ₱1,000</p>
+                        <h3 class="font-playfair font-bold text-gray-900 dark:text-white mb-1 text-lg">Offers And Discounts</h3>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm">On every order over ₱1,000</p>
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale hover:bg-gray-100 transition-colors duration-700 ease-in-out rounded-lg p-4 hover:shadow-md ">
-                    <div class="shrink-0 w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
-                        <svg class="w-8 h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale bg-white dark:bg-white/5 hover:bg-amber-50 dark:hover:bg-amber-500/5 transition-all duration-500 rounded-2xl p-6 border border-gray-100 dark:border-white/10 hover:border-amber-200 dark:hover:border-amber-500/30 hover:shadow-lg dark:hover:shadow-amber-500/10">
+                    <div class="shrink-0 w-14 h-14 rounded-full bg-gradient-to-br from-amber-100 to-amber-50 dark:from-amber-500/20 dark:to-amber-500/10 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                     </div>
                     <div>
-                        <h3 class="font-playfair font-bold text-gray-900 mb-1">24/7 Support Services</h3>
-                        <p class="text-gray-500 text-sm">Contact us anytime</p>
+                        <h3 class="font-playfair font-bold text-gray-900 dark:text-white mb-1 text-lg">24/7 Support Services</h3>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm">Contact us anytime</p>
                     </div>
                 </div>
             </div>
@@ -144,24 +144,27 @@
     </section>
 
     {{-- Featured Collections --}}
-    <section class="py-20 bg-gray-50 scroll-fade-in">
+    <section class="py-24 bg-white dark:bg-black scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10 scroll-slide-left">
-                <h2 class="text-3xl font-playfair font-bold text-gray-900">Featured Collections</h2>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-16 scroll-slide-left">
+                <div>
+                    <p class="text-sm font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-3">Curated for You</p>
+                    <h2 class="text-4xl sm:text-5xl font-playfair font-bold text-gray-900 dark:text-white">Featured Collections</h2>
+                </div>
                 <a href="{{ route('products.index') }}" class="text-amber-600 hover:text-amber-700 font-semibold flex items-center gap-2">
                     View All <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </a>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 @foreach($featuredProducts ?? [] as $product)
-                    <a href="{{ route('products.show', $product) }}" class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300 hover:-translate-y-1">
-                        <div class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
-                            <img src="{{ $product->image_url ?? asset('IMAGES/Bracelet.jpg') }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <a href="{{ route('products.show', $product) }}" class="group bg-white dark:bg-white/5 rounded-2xl overflow-hidden shadow-md dark:shadow-lg hover:shadow-2xl dark:hover:shadow-amber-500/10 border border-gray-100 dark:border-white/10 hover:border-amber-200 dark:hover:border-amber-500/30 transition-all duration-500 hover:-translate-y-2">
+                        <div class="aspect-square bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center overflow-hidden">
+                            <img src="{{ $product->image_url ?? asset('IMAGES/Bracelet.jpg') }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                         </div>
-                        <div class="p-5">
-                            <h3 class="font-playfair font-semibold text-gray-900 mb-1 group-hover:text-amber-600 transition-colors">{{ $product->name }}</h3>
-                            <p class="text-gray-500 text-sm mb-3 line-clamp-2">{{ Str::limit($product->description ?? '', 60) }}</p>
-                            <p class="text-xl font-bold text-amber-600">₱{{ number_format($product->price ?? 0, 0) }}</p>
+                        <div class="p-6">
+                            <h3 class="font-playfair font-semibold text-lg text-gray-900 dark:text-white mb-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">{{ $product->name }}</h3>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm mb-4 line-clamp-2">{{ Str::limit($product->description ?? '', 60) }}</p>
+                            <p class="text-2xl font-bold text-amber-600 dark:text-amber-400">₱{{ number_format($product->price ?? 0, 0) }}</p>
                 </div>
                     </a>
                 @endforeach
@@ -170,17 +173,20 @@
     </section>
 
     {{-- Shop by Category --}}
-    <section class="py-20 bg-white scroll-fade-in">
+    <section class="py-24 bg-gradient-to-b from-gray-50 dark:from-gray-900/30 to-white dark:to-black scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
-            <h2 class="text-3xl font-playfair font-bold text-gray-900 text-center mb-10 scroll-scale">Shop by Category</h2>
+            <div class="text-center mb-16 scroll-scale">
+                <p class="text-sm font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-3">Jewelry Collections</p>
+                <h2 class="text-4xl sm:text-5xl font-playfair font-bold text-gray-900 dark:text-white">Shop by Category</h2>
+            </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
                 @foreach([['name'=>'Necklaces','img'=>'Necklace.jpg','cat'=>'necklaces'],['name'=>'Bracelets','img'=>'Bracelet.jpg','cat'=>'bracelets'],['name'=>'Earrings','img'=>'Earrings.jpg','cat'=>'earrings'],['name'=>'Rings','img'=>'Ring.jpg','cat'=>'rings'],['name'=>'Watches','img'=>'Watches.jpg','cat'=>'watches']] as $c)
-                    <a href="{{ route('products.index', ['category' => $c['cat']]) }}" class="group block bg-gray-50 rounded-xl overflow-hidden border border-gray-100 hover:border-amber-200 transition-all hover:shadow-md">
-                        <div class="aspect-square overflow-hidden">
-                            <img src="{{ asset('IMAGES/' . $c['img']) }}" alt="{{ $c['name'] }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                    <a href="{{ route('products.index', ['category' => $c['cat']]) }}" class="group block bg-white dark:bg-white/5 rounded-2xl overflow-hidden border border-gray-100 dark:border-white/10 hover:border-amber-200 dark:hover:border-amber-500/30 transition-all hover:shadow-lg dark:hover:shadow-amber-500/10 hover:-translate-y-1">
+                        <div class="aspect-square overflow-hidden bg-gray-100 dark:bg-gray-800">
+                            <img src="{{ asset('IMAGES/' . $c['img']) }}" alt="{{ $c['name'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                         </div>
-                        <div class="p-4 text-center">
-                            <h3 class="font-playfair font-semibold text-gray-900 group-hover:text-amber-600">{{ $c['name'] }}</h3>
+                        <div class="p-6 text-center">
+                            <h3 class="font-playfair font-semibold text-lg text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">{{ $c['name'] }}</h3>
                         </div>
                     </a>
                 @endforeach
@@ -189,14 +195,15 @@
     </section>
 
     {{-- About Us / Our Story --}}
-    <section class="py-20 bg-gray-50 scroll-fade-in">
+    <section class="py-24 bg-white dark:bg-black scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
             <div class="max-w-4xl mx-auto text-center">
-                <h2 class="text-4xl font-playfair font-bold text-gray-900 mb-6 scroll-scale">About Lumina</h2>
-                <p class="text-lg text-gray-600 leading-relaxed mb-6">
+                <p class="text-sm font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-3 scroll-scale">Our Story</p>
+                <h2 class="text-4xl sm:text-5xl font-playfair font-bold text-gray-900 dark:text-white mb-8 scroll-scale">About Lumina</h2>
+                <p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed mb-6"
                     Lumina was born from a passion for creating jewelry that transcends trends. Every piece we craft is designed to tell a story—yours. From elegant necklaces to timeless bracelets, our handcrafted collections blend traditional craftsmanship with modern elegance.
                 </p>
-                <p class="text-lg text-gray-600 leading-relaxed mb-8">
+                <p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed mb-8">
                     We believe that true luxury lies in the details. Each piece undergoes meticulous quality checks, ensuring you receive nothing but the finest. Experience the Lumina difference—where artistry meets excellence, and every jewel becomes a cherished memory.
                 </p>
                
@@ -205,16 +212,19 @@
     </section>
 
     {{-- Why Choose Us --}}
-    <section class="py-20 bg-white scroll-fade-in">
+    <section class="py-24 bg-gradient-to-b from-gray-50 dark:from-gray-900/30 to-white dark:to-black scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
-            <h2 class="text-3xl font-playfair font-bold text-gray-900 text-center mb-12 scroll-scale">Why Choose Lumina</h2>
+            <div class="text-center mb-16 scroll-scale">
+                <p class="text-sm font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-3">Why We're Different</p>
+                <h2 class="text-4xl sm:text-5xl font-playfair font-bold text-gray-900 dark:text-white">Why Choose Lumina</h2>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
                     <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
                     </div>
-                    <h3 class="font-playfair font-bold text-gray-900 mb-2">Premium Materials</h3>
-                    <p class="text-gray-600 text-sm">We use only the finest metals and gemstones, sourced ethically from trusted suppliers worldwide.</p>
+                    <h3 class="font-playfair font-bold text-gray-900 dark:text-white mb-2 text-lg">Premium Materials</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm"We use only the finest metals and gemstones, sourced ethically from trusted suppliers worldwide.</p>
                 </div>
                 <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
                     <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -257,24 +267,27 @@
 
     {{-- New Arrivals --}}
     @if(isset($latestProducts) && $latestProducts->isNotEmpty())
-    <section class="py-20 bg-gray-50 scroll-fade-in">
+    <section class="py-24 bg-white dark:bg-black scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10 scroll-slide-right">
-                <h2 class="text-3xl font-playfair font-bold text-gray-900">New Arrivals</h2>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-16 scroll-slide-right">
+                <div>
+                    <p class="text-sm font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-3">Latest Collection</p>
+                    <h2 class="text-4xl sm:text-5xl font-playfair font-bold text-gray-900 dark:text-white">New Arrivals</h2>
+                </div>
                 <a href="{{ route('products.index') }}" class="text-amber-600 hover:text-amber-700 font-semibold flex items-center gap-2">
                     View All <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </a>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 @foreach($latestProducts->take(8) as $product)
-                    <a href="{{ route('products.show', $product) }}" class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300 hover:-translate-y-1">
-                        <div class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
-                            <img src="{{ $product->image_url ?? asset('IMAGES/Bracelet.jpg') }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <a href="{{ route('products.show', $product) }}" class="group bg-white dark:bg-white/5 rounded-2xl overflow-hidden shadow-md dark:shadow-lg hover:shadow-2xl dark:hover:shadow-amber-500/10 border border-gray-100 dark:border-white/10 hover:border-amber-200 dark:hover:border-amber-500/30 transition-all duration-500 hover:-translate-y-2">
+                        <div class="aspect-square bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center overflow-hidden">
+                            <img src="{{ $product->image_url ?? asset('IMAGES/Bracelet.jpg') }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                         </div>
-                        <div class="p-5">
-                            <p class="text-xs text-amber-600 uppercase tracking-wider mb-1">{{ $product->category ?? 'Jewelry' }}</p>
-                            <h3 class="font-playfair font-semibold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors">{{ $product->name }}</h3>
-                            <p class="text-xl font-bold text-amber-600">₱{{ number_format($product->price ?? 0, 0) }}</p>
+                        <div class="p-6">
+                            <p class="text-xs text-amber-600 dark:text-amber-400 uppercase tracking-widest font-semibold mb-2">{{ $product->category ?? 'Jewelry' }}</p>
+                            <h3 class="font-playfair font-semibold text-lg text-gray-900 dark:text-white mb-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">{{ $product->name }}</h3>
+                            <p class="text-2xl font-bold text-amber-600 dark:text-amber-400">₱{{ number_format($product->price ?? 0, 0) }}</p>
                         </div>
                     </a>
                 @endforeach
@@ -284,9 +297,12 @@
     @endif
 
     {{-- How It Works --}}
-    <section class="py-20 bg-white scroll-fade-in">
+    <section class="py-24 bg-gradient-to-b from-gray-50 dark:from-gray-900/30 to-white dark:to-black scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
-            <h2 class="text-3xl font-playfair font-bold text-gray-900 text-center mb-12 scroll-scale">How It Works</h2>
+            <div class="text-center mb-16 scroll-scale">
+                <p class="text-sm font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-3">Easy Process</p>
+                <h2 class="text-4xl sm:text-5xl font-playfair font-bold text-gray-900 dark:text-white">How It Works</h2>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
                 <div class="text-center">
                     <div class="w-16 h-16 bg-amber-200 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-gray-900">1</div>
@@ -313,18 +329,21 @@
     </section>
 
     {{-- Customer Testimonials --}}
-    <section class="py-20 bg-gray-50 scroll-fade-in">
+    <section class="py-24 bg-white dark:bg-black scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
-            <h2 class="text-3xl font-playfair font-bold text-gray-900 text-center mb-12 scroll-scale">What Our Customers Say</h2>
+            <div class="text-center mb-16 scroll-scale">
+                <p class="text-sm font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-3">Testimonials</p>
+                <h2 class="text-4xl sm:text-5xl font-playfair font-bold text-gray-900 dark:text-white">What Our Customers Say</h2>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                 <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
                     <div class="flex gap-1 text-amber-400 mb-4">★★★★★</div>
                     <p class="text-gray-600 mb-6 leading-relaxed">"Stunning quality and fast shipping. The necklace I ordered exceeded my expectations. Lumina is now my go-to for special occasions."</p>
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-amber-200 rounded-full flex items-center justify-center font-bold text-gray-900">MR</div>
+                        <div class="w-12 h-12 bg-gradient-to-br from-amber-200 to-amber-100 dark:from-amber-500/30 dark:to-amber-500/20 rounded-full flex items-center justify-center font-bold text-gray-900 dark:text-amber-400">MR</div>
                         <div>
-                            <p class="font-semibold text-gray-900">Maria Rodriguez</p>
-                            <p class="text-sm text-gray-500">Verified Customer</p>
+                            <p class="font-semibold text-gray-900 dark:text-white">Maria Rodriguez</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Verified Customer</p>
                         </div>
                     </div>
                 </div>
@@ -381,7 +400,7 @@
                 @endforeach
             </div>
             <div class="text-center mt-12">
-                <a href="{{ route('products.index') }}" class="inline-flex items-center gap-2 px-10 py-4 bg-amber-300 text-gray-900 font-bold rounded-lg hover:bg-amber-400 transition-colors">
+                <a href="{{ route('products.index') }}" class="inline-flex items-center gap-2 px-12 py-4 bg-amber-300 hover:bg-amber-400 text-gray-900 font-bold rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                     View All Products
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </a>
@@ -391,16 +410,16 @@
     @endif
 
     {{-- Newsletter / Subscribe --}}
-    <section class="py-20 bg-white border-t border-gray-100 scroll-fade-in">
+    <section class="py-24 bg-gradient-to-b from-gray-50 dark:from-gray-900/30 to-white dark:to-black border-t border-gray-200 dark:border-white/10 scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
             <div class="max-w-2xl mx-auto text-center scroll-scale">
-                <h2 class="text-3xl font-playfair font-bold text-gray-900 mb-4">Join the Lumina Family</h2>
-                <p class="text-gray-600 text-lg mb-8">Subscribe to receive exclusive offers, early access to new collections, and timeless style inspiration delivered to your inbox.</p>
+                <h2 class="text-4xl sm:text-5xl font-playfair font-bold text-gray-900 dark:text-white mb-4">Join the Lumina Family</h2>
+                <p class="text-gray-600 dark:text-gray-400 text-lg mb-8">Subscribe to receive exclusive offers, early access to new collections, and timeless style inspiration delivered to your inbox.</p>
                 <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-                    <input type="email" placeholder="Enter your email address" class="flex-1 px-5 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-300 focus:ring-1 focus:ring-amber-300" />
-                    <button type="button" class="px-8 py-3 bg-amber-300 text-gray-900 font-bold rounded-lg hover:bg-amber-400 transition-colors whitespace-nowrap">Subscribe</button>
+                    <input type="email" placeholder="Enter your email address" class="flex-1 px-6 py-3 bg-white dark:bg-white/10 border border-gray-200 dark:border-white/20 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-amber-400 dark:focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors" />
+                    <button type="button" class="px-10 py-3 bg-amber-300 hover:bg-amber-400 text-gray-900 font-bold rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 whitespace-nowrap">Subscribe</button>
                 </form>
-                <p class="text-xs text-gray-500 mt-4">By subscribing, you agree to our Privacy Policy and Terms of Service.</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-4">By subscribing, you agree to our Privacy Policy and Terms of Service.</p>
             </div>
         </div>
     </section>
