@@ -309,8 +309,8 @@
                                 <!-- Terms -->
                                 <div class="flex items-start gap-3">
                                     <input type="checkbox" name="terms" id="terms" class="w-4 h-4 mt-0.5 rounded border-gray-300 text-amber-400 focus:ring-amber-500">
-                                    <label for="terms" class="text-gray-600 text-sm leading-tight">
-                                        I agree to the <a href="#" class="text-amber-400 hover:text-amber-800 underline">Terms of Service</a> and <a href="#" class="text-amber-400 hover:text-amber-800 underline">Privacy Policy</a>.
+                                        <label for="terms" class="text-gray-600 text-sm leading-tight">
+                                        I agree to the <a href="#" id="openTermsLink" onclick="openTermsModal('terms'); return false;" class="text-amber-400 hover:text-amber-600 underline">Terms of Service</a> and <a href="#" id="openPrivacyLink" onclick="openTermsModal('privacy'); return false;" class="text-amber-400 hover:text-amber-600 underline">Privacy Policy</a>.
                                     </label>
                                 </div>
                                 @error('terms')
@@ -350,6 +350,8 @@
                 <p class="text-gray-300 text-lg max-w-md">Discover our handcrafted collection made with ethically sourced materials and timeless design principles.</p>
             </div>
         </div>
+
+            @include('partials.terms_modal')
     </div>
 
     <script>
