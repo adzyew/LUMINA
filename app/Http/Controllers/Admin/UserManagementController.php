@@ -20,12 +20,20 @@ class UserManagementController extends Controller
 
         $query = User::with('roles')->latest();
 
-        if ($filter === 'admin') {
-            $query->role('admin');
-        } elseif ($filter === 'staff') {
-            $query->role('staff');
-        } elseif ($filter === 'customer') {
-            $query->whereDoesntHave('roles');
+        // By default show only non-archived users in the "All" list.
+        if ($filter === 'archived') {
+            $query->whereNotNull('archived_at');
+        } else {
+            // exclude archived for all other filters (including 'all')
+            $query->whereNull('archived_at');
+
+            if ($filter === 'admin') {
+                $query->role('admin');
+            } elseif ($filter === 'staff') {
+                $query->role('staff');
+            } elseif ($filter === 'customer') {
+                $query->whereDoesntHave('roles');
+            }
         }
 
         $users = $query->paginate(15)->withQueryString();
@@ -150,5 +158,31 @@ class UserManagementController extends Controller
         $role->syncPermissions($request->permissions ?? []);
         return redirect()->route('admin.roles.index')
             ->with('success', 'Permissions updated successfully.');
+    }
+
+    /**
+     * Archive a user account (admin only cannot be archived)
+     */
+    public function archive(User $user)
+    {
+        if ($user->hasRole('admin')) {
+            return redirect()->back()->with('error', 'Cannot archive admin users.');
+        }
+
+        $user->archived_at = now();
+        $user->save();
+
+        return redirect()->route('admin.users.index')->with('success', 'User archived.');
+    }
+
+    /**
+     * Unarchive a user account
+     */
+    public function unarchive(User $user)
+    {
+        $user->archived_at = null;
+        $user->save();
+
+        return redirect()->route('admin.users.index')->with('success', 'User unarchived.');
     }
 }

@@ -11,6 +11,7 @@
         </div>
         {{-- Right Side --}}
         <div class="flex items-center gap-5">
+            
            
             {{-- Divider --}}
             <div class="w-px h-6 bg-gray-200 dark:bg-white/10"></div>

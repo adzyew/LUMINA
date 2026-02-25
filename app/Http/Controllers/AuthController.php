@@ -130,6 +130,11 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
+        // Prevent archived users from authenticating
+        if ($user && $user->archived_at) {
+            return back()->withErrors(['email' => 'This account has been archived. Contact admin.']);
+        }
+
         // ❌ User exists but NOT verified
         if ($user && !$user->is_verified) {
 
@@ -188,6 +193,11 @@ class AuthController extends Controller
 
     // 2. Find the User
     $user = User::where('email', $request->email)->first();
+
+    // Prevent archived users from authenticating
+    if ($user && $user->archived_at) {
+        return back()->withErrors(['email' => 'This account has been archived. Contact admin.']);
+    }
 
     // 3. SECURITY CHECK: Validate Password BEFORE checking verification
     if (!$user || !Hash::check($request->password, $user->password)) {

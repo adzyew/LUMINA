@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\Scopes\NotArchivedScope;
 
 class Product extends Model
 {
@@ -19,7 +20,17 @@ class Product extends Model
         'is_featured',
         'image_url',
         'image_public_id',
+        'archived_at',
     ];
+
+    protected $casts = [
+        'archived_at' => 'datetime',
+    ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new NotArchivedScope());
+    }
 
     public function reviews(): HasMany
     {

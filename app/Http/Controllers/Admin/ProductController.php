@@ -11,7 +11,16 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $products = Product::query();
+        $filter = $request->get('filter', 'all');
+
+        // Admin should be able to see archived products, so remove the storefront global scope here
+        $products = Product::withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class);
+
+        if ($filter === 'archived') {
+            $products->whereNotNull('archived_at');
+        } elseif ($filter === 'active') {
+            $products->whereNull('archived_at');
+        }
 
         if ($request->filled('category')) {
             $products->where('category', $request->input('category'));
@@ -21,9 +30,9 @@ class ProductController extends Controller
             $products->where('name', 'like', "%{$request->input('search')}%");
         }
 
-        $products = $products->paginate(10);
+        $products = $products->paginate(10)->withQueryString();
 
-        return view('admin.products_management.products_index', compact('products'));
+        return view('admin.products_management.products_index', compact('products', 'filter'));
     }
 
     public function show(Request $request, Product $product)
@@ -159,5 +168,27 @@ class ProductController extends Controller
         return redirect()
             ->route('admin.products.index')
             ->with('success', 'Product deleted successfully!');
+    }
+
+    /**
+     * Archive a product (soft archive)
+     */
+    public function archive(Product $product)
+    {
+        $product->archived_at = now();
+        $product->save();
+
+        return redirect()->route('admin.products.index')->with('success', 'Product archived.');
+    }
+
+    /**
+     * Unarchive a product
+     */
+    public function unarchive(Product $product)
+    {
+        $product->archived_at = null;
+        $product->save();
+
+        return redirect()->route('admin.products.index')->with('success', 'Product unarchived.');
     }
 }
