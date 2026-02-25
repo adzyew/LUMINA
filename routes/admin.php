@@ -9,11 +9,12 @@ use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\Admin\StaffDashboardController;
 
-Route::middleware(['auth'])
+Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -67,6 +68,14 @@ Route::middleware(['auth'])
                 ->only(['index', 'create', 'store', 'edit', 'update'])
                 ->middleware('role:admin');
 
+        // archive/unarchive users
+        Route::post('users/{user}/archive', [UserManagementController::class, 'archive'])
+            ->middleware('role:admin')
+            ->name('users.archive');
+        Route::post('users/{user}/unarchive', [UserManagementController::class, 'unarchive'])
+            ->middleware('role:admin')
+            ->name('users.unarchive');
+
         // ROLES (Admin Only) - manage role permissions
         Route::get('roles', [UserManagementController::class, 'rolesIndex'])
             ->middleware('role:admin')
@@ -77,6 +86,26 @@ Route::middleware(['auth'])
         Route::put('roles/{role}', [UserManagementController::class, 'updateRole'])
             ->middleware('role:admin')
             ->name('roles.update');
+
+        // STAFF management (Admin Only)
+        Route::get('staff', [StaffController::class, 'index'])
+            ->middleware('role:admin')
+            ->name('staff.index');
+        Route::get('staff/create', [StaffController::class, 'create'])
+            ->middleware('role:admin')
+            ->name('staff.create');
+        Route::post('staff', [StaffController::class, 'store'])
+            ->middleware('role:admin')
+            ->name('staff.store');
+        Route::get('staff/{user}/edit', [StaffController::class, 'edit'])
+            ->middleware('role:admin')
+            ->name('staff.edit');
+        Route::put('staff/{user}', [StaffController::class, 'update'])
+            ->middleware('role:admin')
+            ->name('staff.update');
+        Route::delete('staff/{user}', [StaffController::class, 'destroy'])
+            ->middleware('role:admin')
+            ->name('staff.destroy');
 
         // PRODUCTS
         Route::get('products', [ProductController::class, 'index'])
@@ -106,6 +135,13 @@ Route::middleware(['auth'])
         Route::delete('products/{product}', [ProductController::class, 'destroy'])
             ->middleware('permission:inventory.delete')
             ->name('products.destroy');
+        // archive/unarchive products
+        Route::post('products/{product}/archive', [ProductController::class, 'archive'])
+            ->middleware('permission:inventory.update')
+            ->name('products.archive');
+        Route::post('products/{product}/unarchive', [ProductController::class, 'unarchive'])
+            ->middleware('permission:inventory.update')
+            ->name('products.unarchive');
 
         // ORDERS
         Route::get('orders', [AdminOrderController::class, 'index'])->middleware('permission:sales.view')->name('orders.index');

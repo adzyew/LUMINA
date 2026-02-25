@@ -29,6 +29,10 @@
        class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'admin' ? 'bg-amber-300 text-black' : 'bg-white/5 text-gray-600 hover:bg-white/10 border border-gray-300' }}">
         Admin
     </a>
+    <a href="{{ route('admin.users.index', ['filter' => 'archived']) }}"
+       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'archived' ? 'bg-amber-300 text-black' : 'bg-white/5 text-gray-600 hover:bg-white/10 border border-gray-300' }}">
+        Archived
+    </a>
 </div>
 
 @if(session('success'))
@@ -43,7 +47,7 @@
             <tr class="bg-white/5 text-white border-b border-white/10 text-sm">
                 <th class="p-4">ID</th>
                 <th class="p-4">Name</th>
-                <th class="p-4">Email</th>
+                <th class="p-4">Email Address</th>
                 <th class="p-4">Role</th>
                 <th class="p-4">Verified</th>
                 <th class="p-4 text-center">Actions</th>
@@ -82,7 +86,18 @@
                         @if($user->hasRole('admin'))
                             <span class="text-gray-500 text-sm">—</span>
                         @else
-                            <a href="{{ route('admin.users.edit', $user) }}" class="inline-flex items-center px-4 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors text-sm">Edit</a>
+                            <a href="{{ route('admin.users.edit', $user) }}" class="inline-flex items-center px-4 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 hover:text-white transition-colors text-sm">Edit</a>
+                            @if($user->archived_at)
+                                <form action="{{ route('admin.users.unarchive', $user) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-500 text-white font-bold rounded-lg hover:bg-gray-400 transition-colors text-sm">Unarchive</button>
+                                </form>
+                            @else
+                                <form action="{{ route('admin.users.archive', $user) }}" method="POST" onsubmit="return confirm('Archive this user? They will be prevented from logging in.');">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-500 text-white font-bold rounded-lg hover:bg-gray-300 hover:text-black transition-colors text-sm">Archive</button>
+                                </form>
+                            @endif
                         @endif
                     </div>
                 </td>

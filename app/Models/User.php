@@ -37,6 +37,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'provider_name',
         'provider_token',
         'provider_refresh_token',
+        'role',
         // Shipping defaults
         'shipping_street',
         'shipping_city',
@@ -68,6 +69,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'archived_at' => 'datetime',
         ];
     }
 
