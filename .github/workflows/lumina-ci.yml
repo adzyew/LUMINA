@@ -26,11 +26,9 @@ jobs:
           --health-retries=3
 
     steps:
-      # 1. Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup PHP
       - name: Setup PHP 8.5
         uses: shivammathur/setup-php@v2
         with:
@@ -38,7 +36,6 @@ jobs:
           extensions: mbstring, pdo, pdo_mysql, bcmath, tokenizer, xml, ctype, json
           coverage: none
 
-      # 3. Cache Composer dependencies
       - name: Cache Composer packages
         uses: actions/cache@v4
         with:
@@ -46,29 +43,28 @@ jobs:
           key: composer-${{ hashFiles('composer.lock') }}
           restore-keys: composer-
 
-      # 4. Install Composer dependencies
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-progress
 
-      # 5. Copy .env
       - name: Copy .env.example to .env
         run: cp .env.example .env
 
-      # 6. Set test environment variables
       - name: Configure test environment
         run: |
           php artisan key:generate
-          sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env
-          sed -i 's/DB_HOST=.*/DB_HOST=127.0.0.1/' .env
-          sed -i 's/DB_PORT=.*/DB_PORT=3306/' .env
-          sed -i 's/DB_DATABASE=.*/DB_DATABASE=lumina_test/' .env
-          sed -i 's/DB_USERNAME=.*/DB_USERNAME=root/' .env
-          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=password/' .env
+          echo "" >> .env
+          echo "DB_CONNECTION=mysql" >> .env
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "DB_DATABASE=lumina_test" >> .env
+          echo "DB_USERNAME=root" >> .env
+          echo "DB_PASSWORD=password" >> .env
 
-      # 7. Run migrations
+      - name: Clear config cache
+        run: php artisan config:clear
+
       - name: Run database migrations
         run: php artisan migrate --force
 
-      # 8. Run PHPUnit tests
       - name: Run PHPUnit tests
         run: php artisan test --ansi
