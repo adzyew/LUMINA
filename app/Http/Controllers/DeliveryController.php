@@ -41,12 +41,19 @@ class DeliveryController extends Controller
             'tracking_number' => 'nullable|string|max:100',
         ]);
 
+        $wasDelivered = $order->status === 'delivered';
+
         $order->update([
             'status' => $request->status,
             'tracking_number' => $request->tracking_number,
             'shipped_at' => $request->status === 'shipped' ? ($order->shipped_at ?? now()) : $order->shipped_at,
             'delivered_at' => $request->status === 'delivered' ? now() : $order->delivered_at,
         ]);
+
+        if ($request->status === 'delivered' && !$wasDelivered && $order->user) {
+            $pointsEarned = floor($order->total_price / 100); // 1 point per $100 spent
+            $order->user->increment('points_balance', $pointsEarned);
+        }
 
         return redirect()->back()->with('success', 'Delivery status updated.');
     }

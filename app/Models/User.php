@@ -45,6 +45,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'shipping_postal_code',
         'shipping_country',
         'shipping_address',
+        'points_balance',
     ];
 
     /**

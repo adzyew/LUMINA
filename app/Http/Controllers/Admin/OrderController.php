@@ -38,6 +38,8 @@ class OrderController extends Controller
         ]);
 
         $wasShipped = $order->status === 'shipped';
+        $wasDelivered = $order->status === 'delivered';
+
         $order->update([
             'status' => $request->status,
             'tracking_number' => $request->tracking_number,
@@ -51,6 +53,12 @@ class OrderController extends Controller
             } catch (\Throwable $e) {
                 report($e);
             }
+        }
+
+        if ($request->status === 'delivered' && !$wasDelivered && $order->user) {
+            $pointsEarned = floor($order->total_price / 100); // 1 point per $100 spent
+
+            $order->user->increment('points_balance', $pointsEarned);
         }
 
         return redirect()->back()->with('success', 'Order updated successfully.');
