@@ -145,6 +145,20 @@ class CartController extends Controller
             $total += $item['price'] * $item['quantity'];
         }
 
+        $user = auth()->user();
+        $pointsUsed = 0;
+        $discountAmount = 0;
+
+        if($request->has('use_points') && $request->use_points == '1' && $user->points_balance > 0){
+            //calculate max possible discount (cannot exceed total)
+            $discountAmount = min($total, $user->points_balance);
+            $pointsUsed = $discountAmount; // 1 point = 1 currency unit
+
+            $total -= $discountAmount;
+
+            $user->decrement('points_balance', $pointsUsed);
+        }
+
         $addressParts = array_filter([
             $request->shipping_street,
             $request->shipping_city,
@@ -157,6 +171,8 @@ class CartController extends Controller
         $order = Order::create([
             'user_id' => auth()->id(),
             'total_price' => $total,
+            'points_used' => $pointsUsed,
+            'discount_amount' => $discountAmount,
             'status' => 'pending',
             'shipping_address' => $fullAddress,
             'contact_phone' => $request->contact_phone,

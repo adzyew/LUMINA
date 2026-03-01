@@ -30,6 +30,14 @@
             </a>
         </div>
 
+        <div class="bg-gradient-to-r from-amber-300 to-amber-500 rounded-2xl p-6 text-black shadow-lg mb-8">
+            <h2 class="text-xl font-bold font-playfair mb-1">Lumina Rewards</h2>
+            <p class="text-sm opacity-90 mb-4">You earn 1 point for every ₱100 spent!</p>
+            <div class="text-4xl font-black">
+                {{ auth()->user()->points_balance }} <span class="text-lg font-medium">pts</span>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             <div class="lg:col-span-1">

@@ -90,6 +90,23 @@
                 @error('notes')<p class="text-red-500 dark:text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
             </div>
         </div>
+        @if(auth()->user()->points_balance > 0)
+        <div class="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+                <h4 class="font-bold text-amber-800 dark:text-amber-300 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+                    Lumina Rewards
+                </h4>
+                <p class="text-sm text-amber-700 dark:text-amber-400 mt-1">
+                    You have <strong>{{ auth()->user()->points_balance }} points</strong> (worth ₱{{ number_format(auth()->user()->points_balance, 2) }}).
+                </p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <input type="checkbox" name="use_points" value="1" id="use_points" class="w-5 h-5 text-amber-600 rounded focus:ring-amber-500 bg-white border-gray-300 dark:border-gray-600 dark:bg-gray-800">
+                <label for="use_points" class="text-sm font-bold text-gray-900 dark:text-white cursor-pointer">Apply Discount</label>
+            </div>
+        </div>
+        @endif
         <button type="submit" class="w-full py-4 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400">Place Order</button>
     </form>
 

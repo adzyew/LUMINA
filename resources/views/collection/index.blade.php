@@ -17,7 +17,7 @@
 
     @include('partials.navbar')
 
-    <section class="relative min-h-[12rem] pt-20 flex items-center justify-center">
+    <section class="relative min-h-48 pt-20 flex items-center justify-center">
         <div class="container mx-auto px-4 text-center">
             <h1 class="text-4xl sm:text-5xl font-playfair font-bold leading-tight">
                 All <span class="text-amber-300">Collections</span>

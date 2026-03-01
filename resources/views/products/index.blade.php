@@ -64,49 +64,72 @@
 
         {{-- Products Grid --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                @forelse($products as $product)
-                <div class="group bg-gray-900/60 rounded-2xl overflow-hidden border border-white/5 hover:border-amber-300/30 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-500/10 relative">
-                    @auth
-                        @php $isWishlisted = auth()->user()->wishlist()->where('product_id', $product->id)->exists(); @endphp
-                        <form action="{{ route('wishlist.toggle', $product) }}" method="POST" class="absolute top-3 right-3 z-10">
-                            @csrf
-                            <button type="submit" class="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/70 transition-colors">
-                                <svg class="w-5 h-5 {{ $isWishlisted ? 'text-red-500 fill-red-500' : 'text-white' }}" fill="{{ $isWishlisted ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                            </button>
-                        </form>
-                    @endauth
-                    <a href="{{ route('products.show', $product) }}" class="block">
-                        <div class="relative h-56 bg-gray-800/50 flex items-center justify-center overflow-hidden">
-                            @if($product->image_url ?? null)
-                                <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center text-gray-600">
-                                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14"></path></svg>
-                                </div>
-                            @endif
-                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-end justify-center p-4">
-                                <span class="py-2 px-4 bg-amber-300 text-black font-bold text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">View Details</span>
-                            </div>
+    @forelse($products as $product)
+        <div class="bg-gray-900/60 rounded-[2rem] p-3 sm:p-4 border border-white/5 hover:border-amber-300/30 shadow-sm hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-300 flex flex-col h-full group relative">
+            
+            <div class="relative w-full aspect-[4/5] sm:aspect-square rounded-[1.5rem] overflow-hidden bg-gray-800/50 mb-4">
+                <a href="{{ route('products.show', $product) }}" class="block w-full h-full">
+                    @if($product->image_url ?? null)
+                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    @else
+                        <div class="w-full h-full flex items-center justify-center text-gray-600">
+                            <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14"></path></svg>
                         </div>
-                        <div class="p-5">
-                            <p class="text-xs text-amber-300 uppercase tracking-widest mb-2">{{ ucfirst($product->category ?? 'Jewelry') }}</p>
-                            <h3 class="text-lg font-playfair font-bold text-white mb-2 truncate" title="{{ $product->name }}">{{ $product->name }}</h3>
-                        <div class="flex justify-between items-center">
-                                <span class="text-xl font-bold text-amber-300">₱{{ number_format($product->price ?? 0, 2) }}</span>
-                                <span class="text-xs {{ ($product->stock_quantity ?? 0) > 0 ? 'text-green-400' : 'text-red-500' }}">
-                                    {{ ($product->stock_quantity ?? 0) > 0 ? 'In Stock' : 'Sold Out' }}
-                            </span>
-                        </div>
-                    </div>
+                    @endif
+                </a>
+
+                @auth
+                    @php $isWishlisted = auth()->user()->wishlist()->where('product_id', $product->id)->exists(); @endphp
+                    <form action="{{ route('wishlist.toggle', $product) }}" method="POST" class="absolute top-3 right-3 z-10">
+                        @csrf
+                        <button type="submit" class="w-10 h-10 bg-black/40 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center hover:bg-black/70 hover:scale-110 transition-all duration-200 shadow-lg">
+                            <svg class="w-5 h-5 transition-colors duration-200 {{ $isWishlisted ? 'text-red-500 fill-red-500' : 'text-white hover:text-red-400' }}" fill="{{ $isWishlisted ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                        </button>
+                    </form>
+                @endauth
+            </div>
+
+            <div class="flex-1 flex flex-col px-1 sm:px-2">
+                <a href="{{ route('products.show', $product) }}">
+                    <h3 class="text-lg font-playfair font-bold text-white mb-2 line-clamp-1" title="{{ $product->name }}">{{ $product->name }}</h3>
+                </a>
+
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <span class="px-3 py-1 rounded-full border border-white/10 text-xs font-medium text-amber-300 capitalize">
+                        {{ $product->category ?? 'Jewelry' }}
+                    </span>
+                    <span class="px-3 py-1 rounded-full text-xs font-medium border {{ ($product->stock_quantity ?? 0) > 0 ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20' }}">
+                        {{ ($product->stock_quantity ?? 0) > 0 ? 'In Stock' : 'Sold Out' }}
+                    </span>
+                </div>
+
+                <p class="text-sm text-gray-400 mb-6 line-clamp-2 leading-relaxed">
+                    {{ $product->description ?? 'Discover the perfect piece to elevate your style. Add a touch of elegance to any outfit.' }}
+                </p>
+
+                <div class="mt-auto flex items-center justify-between pt-2">
+                    <span class="text-2xl font-black text-amber-300">
+                        ₱{{ number_format($product->price ?? 0, 2) }}
+                    </span>
+                    
+                    <a href="{{ route('products.show', $product) }}" class="flex items-center gap-2 bg-amber-300 hover:bg-amber-400 text-black px-4 py-2 sm:px-5 sm:py-2.5 rounded-full font-bold text-sm transition-colors shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 sm:w-5 sm:h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                        </svg>
+                        <span class="hidden sm:inline">Add</span>
                     </a>
                 </div>
-                @empty
-                <div class="col-span-full text-center py-20">
-                    <p class="text-gray-400 text-lg mb-4">No products found.</p>
-                    <a href="{{ route('products.index') }}" class="text-amber-300 hover:text-amber-200 font-semibold">View all products</a>
-                </div>
-                @endforelse
             </div>
+        </div>
+    @empty
+        <div class="col-span-full text-center py-20">
+            <p class="text-gray-400 text-lg mb-4">No products found.</p>
+            <a href="{{ route('collection') }}" class="text-amber-300 hover:text-amber-200 font-semibold">View all products</a>
+        </div>
+    @endforelse
+</div>
 
         <div class="mt-12 flex justify-center">
                 {{ $products->links() }} 
