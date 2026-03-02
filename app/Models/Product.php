@@ -51,4 +51,9 @@ class Product extends Model
     {
         return $this->hasMany(Feature::class);
     }
+
+    public function inventoryLogs(): HasMany
+    {
+        return $this->hasMany(InventoryLog::class)->latest();
+    }
 }

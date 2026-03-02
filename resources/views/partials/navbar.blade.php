@@ -41,7 +41,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                         </svg>
                         @if(session('cart') && count(session('cart')) > 0)
-                        <span class="absolute -top-0.5 -right-0.5 sm:top-0 sm:right-0 bg-amber-300 text-black text-[10px] sm:text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-bold">
+                        <span class="absolute -top-0.5 -right-0.5 sm:top-0 sm:right-0 bg-amber-300 text-black text-[10px] sm:text-xs rounded-full min-w-4.5 h-4.5 flex items-center justify-center font-bold">
                                 {{ count(session('cart')) }}
                             </span>
                         @endif

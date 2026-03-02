@@ -72,23 +72,54 @@
 
             <div class="lg:col-span-2 space-y-8">
                 
-                <div id="orders" class="bg-gray-900 rounded-2xl p-6 border border-white/5 shadow-xl scroll-mt-24">
-                    <h3 class="text-xl font-playfair font-bold text-white mb-6 flex items-center gap-3">
-                        <svg class="w-6 h-6 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                        Recent Orders
-                    </h3>
+                <div class="bg-gray-900/40 rounded-2xl p-6 border border-white/5">
+    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+        <svg class="w-5 h-5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+        Recent Orders
+    </h3>
 
-                    <div class="text-center py-12 border border-dashed border-white/10 rounded-xl bg-black/20">
-                        <div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-500">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
-                        </div>
-                        <p class="text-gray-400 font-medium mb-2">No orders found</p>
-                        <p class="text-gray-600 text-sm mb-6">You haven't purchased any luxury items yet.</p>
-                        <a href="{{ route('products.index') }}" class="px-6 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-all">
-                            Browse Collection
-                        </a>
-                    </div>
+    <div class="space-y-4">
+        @forelse($orders as $order)
+            <div class="bg-black/50 rounded-xl p-5 border border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <p class="text-white font-bold text-lg">Order #{{ $order->id }}</p>
+                    <p class="text-gray-400 text-sm">{{ $order->created_at->format('M d, Y') }}</p>
+                    <p class="text-gray-500 text-sm mt-1">
+                        {{ $order->items->count() }} item(s) • ₱{{ number_format($order->total_price, 2) }}
+                    </p>
                 </div>
+                
+                <div class="flex flex-col sm:items-end gap-2">
+                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
+                        {{ $order->status === 'pending' ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' : '' }}
+                        {{ $order->status === 'processing' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : '' }}
+                        {{ $order->status === 'shipped' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : '' }}
+                        {{ $order->status === 'delivered' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : '' }}
+                        {{ $order->status === 'cancelled' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : '' }}
+                    ">
+                        {{ $order->status }}
+                    </span>
+                    
+                    {{--<a href="{{ route('orders.invoice', $order->id) }}" class="text-amber-300 hover:text-amber-400 text-sm font-semibold flex items-center gap-1 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>
+                        Invoice
+                    </a>--}}
+                </div>
+            </div>
+        @empty
+            <div class="text-center py-10">
+                <div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-600">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                </div>
+                <p class="text-white font-bold text-lg mb-1">No orders found</p>
+                <p class="text-gray-400 mb-6">You haven't purchased any luxury items yet.</p>
+                <a href="{{ route('collection') }}" class="px-6 py-3 bg-amber-300 text-black font-bold rounded-full hover:bg-amber-400 transition-colors">
+                    Browse Collection
+                </a>
+            </div>
+        @endforelse
+    </div>
+</div>
 
                 <div id="settings" class="bg-gray-900 rounded-2xl p-6 border border-white/5 shadow-xl scroll-mt-24">
                     <h3 class="text-xl font-playfair font-bold text-white mb-2">Profile & Security</h3>

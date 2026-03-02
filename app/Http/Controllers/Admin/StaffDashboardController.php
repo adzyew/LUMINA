@@ -17,6 +17,11 @@ class StaffDashboardController extends Controller
     {
         $user = $request->user();
 
+        dd([
+            'Roles' => $user->getRoleNames(), 
+            'Permissions' => $user->getAllPermissions()->pluck('name')
+        ]);
+
         if ($user->hasRole('inventory_manager') || $user->can('inventory.view')) {
             return redirect()->route('admin.inventory.dashboard');
         }

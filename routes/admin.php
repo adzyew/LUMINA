@@ -27,7 +27,7 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
             ->name('analytics.export');
 
         // Staff dashboards (inventory, sales, delivery)
-        Route::get('staff', [StaffDashboardController::class, 'index'])
+        Route::get('staff/dashboard', [StaffDashboardController::class, 'index'])
             ->middleware('role_or_permission:admin|inventory.view|sales.view|deliveries.manage')
             ->name('staff.dashboard');
         Route::get('inventory/dashboard', [StaffDashboardController::class, 'inventoryDashboard'])
@@ -80,6 +80,12 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
         Route::get('roles', [UserManagementController::class, 'rolesIndex'])
             ->middleware('role:admin')
             ->name('roles.index');
+            Route::post('roles', [UserManagementController::class, 'storeRole'])
+            ->middleware('role:admin')
+            ->name('roles.store');
+            Route::delete('roles/{role}', [UserManagementController::class, 'destroyRole'])
+            ->middleware('role:admin')
+            ->name('roles.destroy');
         Route::get('roles/{role}/edit', [UserManagementController::class, 'editRole'])
             ->middleware('role:admin')
             ->name('roles.edit');

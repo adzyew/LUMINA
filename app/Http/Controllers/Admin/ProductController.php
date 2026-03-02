@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\InventoryLog;
 use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
+
 
 class ProductController extends Controller
 {
@@ -137,6 +139,23 @@ class ProductController extends Controller
                     'sort_order' => $start + $offset,
                 ]);
             }
+        }
+
+        if($request->has('stock_quantity') && $request->stock_quantity ) {
+
+        $oldStock = $product->stock_quantity;
+        $newStock = $request->stock_quantity;
+        $difference = $newStock - $oldStock;
+
+        InventoryLog::create([
+            'product_id' => $product->id,
+            
+            'quantity_change' => $difference,
+            'previous_stock' => $oldStock,
+            'new_stock' => $newStock,
+            'reason' => 'Stock updated via admin panel',
+            'reference_id' => null, // could be order ID or something if related to a specific action
+        ]);
         }
 
         $product->update([

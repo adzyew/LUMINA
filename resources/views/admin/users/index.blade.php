@@ -45,7 +45,6 @@
     <table class="w-full text-left border-collapse">
         <thead>
             <tr class="bg-white/5 text-white border-b border-white/10 text-sm">
-                <th class="p-4">ID</th>
                 <th class="p-4">Name</th>
                 <th class="p-4">Email Address</th>
                 <th class="p-4">Role</th>
@@ -56,7 +55,6 @@
         <tbody class="divide-y divide-white/10">
             @foreach($users as $user)
             <tr class="hover:bg-amber-300/10 transition duration-300">
-                <td class="p-4 text-gray-400">{{ $user->id }}</td>
                 <td class="p-4 font-medium text-white">{{ $user->name }}</td>
                 <td class="p-4 text-gray-300">{{ $user->email }}</td>
                 <td class="p-4">
