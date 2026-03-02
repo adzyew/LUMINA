@@ -8,11 +8,40 @@
         <h1 class="text-3xl font-playfair font-bold text-black">Roles & Permissions</h1>
         <p class="text-gray-600 text-sm mt-1">Manage role permissions for your team.</p>
     </div>
-    <div class="flex gap-3">
-        <a href="{{ route('admin.users.create') }}" class="px-5 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors">
-            + Add Staff
-        </a>
-    </div>
+    <button onclick="document.getElementById('addRoleModal').classList.remove('hidden')" class="px-5 py-2.5 bg-amber-400 hover:bg-amber-500 text-black font-bold rounded-lg transition-colors shadow-lg">
+    + Add Role
+    </button>
+
+    <div id="addRoleModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        
+        <div class="fixed inset-0 bg-black/75 transition-opacity" aria-hidden="true" onclick="document.getElementById('addRoleModal').classList.add('hidden')"></div>
+
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <div class="relative z-10 inline-block align-bottom bg-gray-900 border border-white/10 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full p-8">
+            <h3 class="text-2xl font-bold text-white mb-2" id="modal-title">Create New Role</h3>
+            <p class="text-gray-400 text-sm mb-6">Enter a department or job title. It will automatically be formatted for the system.</p>
+
+            <form action="{{ route('admin.roles.store') }}" method="POST">
+                @csrf
+                <div class="mb-6">
+                    <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Role Name (e.g., Marketing Staff)</label>
+                    <input type="text" name="name" id="name" required placeholder="Type role name..." class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors">
+                </div>
+
+                <div class="flex justify-end gap-3 mt-8">
+                    <button type="button" onclick="document.getElementById('addRoleModal').classList.add('hidden')" class="px-5 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-xl transition-colors font-medium">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-xl transition-colors shadow-lg">
+                        Create Role
+                    </button>
+                </div>
+            </form>
+        </div>
+        </div>
+</div>
 </header>
 
 @if(session('success'))
@@ -34,7 +63,7 @@
     @foreach($roles as $role)
             <tr class="hover:bg-amber-300/10 transition duration-300">
                 <td class="p-4">
-                    <span class="font-bold text-white capitalize">{{ $role->name }}</span>
+                    <span class="font-bold text-white capitalize">{{ Str::headline($role->name) }}</span>
                 </td>
                 <td class="p-4">
                     <div class="flex flex-wrap gap-2">
@@ -46,11 +75,21 @@
                     </div>
                 </td>
                 <td class="p-4">
-                    <div class="flex justify-center">
-                        <a href="{{ route('admin.roles.edit', $role) }}" class="inline-flex items-center px-4 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors text-sm">
-                    Edit Permissions
-                </a>
-            </div>
+                   <div class="flex items-center gap-3">
+                    <a href="{{ route('admin.roles.edit', $role->id) }}" class="px-5 py-2 bg-amber-400 hover:bg-amber-500 text-black font-bold rounded-xl transition-colors text-sm shadow-md">
+                        Edit Permissions
+                    </a>
+
+                    @if(strtolower($role->name) !== 'admin' && strtolower($role->name) !== 'staff')
+                        <form action="{{ route('admin.roles.destroy', $role->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete the {{ Str::headline($role->name) }} role? This cannot be undone.');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="px-5 py-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 hover:border-red-500 font-bold rounded-xl transition-all text-sm shadow-md">
+                                Delete
+                            </button>
+                        </form>
+                    @endif
+                </div>
                 </td>
             </tr>
                 @endforeach

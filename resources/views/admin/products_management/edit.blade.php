@@ -99,6 +99,52 @@
                 </a>
         </div>
     </form>
+    <div class="mt-12 bg-gray-900 rounded-xl p-6 border border-white/10">
+    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+        <svg class="w-5 h-5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        Inventory Movement History
+    </h3>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-white/10 text-gray-400 text-sm tracking-wider uppercase">
+                    <th class="py-3 font-medium">Date</th>
+                    <th class="py-3 font-medium">Action By</th>
+                    <th class="py-3 font-medium">Reason</th>
+                    <th class="py-3 font-medium">Previous</th>
+                    <th class="py-3 font-medium text-center">Change</th>
+                    <th class="py-3 font-medium text-right">New Stock</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-300">
+                @forelse($product->inventoryLogs as $log)
+                    <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                        <td class="py-4 text-sm">{{ $log->created_at->format('M d, Y h:i A') }}</td>
+                        <td class="py-4 text-sm">{{ $log->user->name ?? 'System' }}</td>
+                        <td class="py-4 text-sm">
+                            {{ $log->reason }}
+                            @if($log->reference_id)
+                                <span class="text-gray-500 text-xs ml-1">({{ $log->reference_id }})</span>
+                            @endif
+                        </td>
+                        <td class="py-4">{{ $log->previous_stock }}</td>
+                        <td class="py-4 text-center">
+                            <span class="px-2 py-1 rounded-md text-xs font-bold {{ $log->quantity_changed > 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400' }}">
+                                {{ $log->quantity_changed > 0 ? '+' : '' }}{{ $log->quantity_changed }}
+                            </span>
+                        </td>
+                        <td class="py-4 text-right font-bold text-white">{{ $log->new_stock }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="py-8 text-center text-gray-500">No inventory movements recorded yet.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
     </div>
 </div>
 @endsection

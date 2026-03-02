@@ -6,7 +6,7 @@
 <div class="max-w-4xl w-full">
     <header class="mb-8">
         <h1 class="text-3xl font-playfair font-bold text-black">Edit Permissions</h1>
-        <p class="text-gray-600 text-sm mt-1">Manage permissions for "{{ $role->name }}" role.</p>
+        <p class="text-gray-600 text-sm mt-1">Manage permissions for {{ Str::headline($role->name) }} role.</p>
     </header>
 
     <div class="bg-gray-900 border border-white/5 rounded-2xl p-6 sm:p-8">
@@ -22,7 +22,7 @@
                            value="{{ $permission->name }}"
                                {{ $role->hasPermissionTo($permission->name) ? 'checked' : '' }}
                                class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-amber-300 focus:ring-amber-300">
-                        <span class="text-gray-300">{{ $permission->name }}</span>
+                        <span class="text-gray-300">{{ ucwords(str_replace('.', ' ', $permission->name)) }}</span>
                 </label>
             @endforeach
         </div>

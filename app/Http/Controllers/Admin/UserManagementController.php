@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Str;
 
 class UserManagementController extends Controller
 {
@@ -139,6 +140,39 @@ class UserManagementController extends Controller
     {
         $roles = Role::with('permissions')->get();
         return view('admin.roles.index', compact('roles'));
+    }
+    public function storeRole(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:roles,name',
+        ]);
+
+        // Convert "Marketing Staff" to "marketing_staff"
+        $formattedName = Str::snake(strtolower($request->name));
+
+        Role::create(['name' => $formattedName]);
+
+        return redirect()->back()->with('success', 'New role created successfully!');
+    }
+
+    public function destroyRole($id)
+    {
+        $role = Role::findOrFail($id);
+
+        // 1. SAFETY CHECK: Prevent deleting core system roles
+        if (in_array(strtolower($role->name), ['admin', 'staff'])) {
+            return redirect()->back()->with('error', 'System protection: You cannot delete the core Admin or Staff roles.');
+        }
+
+        // 2. SAFETY CHECK: Prevent deleting roles that users are still using
+        if ($role->users()->count() > 0) {
+            return redirect()->back()->with('error', 'Cannot delete this role because there are staff members currently assigned to it. Please reassign those users first.');
+        }
+
+        // 3. Safe to delete!
+        $role->delete();
+
+        return redirect()->back()->with('success', Str::headline($role->name) . ' role was successfully deleted!');
     }
 
     /**

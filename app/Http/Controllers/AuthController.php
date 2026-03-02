@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Order;
 use App\Mail\TestMail;
 use App\Services\CloudinaryService;
 use Illuminate\Support\Facades\Log;
@@ -23,9 +24,6 @@ class AuthController extends Controller
     {
         return view('auth.register');
     }
-
-    // --- ADD THESE FUNCTIONS TO AuthController.php ---
-
    
 
     public function registerPost(Request $request)
@@ -83,8 +81,12 @@ class AuthController extends Controller
 
     public function user_dashboard(Request $request)
     {
-        return view("user.user_dashboard");
+        $user = auth()->user();
+        $orders = $user->orders()->with('items.product')->latest()->get();
+        return view("user.user_dashboard", compact('user', 'orders'));
     }
+
+    
 
     public function editProfile()
     {
@@ -324,7 +326,7 @@ class AuthController extends Controller
             return redirect()->route('admin.admin_dashboard')->with('success', 'Account verified!');
         }
         if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('deliveries.manage')) {
-            return redirect()->route('admin.staff.dashboard')->with('success', 'Account verified!');
+            return redirect()->route('staff.dashboard')->with('success', 'Account verified!');
         }
 
         return redirect()->route('dashboard')->with('success', 'Account verified!');
