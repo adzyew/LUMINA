@@ -194,6 +194,8 @@ class ProductController extends Controller
      */
     public function archive(Product $product)
     {
+
+        $product->delete(); // This will set the deleted_at timestamp due to SoftDeletes trait
         $product->archived_at = now();
         $product->save();
 
@@ -205,6 +207,9 @@ class ProductController extends Controller
      */
     public function unarchive(Product $product)
     {
+        $product = Product::withTrashed()->findOrFail($product->id);
+        $product->restore(); // This will set the deleted_at timestamp to null
+
         $product->archived_at = null;
         $product->save();
 

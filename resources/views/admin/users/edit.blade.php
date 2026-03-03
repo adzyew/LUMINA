@@ -56,7 +56,7 @@
                 <p class="text-xs text-gray-500 mt-1">Admin = full access. Staff = limited access (inventory, sales). Customer = store access only.</p>
             </div>
 
-            @if($permissions->isNotEmpty())
+            {{--  @if($permissions->isNotEmpty())
             <div id="permissionsSection" class="border-t border-white/10 pt-6">
                 <label class="block text-sm font-medium text-gray-400 mb-3">Extra permissions for this user</label>
                 <p class="text-xs text-gray-500 mb-4">Grant additional permissions beyond their role. Useful for giving specific staff members access to more areas.</p>
@@ -82,7 +82,7 @@
                     @endforeach
                 </div>
             </div>
-            @endif
+            @endif--}}
 
             <div class="flex gap-4 pt-4">
                 <button type="submit" class="px-6 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors">
