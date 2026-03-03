@@ -52,38 +52,41 @@
                     placeholder="Street, building name, house number">
                 @error('shipping_street')<p class="text-red-500 dark:text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">City / Municipality <span class="text-amber-500">*</span></label>
+                        <select id="city" name="shipping_city" required
+                            class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-amber-400 outline-none transition-colors">
+                            <option value="">Loading cities...</option>
+                        </select>
+                        @error('shipping_city')<p class="text-red-500 dark:text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
+                    </div>          
                 <div>
-                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">City / Municipality <span class="text-amber-500">*</span></label>
-                    <input type="text" name="shipping_city" value="{{ old('shipping_city', auth()->user()->shipping_city ?? '') }}" required
-                        class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-amber-400 outline-none transition-colors"
-                        placeholder="City or municipality">
-                    @error('shipping_city')<p class="text-red-500 dark:text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Province / State <span class="text-amber-500">*</span></label>
-                    <input type="text" name="shipping_province" value="{{ old('shipping_province', auth()->user()->shipping_province ?? '') }}" required
-                        class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-amber-400 outline-none transition-colors"
-                        placeholder="Province or state">
-                    @error('shipping_province')<p class="text-red-500 dark:text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
-                </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Postal / ZIP Code</label>
-                    <input type="text" name="shipping_postal_code" value="{{ old('shipping_postal_code', auth()->user()->shipping_postal_code ?? '') }}"
-                        class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-amber-400 outline-none transition-colors"
-                        placeholder="e.g. 1000">
-                    @error('shipping_postal_code')<p class="text-red-500 dark:text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Country <span class="text-amber-500">*</span></label>
-                    <input type="text" name="shipping_country" value="{{ old('shipping_country', auth()->user()->shipping_country ?? 'Philippines') }}" required
-                        class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-amber-400 outline-none transition-colors"
-                        placeholder="Country">
-                    @error('shipping_country')<p class="text-red-500 dark:text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
+                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Barangay <span class="text-amber-500">*</span></label>
+                    <select id="barangay" name="shipping_barangay" required
+                        class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-amber-400 outline-none transition-colors">
+                        <option value="">Select Barangay</option>
+                    </select>
+                    @error('shipping_barangay')<p class="text-red-500 dark:text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
                 </div>
             </div>
+           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Postal / ZIP Code</label>
+                    <input type="text" id="zip" name="shipping_postal_code" value="{{ old('shipping_postal_code', auth()->user()->shipping_postal_code ?? '') }}" readonly
+                        class="w-full bg-gray-100 dark:bg-gray-700/50 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-500 dark:text-gray-400 cursor-not-allowed outline-none"
+                        placeholder="Auto-filled">
+                </div>  
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Country</label>
+                    <input type="text" name="shipping_country" value="Philippines" readonly
+                        class="w-full bg-gray-100 dark:bg-gray-700/50 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-500 dark:text-gray-400 cursor-not-allowed outline-none">
+                </div>
+            </div>
+
+            <input type="hidden" name="shipping_region" value="National Capital Region (NCR)">
+            <input type="hidden" name="shipping_province" value="Metro Manila">
+
             <div>
                 <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Additional Notes (optional)</label>
                 <textarea name="notes" rows="2" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-amber-400 outline-none transition-colors" placeholder="Delivery instructions, landmark, etc.">{{ old('notes') }}</textarea>
@@ -112,6 +115,88 @@
 
     <a href="{{ route('cart.index') }}" class="block text-center mt-4 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">← Back to Cart</a>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const citySelect = document.getElementById('city');
+    const barangaySelect = document.getElementById('barangay');
+    const zipInput = document.getElementById('zip');
+
+    const zipCodes = {
+    "City of Manila": "1000",
+    "Quezon City": "1100",
+    "City of Caloocan": "1400",
+    "City of Makati": "1200",
+    "City of Taguig": "1630",
+    "City of Pasig": "1600",
+    "City of Parañaque": "1700",
+    "City of Las Piñas": "1740",
+    "City of Mandaluyong": "1550",
+    "City of Marikina": "1800",
+    "City of Navotas": "1485",
+    "City of Malabon": "1470",
+    "City of Valenzuela": "1440",
+    "City of San Juan": "1500",
+    "City of Muntinlupa": "1770",
+    "Pasay City": "1300",
+    "Pateros": "1620"
+};
+
+    // Load NCR Cities
+    fetch('https://psgc.gitlab.io/api/regions/130000000/cities-municipalities/')
+        .then(response => response.json())
+        .then(data => {
+            citySelect.innerHTML = '<option value="">Select City</option>';
+            data.forEach(city => {
+                const option = document.createElement('option');
+                option.value = city.name;
+                option.textContent = city.name;
+                option.dataset.code = city.code;
+                
+                // Pre-select if user has a saved city
+                if(option.value === "{{ auth()->user()->shipping_city }}") {
+                    option.selected = true;
+                }
+                
+                citySelect.appendChild(option);
+            });
+            
+            // Trigger change to load barangays if a city is pre-selected
+            if (citySelect.value) citySelect.dispatchEvent(new Event('change'));
+        });
+
+    citySelect.addEventListener('change', function () {
+        const selectedOption = this.selectedOptions[0];
+        if (!selectedOption || !selectedOption.dataset.code) return;
+
+        const cityCode = selectedOption.dataset.code;
+        const cityName = selectedOption.value;
+
+        zipInput.value = zipCodes[cityName] ?? '';
+        barangaySelect.innerHTML = '<option value="">Loading barangays...</option>';
+
+        fetch(`https://psgc.gitlab.io/api/cities-municipalities/${cityCode}/barangays/`)
+            .then(response => response.json())
+            .then(data => {
+                barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+                data.forEach(brgy => {
+                    const option = document.createElement('option');
+                    option.value = brgy.name;
+                    option.textContent = brgy.name;
+                    
+                    if(option.value === "{{ auth()->user()->shipping_barangay }}") {
+                        option.selected = true;
+                    }
+                    
+                    barangaySelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                barangaySelect.innerHTML = '<option value="">Failed to load</option>';
+            });
+    });
+});
+</script>
 
 @include('partials.footer')
 </body>
