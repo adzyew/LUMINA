@@ -97,10 +97,10 @@
     </section>
 
     {{-- Services Footer Section (4 cards) --}}
-    <section id="features" class="py-16 bg-white border-t border-gray-100 scroll-fade-in">
-        <div class="container mx-auto px-4 sm:px-6">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale hover:bg-gray-100 transition-colors duration-700 ease-in-out rounded-lg p-4 hover:shadow-md ">
+    <section id="features" class="py-16 bg-white border-t border-gray-100 scroll-fade-in scroll-smooth">
+        <div class="container mx-auto px-2 sm:px-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-12">
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-700 ease-in-out">
                     <div class="shrink-0 w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
                         <svg class="w-8 h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
                     </div>
@@ -110,7 +110,7 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale hover:bg-gray-100 transition-colors duration-700 ease-in-out rounded-lg p-4 hover:shadow-md pointer-events-auto ">
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-700 ease-in-out">
                     <div class="shrink-0 w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
                         <svg class="w-8 h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
@@ -120,7 +120,7 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale hover:bg-gray-100 transition-colors duration-700 ease-in-out rounded-lg p-4 hover:shadow-md ">
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-2 text-center sm:text-left scroll-scale p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-700 ease-in-out">
                     <div class="shrink-0 w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
                         <svg class="w-8 h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
                     </div>
@@ -130,7 +130,7 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale hover:bg-gray-100 transition-colors duration-700 ease-in-out rounded-lg p-4 hover:shadow-md ">
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-700 ease-in-out">
                     <div class="shrink-0 w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
                         <svg class="w-8 h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                     </div>

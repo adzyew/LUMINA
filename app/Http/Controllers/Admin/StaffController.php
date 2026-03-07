@@ -6,22 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role; // Add this!
 use Illuminate\Support\Str; // Add this!
 
 class StaffController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     public function index()
     {
         $this->authorizeAdmin();
 
-        // 🔄 UPDATED: Fetch users who have Spatie roles assigned to them
-        $staff = User::whereHas('roles')->orderBy('name')->paginate(25);
+        // Show only non-admin role users in staff management.
+        $staff = User::whereHas('roles', function ($query) {
+            $query->where('name', '!=', 'admin');
+        })->orderBy('name')->paginate(25);
 
         return view('admin.staff.index', compact('staff'));
     }
@@ -42,7 +40,7 @@ class StaffController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
-            'role' => 'nullable|string|exists:roles,name', // Validates against the roles table
+            'role' => 'required|string|exists:roles,name',
         ]);
 
         $user = User::create([
@@ -53,10 +51,7 @@ class StaffController extends Controller
             // 'role' => $data['role'] ?? null, // Keep this if you still have the old column
         ]);
 
-        // 🔄 UPDATED: Attach the Spatie Role to the new user
-        if (!empty($data['role'])) {
-            $user->assignRole($data['role']);
-        }
+        $user->assignRole($data['role']);
 
         return redirect()->route('admin.staff.index')->with('success', 'Staff account created successfully.');
     }
@@ -81,7 +76,7 @@ class StaffController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:6|confirmed',
-            'role' => 'nullable|string|exists:roles,name',
+            'role' => 'required|string|exists:roles,name',
         ]);
 
         $user->name = $data['name'];
@@ -91,13 +86,7 @@ class StaffController extends Controller
         }
         $user->save();
 
-        // 🔄 UPDATED: Sync the Spatie Roles (Removes old role, adds the new one)
-        if (!empty($data['role'])) {
-            $user->syncRoles([$data['role']]);
-        } else {
-            // If no role is selected, clear their roles
-            $user->syncRoles([]); 
-        }
+        $user->syncRoles([$data['role']]);
 
         return redirect()->route('admin.staff.index')->with('success', 'Staff updated successfully.');
     }
@@ -107,7 +96,7 @@ class StaffController extends Controller
         $this->authorizeAdmin();
 
         // prevent deleting self
-        if (auth()->id() === $user->id) {
+        if (Auth::id() === $user->id) {
             return redirect()->back()->with('error', 'You cannot delete your own account.');
         }
 
@@ -119,8 +108,8 @@ class StaffController extends Controller
     // 🔄 UPDATED: Automatically grab roles directly from the database!
     protected function availableRoles(): array
     {
-        // Get all roles except 'Admin' (to prevent accidentally making someone a full admin)
-        $roles = Role::where('name', '!=', 'admin')->get();
+        // Exclude admin role so this page remains staff-only.
+        $roles = Role::whereNotIn('name', ['admin', 'customer'])->orderBy('name')->get();
         
         $formattedRoles = [];
         foreach ($roles as $role) {
@@ -133,7 +122,10 @@ class StaffController extends Controller
 
     protected function authorizeAdmin()
     {
-        if (!auth()->user() || (!auth()->user()->is_admin && !auth()->user()->hasRole('admin'))) {
+        /** @var \App\Models\User|null $currentUser */
+        $currentUser = Auth::user();
+
+        if (!$currentUser || (!$currentUser->is_admin && !$currentUser->hasRole('admin'))) {
             abort(403, 'Unauthorized access.');
         }
     }

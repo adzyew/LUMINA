@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Str;
@@ -31,7 +32,10 @@ class UserManagementController extends Controller
             if ($filter === 'admin') {
                 $query->role('admin');
             } elseif ($filter === 'staff') {
-                $query->role('staff');
+                $query->whereHas('roles', function ($roleQuery) {
+                    $roleQuery->where('name', '!=', 'admin')
+                        ->where('name', '!=', 'customer');
+                });
             } elseif ($filter === 'customer') {
                 $query->whereDoesntHave('roles');
             }
@@ -47,7 +51,7 @@ class UserManagementController extends Controller
      */
     public function create()
     {
-        $roles = Role::whereIn('name', ['staff', 'customer'])->orderBy('name')->get();
+        $roles = Role::whereIn('name', $this->staffRoleNames())->orderBy('name')->get();
         $permissions = Permission::orderBy('name')->get();
         return view('admin.users.create', compact('roles', 'permissions'));
     }
@@ -58,11 +62,13 @@ class UserManagementController extends Controller
      */
     public function store(Request $request)
     {
+        $staffRoleNames = $this->staffRoleNames();
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'nullable|string|in:staff,customer',
+            'role' => ['required', 'string', Rule::in($staffRoleNames)],
             'permissions' => 'nullable|array',
             'permissions.*' => 'exists:permissions,name',
         ]);
@@ -73,9 +79,7 @@ class UserManagementController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        if ($request->filled('role') && Role::where('name', $request->role)->exists()) {
-            $user->assignRole($request->role);
-        }
+        $user->assignRole($request->role);
 
         $user->syncPermissions($request->permissions ?? []);
 
@@ -93,7 +97,7 @@ class UserManagementController extends Controller
             abort(403, 'Admin users cannot be edited.');
         }
 
-        $roles = Role::orderBy('name')->get();
+        $roles = Role::whereIn('name', $this->staffRoleNames())->orderBy('name')->get();
         $permissions = Permission::orderBy('name')->get();
         return view('admin.users.edit', compact('user', 'roles', 'permissions'));
     }
@@ -108,10 +112,12 @@ class UserManagementController extends Controller
             abort(403, 'Admin users cannot be edited.');
         }
 
+        $staffRoleNames = $this->staffRoleNames();
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'role' => 'nullable|string',
+            'role' => ['required', 'string', Rule::in($staffRoleNames)],
             'permissions' => 'nullable|array',
             'permissions.*' => 'exists:permissions,name',
         ]);
@@ -121,11 +127,7 @@ class UserManagementController extends Controller
             'email' => $request->email,
         ]);
 
-        if ($request->filled('role') && Role::where('name', $request->role)->exists()) {
-            $user->syncRoles([$request->role]);
-        } else {
-            $user->syncRoles([]);
-        }
+        $user->syncRoles([$request->role]);
 
         $user->syncPermissions($request->permissions ?? []);
 
@@ -218,5 +220,32 @@ class UserManagementController extends Controller
         $user->save();
 
         return redirect()->route('admin.users.index')->with('success', 'User unarchived.');
+    }
+
+    /**
+     * Permanently delete an archived user account
+     */
+    public function destroy(User $user)
+    {
+        if ($user->hasRole('admin')) {
+            return redirect()->back()->with('error', 'Cannot delete admin users.');
+        }
+
+        $user->delete();
+
+        return redirect()->route('admin.users.index', ['filter' => 'archived'])
+            ->with('success', 'User permanently deleted.');
+    }
+
+    /**
+     * Allowed roles for admin-created staff users.
+     */
+    protected function staffRoleNames(): array
+    {
+        return Role::query()
+            ->where('name', '!=', 'admin')
+            ->where('name', '!=', 'customer')
+            ->pluck('name')
+            ->all();
     }
 }

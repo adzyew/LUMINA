@@ -33,8 +33,19 @@ class AuthController extends Controller
             'last_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:8|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'confirmed',
+            ],
             'terms' => 'accepted',
+        ], [
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.regex' => 'Password must include uppercase, lowercase, and a number.',
         ]);
 
         // Combine first and last name

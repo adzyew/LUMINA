@@ -7,8 +7,8 @@
     <header class="mb-8">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-3xl font-playfair font-bold text-gray-900 dark:text-white">Add User</h1>
-                <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Create a new staff or customer account.</p>
+                <h1 class="text-3xl font-playfair font-bold text-gray-900 dark:text-white">Add Staff User</h1>
+                <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Create a new staff account and assign a staff role.</p>
             </div>
             <a href="{{ route('admin.roles.index') }}" class="text-sm text-gray-600 dark:text-gray-400 hover:text-amber-500 transition-colors">
                 &larr; Back to Roles & Permissions
@@ -83,13 +83,15 @@
             <div>
                 <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Role</label>
                 <select name="role" id="roleSelect" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-amber-400 dark:focus:border-amber-300 outline-none transition-colors">
-                    <option value="staff" {{ old('role', 'staff') === 'staff' ? 'selected' : '' }}>Staff</option>
-                    <option value="customer" {{ old('role') === 'customer' ? 'selected' : '' }}>Customer</option>
+                    <option value="">Select staff role</option>
+                    @foreach($roles as $role)
+                        <option value="{{ $role->name }}" {{ old('role') === $role->name ? 'selected' : '' }}>{{ \Illuminate\Support\Str::headline($role->name) }}</option>
+                    @endforeach
                 </select>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Staff = inventory &amp; sales access. Customer = store access only.</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Only staff roles are allowed from this form.</p>
             </div>
 
-            @if($permissions->isNotEmpty())
+            {{--  @if($permissions->isNotEmpty())
             <div id="permissionsSection" class="border-t border-gray-200 dark:border-white/10 pt-6">
                 <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">Extra permissions</label>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Grant additional permissions beyond the role (optional).</p>
@@ -115,11 +117,11 @@
                     @endforeach
                 </div>
             </div>
-            @endif
+            {{--  @endif --}}
 
             <div class="flex gap-4 pt-4">
                 <button type="submit" class="px-6 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors">
-                    Create User
+                    Create Staff
                 </button>
                 <a href="{{ route('admin.users.index') }}" class="px-6 py-2.5 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 transition-colors">
                     Cancel
