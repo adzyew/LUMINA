@@ -57,7 +57,7 @@
     @include('partials.navbar')
 
     {{-- Hero Section - Carousel background --}}
-    <section class="relative pt-24 sm:pt-28 min-h-[85vh] lg:min-h-[90vh] overflow-hidden">
+    <section class="relative pt-24 sm:pt-28 min-h-screen lg:min-h-screen overflow-hidden scrollbar-hide">
         <div class="absolute inset-0 -z-10 hero-carousel">
             <div class="swiper heroBgSwiper w-full h-full ">
                 <div class="swiper-wrapper">
@@ -79,7 +79,7 @@
                 </div>
             </div>
         </div>
-        <div class="absolute inset-0 -z-[1] bg-black/25"></div>
+        <div class="absolute inset-0 -z-1 bg-black/25"></div>
         <div class="relative flex flex-col justify-center min-h-[75vh] lg:min-h-[80vh] items-start max-w-3xl">
             <div class="flex flex-col justify-center px-6 sm:px-10 lg:px-16 xl:px-24 py-12 lg:py-24">
                 <p class="text-sm font-bold text-amber-200 uppercase tracking-widest mb-3">Handcrafted Elegance</p>
