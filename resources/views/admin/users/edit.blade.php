@@ -7,11 +7,11 @@
     <header class="mb-8">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-3xl font-playfair font-bold text-black">Edit User</h1>
-                <p class="text-gray-600 text-sm mt-1">{{ $user->name }}</p>
+                <h1 class="text-3xl font-playfair font-bold text-gray-900 dark:text-white">Edit Staff User</h1>
+                <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">{{ $user->name }}</p>
             </div>
-            <a href="{{ route('admin.users.index') }}" class="text-sm text-gray-600 hover:text-black transition-colors">
-                &larr; Back to Users
+            <a href="{{ route('admin.users.index') }}" class="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
+                &larr; Back to Staff
             </a>
         </div>
     </header>
@@ -26,34 +26,33 @@
         </div>
     @endif
 
-    <div class="bg-gray-900 border border-white/5 rounded-2xl p-6 sm:p-8">
+    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 sm:p-8">
         <form method="POST" action="{{ route('admin.users.update', $user) }}" class="space-y-6">
             @csrf
             @method('PUT')
 
             <div>
-                <label class="block text-sm font-medium text-gray-400 mb-2">Name</label>
+                <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Name</label>
                 <input type="text" name="name" value="{{ old('name', $user->name) }}" required
-                    class="w-full bg-gray-800 border border-white/10 rounded-lg p-3 text-white focus:border-amber-300 outline-none">
+                    class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-amber-300 outline-none">
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-400 mb-2">Email</label>
+                <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Email</label>
                 <input type="email" name="email" value="{{ old('email', $user->email) }}" required
-                    class="w-full bg-gray-800 border border-white/10 rounded-lg p-3 text-white focus:border-amber-300 outline-none">
+                    class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-amber-300 outline-none">
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-400 mb-2">Role</label>
-                <select name="role" required id="roleSelect" class="w-full bg-gray-800 border border-white/10 rounded-lg p-3 text-white focus:border-amber-300 outline-none">
-                    <option value="" {{ $user->roles->isEmpty() ? 'selected' : '' }}>Customer (no role)</option>
+                <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Role</label>
+                <select name="role" required id="roleSelect" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-amber-300 outline-none">
                     @foreach($roles as $role)
                         <option value="{{ $role->name }}" {{ $user->hasRole($role->name) ? 'selected' : '' }}>
-                            {{ ucfirst($role->name) }}
+                            {{ \Illuminate\Support\Str::headline($role->name) }}
                         </option>
                     @endforeach
                 </select>
-                <p class="text-xs text-gray-500 mt-1">Admin = full access. Staff = limited access (inventory, sales). Customer = store access only.</p>
+                <p class="text-xs text-gray-500 mt-1">Select one staff role for this account.</p>
             </div>
 
             {{--  @if($permissions->isNotEmpty())
@@ -86,9 +85,9 @@
 
             <div class="flex gap-4 pt-4">
                 <button type="submit" class="px-6 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors">
-                    Update User
+                    Update Staff
                 </button>
-                <a href="{{ route('admin.users.index') }}" class="px-6 py-2.5 bg-white/5 text-gray-300 font-semibold rounded-lg hover:bg-white/10 border border-white/10 transition-colors">
+                <a href="{{ route('admin.users.index') }}" class="px-6 py-2.5 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 font-semibold rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10 transition-colors">
                     Cancel
                 </a>
             </div>

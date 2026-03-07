@@ -103,31 +103,143 @@
 
     {{-- Stats Cards --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 relative overflow-hidden group shadow-sm dark:shadow-none">
-            <div class="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                <svg class="w-24 h-24 text-amber-300" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"></path><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"></path></svg>
+        <div class="bg-linear-to-br from-amber-50 to-white dark:from-gray-900 dark:to-gray-900 border border-amber-200/60 dark:border-white/10 rounded-3xl p-6 relative overflow-hidden group shadow-sm dark:shadow-none">
+            <div class="absolute -right-5 -top-5 w-20 h-20 bg-amber-300/20 rounded-full blur-2xl"></div>
+            <div class="flex items-start justify-between mb-4">
+                <h3 class="text-gray-600 dark:text-gray-400 text-md font-semibold">Revenue</h3>
+                <div class="w-13 h-13 rounded-2xl bg-amber-400/20 text-amber-700 dark:text-amber-300 flex items-center justify-center">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg>
+                </div>
             </div>
-            <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Total Revenue</h3>
-            <p class="text-3xl font-bold text-amber-600 dark:text-amber-300">₱{{ number_format($totalRevenue ?? 0, 2) }}</p>
-            <div class="mt-4 flex items-center text-xs {{ ($revenueChange ?? 0) >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
-                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                <span>{{ ($revenueChange ?? 0) >= 0 ? '+' : '' }}{{ $revenueChange ?? 0 }}% vs last month</span>
-            </div>
+            <p class="text-3xl font-bold text-amber-700 dark:text-amber-300">₱{{ number_format($totalRevenue ?? 0, 2) }}</p>
+            <p class="mt-3 text-xs {{ ($revenueChange ?? 0) >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
+                {{ ($revenueChange ?? 0) >= 0 ? '+' : '' }}{{ $revenueChange ?? 0 }}% vs last month
+            </p>
         </div>
 
-        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-none">
-            <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Total Orders</h3>
+        <div class="bg-linear-to-br from-blue-50 to-white dark:from-gray-900 dark:to-gray-900 border border-blue-200/60 dark:border-white/10 rounded-3xl p-6 relative overflow-hidden shadow-sm dark:shadow-none">
+            <div class="absolute -right-5 -top-5 w-20 h-20 bg-blue-300/20 rounded-full blur-2xl"></div>
+            <div class="flex items-start justify-between mb-4">
+                <h3 class="text-gray-600 dark:text-gray-400 text-md font-semibold">Orders</h3>
+                <div class="w-13 h-13 rounded-2xl bg-blue-400/20 text-blue-700 dark:text-blue-300 flex items-center justify-center">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                </div>
+            </div>
             <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $totalOrders }}</p>
+            <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                {{ $ordersByStatus['pending'] ?? 0 }} pending, {{ $ordersByStatus['processing'] ?? 0 }} processing
+            </p>
         </div>
 
-        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-none">
-            <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Total Products</h3>
+        <div class="bg-linear-to-br from-emerald-50 to-white dark:from-gray-900 dark:to-gray-900 border border-emerald-200/60 dark:border-white/10 rounded-3xl p-6 relative overflow-hidden shadow-sm dark:shadow-none">
+            <div class="absolute -right-5 -top-5 w-20 h-20 bg-emerald-300/20 rounded-full blur-2xl"></div>
+            <div class="flex items-start justify-between mb-4">
+                <h3 class="text-gray-600 dark:text-gray-400 text-md font-semibold">Products</h3>
+                <div class="w-13 h-13 rounded-2xl bg-emerald-400/20 text-emerald-700 dark:text-emerald-300 flex items-center justify-center">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                </div>
+            </div>
             <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $totalProducts }}</p>
+            <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                {{ $inventoryStatuses['in_stock'] ?? 0 }} in stock, {{ $inventoryStatuses['low_stock'] ?? 0 }} low stock
+            </p>
+        </div>
+
+        <div class="bg-linear-to-br from-violet-50 to-white dark:from-gray-900 dark:to-gray-900 border border-violet-200/60 dark:border-white/10 rounded-3xl p-6 relative overflow-hidden shadow-sm dark:shadow-none">
+            <div class="absolute -right-5 -top-5 w-20 h-20 bg-violet-300/20 rounded-full blur-2xl"></div>
+            <div class="flex items-start justify-between mb-4">
+                <h3 class="text-gray-600 dark:text-gray-400 text-md font-semibold">Users</h3>
+                <div class="w-13 h-13 rounded-2xl bg-violet-400/20 text-violet-700 dark:text-violet-300 flex items-center justify-center">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-1a4 4 0 00-4-4h-1m-4 5H3v-1a4 4 0 014-4h6a4 4 0 014 4v1zM9 7a4 4 0 118 0 4 4 0 01-8 0z"/></svg>
+                </div>
+            </div>
+            <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $totalUsers }}</p>
+            <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                {{ $staffUsers ?? 0 }} staff, {{ $customerUsers ?? 0 }} customers
+            </p>
+        </div>
+    </div>
+
+    {{-- Department Status Overview --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-none">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Inventory Status</h3>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-blue-500/20 bg-blue-500/10 p-3">
+                    <p class="text-[11px] uppercase tracking-wide text-blue-600 dark:text-blue-400">Total</p>
+                    <p class="text-xl font-bold text-blue-700 dark:text-blue-300">{{ $inventoryStatuses['total'] ?? 0 }}</p>
+                </div>
+                <div class="rounded-xl border border-green-500/20 bg-green-500/10 p-3">
+                    <p class="text-[11px] uppercase tracking-wide text-green-600 dark:text-green-400">In Stock</p>
+                    <p class="text-xl font-bold text-green-700 dark:text-green-300">{{ $inventoryStatuses['in_stock'] ?? 0 }}</p>
+                </div>
+                <div class="rounded-xl border border-amber-500/20 bg-amber-500/10 p-3">
+                    <p class="text-[11px] uppercase tracking-wide text-amber-600 dark:text-amber-400">Low Stock</p>
+                    <p class="text-xl font-bold text-amber-700 dark:text-amber-300">{{ $inventoryStatuses['low_stock'] ?? 0 }}</p>
+                </div>
+                <div class="rounded-xl border border-red-500/20 bg-red-500/10 p-3">
+                    <p class="text-[11px] uppercase tracking-wide text-red-600 dark:text-red-400">Out Stock</p>
+                    <p class="text-xl font-bold text-red-700 dark:text-red-300">{{ $inventoryStatuses['out_of_stock'] ?? 0 }}</p>
+                </div>
+            </div>
         </div>
 
         <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-none">
-            <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Active Users</h3>
-            <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $totalUsers }}</p>
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Sales Status</h3>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+                <div class="rounded-lg border border-amber-500/20 bg-amber-500/10 p-2 text-center">
+                    <p class="text-[10px] uppercase text-amber-600 dark:text-amber-400">Pending</p>
+                    <p class="font-bold text-amber-700 dark:text-amber-300">{{ $salesStatuses['pending'] ?? 0 }}</p>
+                </div>
+                <div class="rounded-lg border border-blue-500/20 bg-blue-500/10 p-2 text-center">
+                    <p class="text-[10px] uppercase text-blue-600 dark:text-blue-400">Confirmed</p>
+                    <p class="font-bold text-blue-700 dark:text-blue-300">{{ $salesStatuses['confirmed'] ?? 0 }}</p>
+                </div>
+                <div class="rounded-lg border border-indigo-500/20 bg-indigo-500/10 p-2 text-center">
+                    <p class="text-[10px] uppercase text-indigo-600 dark:text-indigo-400">Processing</p>
+                    <p class="font-bold text-indigo-700 dark:text-indigo-300">{{ $salesStatuses['processing'] ?? 0 }}</p>
+                </div>
+                <div class="rounded-lg border border-purple-500/20 bg-purple-500/10 p-2 text-center">
+                    <p class="text-[10px] uppercase text-purple-600 dark:text-purple-400">Shipped</p>
+                    <p class="font-bold text-purple-700 dark:text-purple-300">{{ $salesStatuses['shipped'] ?? 0 }}</p>
+                </div>
+                <div class="rounded-lg border border-green-500/20 bg-green-500/10 p-2 text-center">
+                    <p class="text-[10px] uppercase text-green-600 dark:text-green-400">Delivered</p>
+                    <p class="font-bold text-green-700 dark:text-green-300">{{ $salesStatuses['delivered'] ?? 0 }}</p>
+                </div>
+                <div class="rounded-lg border border-red-500/20 bg-red-500/10 p-2 text-center">
+                    <p class="text-[10px] uppercase text-red-600 dark:text-red-400">Cancelled</p>
+                    <p class="font-bold text-red-700 dark:text-red-300">{{ $salesStatuses['cancelled'] ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-none">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Delivery Status</h3>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="rounded-xl border border-amber-500/20 bg-amber-500/10 p-3">
+                    <p class="text-[11px] uppercase tracking-wide text-amber-600 dark:text-amber-400">To Ship</p>
+                    <p class="text-xl font-bold text-amber-700 dark:text-amber-300">{{ $deliveryStatuses['to_ship'] ?? 0 }}</p>
+                </div>
+                <div class="rounded-xl border border-blue-500/20 bg-blue-500/10 p-3">
+                    <p class="text-[11px] uppercase tracking-wide text-blue-600 dark:text-blue-400">In Transit</p>
+                    <p class="text-xl font-bold text-blue-700 dark:text-blue-300">{{ $deliveryStatuses['in_transit'] ?? 0 }}</p>
+                </div>
+                <div class="rounded-xl border border-green-500/20 bg-green-500/10 p-3">
+                    <p class="text-[11px] uppercase tracking-wide text-green-600 dark:text-green-400">Delivered</p>
+                    <p class="text-xl font-bold text-green-700 dark:text-green-300">{{ $deliveryStatuses['delivered'] ?? 0 }}</p>
+                </div>
+                <div class="rounded-xl border border-red-500/20 bg-red-500/10 p-3">
+                    <p class="text-[11px] uppercase tracking-wide text-red-600 dark:text-red-400">Cancelled</p>
+                    <p class="text-xl font-bold text-red-700 dark:text-red-300">{{ $deliveryStatuses['cancelled'] ?? 0 }}</p>
+                </div>
+            </div>
         </div>
     </div>
 

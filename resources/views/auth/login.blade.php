@@ -49,7 +49,7 @@
 <body class="bg-white font-sans antialiased">
     @include('partials.navbar', ['authPage' => true])
 
-    <div class="min-h-screen flex pt-16">
+    <div class="min-h-screen flex pt-14">
         <!-- Left Side - Form -->
         <div class="w-full lg:w-1/2 flex flex-col justify-center p-8 lg:p-16">
             <div class="auth-form-wrapper">
@@ -73,7 +73,7 @@
 
                         <!-- LOGIN PANEL -->
                         <div class="slide-panel" id="panel-login">
-                            <h2 class="text-3xl font-serif font-semibold text-gray-900 mb-2">Welcome back</h2>
+                            <h2 class="text-3xl font-serif font-semibold text-gray-900 mb-2">Welcome Back!</h2>
                             <p class="text-gray-500 mb-8">Please enter your details to access your collection.</p>
 
                             <form method="POST" action="{{ route('login.post') }}" class="space-y-5">
@@ -181,7 +181,7 @@
 
                         <!-- REGISTER PANEL -->
                         <div class="slide-panel" id="panel-register">
-                            <h2 class="text-3xl font-serif font-semibold text-gray-900 mb-2">Join the Circle</h2>
+                            <h2 class="text-3xl font-serif font-semibold text-gray-900 mb-2 p-1">Join our Circle</h2>
                             <p class="text-gray-500 mb-6">Create an account to curate your wishlist.</p>
 
                             <form method="POST" action="{{ route('register.post') }}" class="space-y-4">
@@ -265,7 +265,9 @@
                                         </span>
                                         <input id="register-password" type="password" name="password"
                                             class="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all"
-                                            placeholder="Create Password">
+                                            placeholder="Create Password"
+                                            minlength="8"
+                                            autocomplete="new-password">
                                         <button type="button" onclick="togglePasswordField('register-password', 'register-eye-open', 'register-eye-closed')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
                                             <svg id="register-eye-open" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -281,6 +283,8 @@
                                             <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
                                         @endif
                                     @enderror
+                                    <p id="register-password-strength" class="hidden text-xs mt-2 text-gray-500">Password strength: Weak</p>
+                                    <p id="register-password-rules" class="hidden text-xs mt-1 text-gray-500">Use at least 8 characters with uppercase, lowercase, and a number.</p>
                                 </div>
 
                                 <!-- Confirm Password -->
@@ -309,7 +313,7 @@
                                 <!-- Terms -->
                                 <div class="flex items-start gap-3">
                                     <input type="checkbox" name="terms" id="terms" class="w-4 h-4 mt-0.5 rounded border-gray-300 text-amber-400 focus:ring-amber-500">
-                                        <label for="terms" class="text-gray-600 text-sm leading-tight">
+                                        <label for="terms" class="text-gray-600 text-sm leading-tight cursor-pointer">
                                         I agree to the <a href="#" id="openTermsLink" onclick="openTermsModal('terms'); return false;" class="text-amber-400 hover:text-amber-600 underline">Terms of Service</a> and <a href="#" id="openPrivacyLink" onclick="openTermsModal('privacy'); return false;" class="text-amber-400 hover:text-amber-600 underline">Privacy Policy</a>.
                                     </label>
                                 </div>
@@ -319,7 +323,7 @@
                                     @endif
                                 @enderror
 
-                                <button type="submit" class="w-full py-4 bg-amber-400 text-white font-medium rounded-xl hover:bg-amber-800 transition-all flex items-center justify-center gap-2 group">
+                                <button id="signupBtn" type="submit" disabled class="w-full py-4 bg-amber-400 text-white font-medium rounded-xl hover:bg-amber-600 transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
                                     Create Account
                                     <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
@@ -409,6 +413,61 @@
             if (activeTab === 'register') {
                 showTab('register');
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const termsCheckbox = document.querySelector('input[name="terms"]');
+            const signupBtn = document.getElementById('signupBtn');
+            const registerPassword = document.getElementById('register-password');
+            const strengthLabel = document.getElementById('register-password-strength');
+            const rulesLabel = document.getElementById('register-password-rules');
+
+            function updateRegisterPasswordStrength() {
+                if (!registerPassword || !strengthLabel || !rulesLabel) {
+                    return;
+                }
+
+                const value = registerPassword.value || '';
+                const hasMinLength = value.length >= 8;
+                const hasLower = /[a-z]/.test(value);
+                const hasUpper = /[A-Z]/.test(value);
+                const hasNumber = /\d/.test(value);
+                const isStrong = hasMinLength && hasLower && hasUpper && hasNumber;
+
+                if (value.length === 0) {
+                    strengthLabel.classList.add('hidden');
+                    rulesLabel.classList.add('hidden');
+                    strengthLabel.textContent = 'Password strength: Weak';
+                    strengthLabel.className = 'text-xs mt-2 text-gray-500';
+                    rulesLabel.textContent = 'Use at least 8 characters with uppercase, lowercase, and a number.';
+                    rulesLabel.className = 'text-xs mt-1 text-gray-500';
+                    return;
+                }
+
+                strengthLabel.classList.remove('hidden');
+                rulesLabel.classList.remove('hidden');
+
+                if (isStrong) {
+                    strengthLabel.textContent = 'Password strength: Strong';
+                    strengthLabel.className = 'text-xs mt-2 text-green-600';
+                    rulesLabel.textContent = 'Good password. Requirements complete.';
+                    rulesLabel.className = 'text-xs mt-1 text-green-600';
+                } else {
+                    strengthLabel.textContent = 'Password strength: Weak';
+                    strengthLabel.className = 'text-xs mt-2 text-red-500';
+                    rulesLabel.textContent = 'Missing requirement: 8+ chars, uppercase, lowercase, and number.';
+                    rulesLabel.className = 'text-xs mt-1 text-red-500';
+                }
+            }
+
+            if (registerPassword) {
+                registerPassword.addEventListener('input', updateRegisterPasswordStrength);
+                updateRegisterPasswordStrength();
+            }
+
+            termsCheckbox.addEventListener('change', function () {
+                signupBtn.disabled = !this.checked;
+            });
         });
     </script>
 </body>

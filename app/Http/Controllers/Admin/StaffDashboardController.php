@@ -11,31 +11,56 @@ use Illuminate\View\View;
 class StaffDashboardController extends Controller
 {
     /**
-     * Redirect staff to their role-specific dashboard.
+     * Staff hub dashboard with quick status previews per department.
      */
     public function index(Request $request)
     {
         $user = $request->user();
 
-        dd([
-            'Roles' => $user->getRoleNames(), 
-            'Permissions' => $user->getAllPermissions()->pluck('name')
-        ]);
-
-        if ($user->hasRole('inventory_manager') || $user->can('inventory.view')) {
-            return redirect()->route('admin.inventory.dashboard');
-        }
-        if ($user->hasRole('sales_staff') || $user->can('sales.view')) {
-            return redirect()->route('admin.sales.dashboard');
-        }
-        if ($user->hasRole('delivery_staff') || $user->can('deliveries.manage')) {
-            return redirect()->route('admin.delivery.dashboard');
-        }
-        if ($user->hasRole('staff')) {
-            return redirect()->route('admin.inventory.dashboard');
+        if ($user->hasRole('admin')) {
+            return redirect()->route('admin.admin_dashboard');
         }
 
-        return redirect()->route('admin.admin_dashboard');
+        $canInventory = $user->can('inventory.view');
+        $canSales = $user->can('sales.view');
+        $canDelivery = $user->can('deliveries.manage');
+
+        if (!$canInventory && !$canSales && !$canDelivery) {
+            return redirect()->route('admin.admin_dashboard');
+        }
+
+        $inventoryStats = null;
+        if ($canInventory) {
+            $inventoryStats = [
+                'total' => Product::count(),
+                'low_stock' => Product::whereBetween('stock_quantity', [1, 5])->count(),
+                'out_of_stock' => Product::where('stock_quantity', '<=', 0)->count(),
+            ];
+        }
+
+        $salesStats = null;
+        if ($canSales) {
+            $salesStats = [
+                'pending' => Order::where('status', 'pending')->count(),
+                'processing' => Order::where('status', 'processing')->count(),
+                'delivered' => Order::where('status', 'delivered')->count(),
+            ];
+        }
+
+        $deliveryStats = null;
+        if ($canDelivery) {
+            $deliveryStats = [
+                'to_ship' => Order::where('status', 'processing')->count(),
+                'in_transit' => Order::where('status', 'shipped')->count(),
+                'delivered' => Order::where('status', 'delivered')->count(),
+            ];
+        }
+
+        return view('admin.staff.dashboard', compact(
+            'inventoryStats',
+            'salesStats',
+            'deliveryStats'
+        ));
     }
 
     /**
@@ -72,13 +97,23 @@ class StaffDashboardController extends Controller
         $recentOrders = Order::with('user')->latest()->take(8)->get();
         $ordersByStatus = Order::selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status')->toArray();
 
+        $salesStatuses = [
+            'pending' => Order::where('status', 'pending')->count(),
+            'confirmed' => Order::where('status', 'confirmed')->count(),
+            'processing' => Order::where('status', 'processing')->count(),
+            'shipped' => Order::where('status', 'shipped')->count(),
+            'delivered' => Order::where('status', 'delivered')->count(),
+            'cancelled' => Order::where('status', 'cancelled')->count(),
+        ];
+
         return view('admin.staff.sales_dashboard', compact(
             'totalRevenue',
             'totalOrders',
             'pendingOrders',
             'thisMonthRevenue',
             'recentOrders',
-            'ordersByStatus'
+            'ordersByStatus',
+            'salesStatuses'
         ));
     }
 
@@ -96,11 +131,20 @@ class StaffDashboardController extends Controller
             ->take(10)
             ->get();
 
+        $deliveryStatuses = [
+            'processing' => $toShip,
+            'shipped' => $shipped,
+            'delivered' => $delivered,
+            'pending' => Order::where('status', 'pending')->count(),
+            'cancelled' => Order::where('status', 'cancelled')->count(),
+        ];
+
         return view('admin.staff.delivery_dashboard', compact(
             'toShip',
             'shipped',
             'delivered',
-            'pendingShipment'
+            'pendingShipment',
+            'deliveryStatuses'
         ));
     }
 }

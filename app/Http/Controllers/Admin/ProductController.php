@@ -172,8 +172,10 @@ class ProductController extends Controller
             ->with('success', 'Product updated successfully!');
     }
 
-    public function destroy(Product $product, CloudinaryService $cloudinary)
+    public function destroy($product, CloudinaryService $cloudinary)
     {
+        $product = Product::withTrashed()->findOrFail($product);
+
         $cloudinary->deleteImage($product->image_public_id);
 
         // delete gallery images too
@@ -182,11 +184,11 @@ class ProductController extends Controller
             $cloudinary->deleteImage($img->image_public_id);
         }
 
-        $product->delete();
+        $product->forceDelete();
 
         return redirect()
             ->route('admin.products.index')
-            ->with('success', 'Product deleted successfully!');
+            ->with('success', 'Product permanently deleted!');
     }
 
     /**

@@ -40,7 +40,7 @@
                 <select name="role" class="w-full mt-1 p-2 border rounded">
                     <option value="">-- Select role --</option>
                     @foreach($roles as $label => $value)
-                        <option value="{{ $value }}" @if(old('role', $user->role) == $value) selected @endif>{{ $label }}</option>
+                        <option value="{{ $value }}" @if(old('role', $currentRole) == $value) selected @endif>{{ $label }}</option>
                     @endforeach
                 </select>
             </label>

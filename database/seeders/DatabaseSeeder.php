@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,7 +16,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call(RolePermissionSeeder::class);
+
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@lumina.local'],
+            [
+                'name' => 'Lumina Admin',
+                'password' => Hash::make('Admin@12345'),
+                'is_admin' => true,
+                'email_verified_at' => now(),
+                'is_verified' => true,
+            ]
+        );
+        $admin->assignRole('admin');
 
         User::factory()->create([
             'name' => 'Test User',

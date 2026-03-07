@@ -52,6 +52,36 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
             $ordersByStatus = Order::selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status')->toArray();
             $recentOrders = Order::with('user')->latest()->take(5)->get();
 
+            $adminUsers = User::role('admin')->count();
+            $staffUsers = User::whereHas('roles', function ($query) {
+                $query->whereNotIn('name', ['admin', 'customer']);
+            })->count();
+            $customerUsers = User::whereDoesntHave('roles')->count();
+
+            $inventoryStatuses = [
+                'total' => $totalProducts,
+                'low_stock' => Product::whereBetween('stock_quantity', [1, 5])->count(),
+                'out_of_stock' => Product::where('stock_quantity', '<=', 0)->count(),
+            ];
+            $inventoryStatuses['in_stock'] = max(0, $inventoryStatuses['total'] - $inventoryStatuses['out_of_stock']);
+
+            $salesStatuses = [
+                'pending' => $ordersByStatus['pending'] ?? 0,
+                'confirmed' => $ordersByStatus['confirmed'] ?? 0,
+                'processing' => $ordersByStatus['processing'] ?? 0,
+                'shipped' => $ordersByStatus['shipped'] ?? 0,
+                'delivered' => $ordersByStatus['delivered'] ?? 0,
+                'cancelled' => $ordersByStatus['cancelled'] ?? 0,
+            ];
+
+            $deliveryStatuses = [
+                'to_ship' => $salesStatuses['processing'],
+                'in_transit' => $salesStatuses['shipped'],
+                'delivered' => $salesStatuses['delivered'],
+                'pending' => $salesStatuses['pending'],
+                'cancelled' => $salesStatuses['cancelled'],
+            ];
+
             return view('admin.admin_dashboard', compact(
                 'totalOrders',
                 'totalProducts',
@@ -59,7 +89,15 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
                 'totalRevenue',
                 'recentOrders',
                 'revenueChange',
-                'ordersByStatus'
+                'ordersByStatus',
+                'thisMonthRevenue',
+                'lastMonthRevenue',
+                'inventoryStatuses',
+                'salesStatuses',
+                'deliveryStatuses',
+                'adminUsers',
+                'staffUsers',
+                'customerUsers'
             ));
         })->middleware('role:admin')->name('admin_dashboard');
 
@@ -68,13 +106,16 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
                 ->only(['index', 'create', 'store', 'edit', 'update'])
                 ->middleware('role:admin');
 
-        // archive/unarchive users
+        // archive/unarchive/delete users
         Route::post('users/{user}/archive', [UserManagementController::class, 'archive'])
             ->middleware('role:admin')
             ->name('users.archive');
         Route::post('users/{user}/unarchive', [UserManagementController::class, 'unarchive'])
             ->middleware('role:admin')
             ->name('users.unarchive');
+        Route::delete('users/{user}', [UserManagementController::class, 'destroy'])
+            ->middleware('role:admin')
+            ->name('users.destroy');
 
         // ROLES (Admin Only) - manage role permissions
         Route::get('roles', [UserManagementController::class, 'rolesIndex'])
