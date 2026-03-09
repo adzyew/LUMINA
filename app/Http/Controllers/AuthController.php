@@ -31,7 +31,7 @@ class AuthController extends Controller
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
+            'phone' => ['required', 'regex:/^09\\d{9}$/'],
             'email' => 'required|email|unique:users',
             'password' => [
                 'required',
@@ -46,6 +46,7 @@ class AuthController extends Controller
         ], [
             'password.min' => 'Password must be at least 8 characters.',
             'password.regex' => 'Password must include uppercase, lowercase, and a number.',
+            'phone.regex' => 'Please enter a valid Philippine mobile number (e.g. 09171234567).',
         ]);
 
         // Combine first and last name
@@ -97,6 +98,19 @@ class AuthController extends Controller
         return view("user.user_dashboard", compact('user', 'orders'));
     }
 
+    public function orders(Request $request)
+    {
+        $user = auth()->user();
+
+        $orders = $user->orders()
+            ->with('items.product')
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('user.orders', compact('orders'));
+    }
+
     
 
     public function editProfile()
@@ -108,12 +122,14 @@ class AuthController extends Controller
 {
     $validated = $request->validate([
         'name' => 'required|string|max:255',
-        'phone' => 'required|string|max:20',
+        'phone' => ['required', 'regex:/^09\\d{9}$/'],
 
         'shipping_street' => 'nullable|string|max:255',
         'shipping_city' => 'required|string|max:100',
         'shipping_barangay' => 'required|string|max:100',
         'shipping_postal_code' => 'required|string|max:20',
+    ], [
+        'phone.regex' => 'Please enter a valid Philippine mobile number (e.g. 09171234567).',
     ]);
 
     $user = auth()->user();

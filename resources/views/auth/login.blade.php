@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     @vite('resources/css/app.css')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.3/build/css/intlTelInput.css">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         .font-serif { font-family: 'Cormorant Garamond', serif; }
@@ -242,9 +243,11 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                                             </svg>
                                         </span>
-                                        <input type="text" name="phone" value="{{ old('phone') }}"
+                                        <input id="register-phone" type="text" name="phone" value="{{ old('phone') }}"
                                             class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all"
-                                            placeholder="Mobile phone number"
+                                            placeholder="09171234567"
+                                            inputmode="numeric"
+                                            pattern="09[0-9]{9}"
                                             maxlength="11"
                                             oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length > 11) this.value = this.value.slice(0, 11);">
                                     </div>
@@ -308,6 +311,7 @@
                                             </svg>
                                         </button>
                                     </div>
+                                    <p id="register-password-match" class="hidden text-xs mt-2">Passwords match.</p>
                                 </div>
 
                                 <!-- Terms -->
@@ -358,8 +362,27 @@
             @include('partials.terms_modal')
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.3/build/js/intlTelInput.min.js"></script>
     <script>
         const activeTab = '{{ $activeTab ?? 'login' }}';
+
+        function normalizePhilippineMobile(value) {
+            const digits = (value || '').replace(/\D/g, '');
+
+            if (/^09\d{9}$/.test(digits)) {
+                return digits;
+            }
+
+            if (/^9\d{9}$/.test(digits)) {
+                return `0${digits}`;
+            }
+
+            if (/^639\d{9}$/.test(digits)) {
+                return `0${digits.slice(2)}`;
+            }
+
+            return digits;
+        }
 
         function showTab(tab) {
             const track = document.getElementById('slider-track');
@@ -419,10 +442,26 @@
             const termsCheckbox = document.querySelector('input[name="terms"]');
             const signupBtn = document.getElementById('signupBtn');
             const registerPassword = document.getElementById('register-password');
+            const registerPasswordConfirm = document.getElementById('register-password-confirm');
+            const registerPhone = document.getElementById('register-phone');
             const strengthLabel = document.getElementById('register-password-strength');
             const rulesLabel = document.getElementById('register-password-rules');
+            const matchLabel = document.getElementById('register-password-match');
 
-            function updateRegisterPasswordStrength() {
+            function updateSignupButtonState() {
+                if (!signupBtn) {
+                    return;
+                }
+
+                const termsAccepted = !!(termsCheckbox && termsCheckbox.checked);
+                const password = registerPassword ? (registerPassword.value || '') : '';
+                const confirmPassword = registerPasswordConfirm ? (registerPasswordConfirm.value || '') : '';
+                const passwordsMatch = password.length > 0 && confirmPassword.length > 0 && password === confirmPassword;
+
+                signupBtn.disabled = !(termsAccepted && passwordsMatch);
+            }
+
+            function updateRegisterPasswordStrength(showOutput = false) {
                 if (!registerPassword || !strengthLabel || !rulesLabel) {
                     return;
                 }
@@ -434,7 +473,7 @@
                 const hasNumber = /\d/.test(value);
                 const isStrong = hasMinLength && hasLower && hasUpper && hasNumber;
 
-                if (value.length === 0) {
+                if (!showOutput || value.length === 0) {
                     strengthLabel.classList.add('hidden');
                     rulesLabel.classList.add('hidden');
                     strengthLabel.textContent = 'Password strength: Weak';
@@ -460,14 +499,77 @@
                 }
             }
 
-            if (registerPassword) {
-                registerPassword.addEventListener('input', updateRegisterPasswordStrength);
-                updateRegisterPasswordStrength();
+            function updatePasswordMatch() {
+                if (!registerPassword || !registerPasswordConfirm || !matchLabel) {
+                    return;
+                }
+
+                const password = registerPassword.value || '';
+                const confirmPassword = registerPasswordConfirm.value || '';
+
+                if (confirmPassword.length === 0) {
+                    matchLabel.classList.add('hidden');
+                    matchLabel.textContent = 'Passwords match.';
+                    matchLabel.className = 'hidden text-xs mt-2';
+                    updateSignupButtonState();
+                    return;
+                }
+
+                matchLabel.classList.remove('hidden');
+
+                if (password === confirmPassword) {
+                    matchLabel.textContent = 'Passwords match.';
+                    matchLabel.className = 'text-xs mt-2 text-green-600';
+                } else {
+                    matchLabel.textContent = 'Passwords do not match.';
+                    matchLabel.className = 'text-xs mt-2 text-red-500';
+                }
+
+                updateSignupButtonState();
             }
 
-            termsCheckbox.addEventListener('change', function () {
-                signupBtn.disabled = !this.checked;
-            });
+            if (registerPassword) {
+                registerPassword.addEventListener('input', function () {
+                    updateRegisterPasswordStrength(true);
+                    updatePasswordMatch();
+                });
+
+                registerPassword.addEventListener('blur', function () {
+                    updateRegisterPasswordStrength(false);
+                });
+            }
+
+            if (registerPasswordConfirm) {
+                registerPasswordConfirm.addEventListener('input', updatePasswordMatch);
+                registerPasswordConfirm.addEventListener('blur', updatePasswordMatch);
+            }
+
+            if (termsCheckbox) {
+                termsCheckbox.addEventListener('change', updateSignupButtonState);
+            }
+
+            updateSignupButtonState();
+
+            if (registerPhone && window.intlTelInput) {
+                window.intlTelInput(registerPhone, {
+                    initialCountry: 'ph',
+                    onlyCountries: ['ph'],
+                    separateDialCode: true,
+                    nationalMode: true,
+                    autoPlaceholder: 'polite',
+                });
+
+                registerPhone.addEventListener('blur', function () {
+                    registerPhone.value = normalizePhilippineMobile(registerPhone.value);
+                });
+
+                const registerForm = registerPhone.closest('form');
+                if (registerForm) {
+                    registerForm.addEventListener('submit', function () {
+                        registerPhone.value = normalizePhilippineMobile(registerPhone.value);
+                    });
+                }
+            }
         });
     </script>
 </body>

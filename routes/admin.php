@@ -193,6 +193,8 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
         // ORDERS
         Route::get('orders', [AdminOrderController::class, 'index'])->middleware('permission:sales.view')->name('orders.index');
         Route::get('orders/{order}', [AdminOrderController::class, 'show'])->middleware('permission:sales.view')->name('orders.show');
+        Route::get('orders/{order}/email-preview/placed', [AdminOrderController::class, 'previewPlacedEmail'])->middleware('permission:sales.view')->name('orders.email_preview.placed');
+        Route::get('orders/{order}/email-preview/status', [AdminOrderController::class, 'previewStatusEmail'])->middleware('permission:sales.view')->name('orders.email_preview.status');
         Route::put('orders/{order}', [AdminOrderController::class, 'update'])->middleware('permission:sales.view')->name('orders.update');
 
         // SALES

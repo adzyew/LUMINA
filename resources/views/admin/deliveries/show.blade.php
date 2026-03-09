@@ -23,6 +23,8 @@
                 <div class="flex justify-between"><dt class="text-gray-500 dark:text-gray-400">Customer</dt><dd class="text-gray-900 dark:text-white">{{ $order->user->name ?? 'Guest' }}</dd></div>
                 <div class="flex justify-between"><dt class="text-gray-500 dark:text-gray-400">Status</dt><dd><span class="px-2 py-1 rounded-full text-xs font-medium {{ $order->status === 'delivered' ? 'bg-green-500/20 text-green-400' : ($order->status === 'shipped' ? 'bg-purple-500/20 text-purple-400' : 'bg-indigo-500/20 text-indigo-400') }}">{{ ucfirst($order->status) }}</span></dd></div>
                 <div class="flex justify-between"><dt class="text-gray-500 dark:text-gray-400">Tracking Number</dt><dd class="text-gray-900 dark:text-white">{{ $order->tracking_number ?? 'Not set' }}</dd></div>
+                <div class="flex justify-between"><dt class="text-gray-500 dark:text-gray-400">Courier</dt><dd class="text-gray-900 dark:text-white">{{ $order->courier_name ?? 'Not set' }}</dd></div>
+                <div class="flex justify-between"><dt class="text-gray-500 dark:text-gray-400">Tracking URL</dt><dd class="text-gray-900 dark:text-white break-all">{{ $order->tracking_url ?? 'Not set' }}</dd></div>
                 <div class="flex justify-between"><dt class="text-gray-500 dark:text-gray-400">Shipped At</dt><dd class="text-gray-900 dark:text-white">{{ $order->shipped_at ? $order->shipped_at->format('M d, Y H:i') : '—' }}</dd></div>
                 <div class="flex justify-between"><dt class="text-gray-500 dark:text-gray-400">Delivered At</dt><dd class="text-gray-900 dark:text-white">{{ $order->delivered_at ? $order->delivered_at->format('M d, Y H:i') : '—' }}</dd></div>
             </dl>
@@ -41,6 +43,14 @@
                 <div>
                     <label class="block text-sm text-gray-500 dark:text-gray-400 mb-1">Tracking Number</label>
                     <input type="text" name="tracking_number" value="{{ old('tracking_number', $order->tracking_number) }}" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-white/10 rounded-lg p-2 text-gray-900 dark:text-white" placeholder="e.g. TRK123456">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-500 dark:text-gray-400 mb-1">Courier Name</label>
+                    <input type="text" name="courier_name" value="{{ old('courier_name', $order->courier_name) }}" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-white/10 rounded-lg p-2 text-gray-900 dark:text-white" placeholder="e.g. J&T Express">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-500 dark:text-gray-400 mb-1">Tracking URL</label>
+                    <input type="url" name="tracking_url" value="{{ old('tracking_url', $order->tracking_url) }}" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-white/10 rounded-lg p-2 text-gray-900 dark:text-white" placeholder="https://courier.example/track/...">
                 </div>
                 <button type="submit" class="w-full py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400">Update Delivery</button>
             </form>

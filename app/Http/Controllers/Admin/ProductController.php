@@ -14,6 +14,9 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $filter = $request->get('filter', 'all');
+        $stock = $request->get('stock', 'all');
+        $search = trim((string) $request->get('search', ''));
+        $category = $request->get('category');
 
         // Admin should be able to see archived products, so remove the storefront global scope here
         $products = Product::withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class);
@@ -24,17 +27,44 @@ class ProductController extends Controller
             $products->whereNull('archived_at');
         }
 
-        if ($request->filled('category')) {
-            $products->where('category', $request->input('category'));
+        if (!empty($category)) {
+            $products->where('category', $category);
         }
 
-        if ($request->filled('search')) {
-            $products->where('name', 'like', "%{$request->input('search')}%");
+        if ($search !== '') {
+            $products->where(function ($query) use ($search): void {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
         }
 
-        $products = $products->paginate(10)->withQueryString();
+        if ($stock === 'out_of_stock') {
+            $products->where('stock_quantity', '<=', 0);
+        } elseif ($stock === 'low_stock') {
+            $products->whereBetween('stock_quantity', [1, 5]);
+        } elseif ($stock === 'in_stock') {
+            $products->where('stock_quantity', '>', 5);
+        }
 
-        return view('admin.products_management.products_index', compact('products', 'filter'));
+        $categories = Product::withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class)
+            ->select('category')
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->whereRaw("TRIM(category) != ''")
+            ->distinct()
+            ->orderBy('category')
+            ->pluck('category');
+
+        $products = $products->latest()->paginate(10)->withQueryString();
+
+        return view('admin.products_management.products_index', compact(
+            'products',
+            'filter',
+            'stock',
+            'search',
+            'category',
+            'categories'
+        ));
     }
 
     public function show(Request $request, Product $product)
