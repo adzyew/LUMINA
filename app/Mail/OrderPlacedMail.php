@@ -19,7 +19,12 @@ class OrderPlacedMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Order Confirmation #' . $this->order->id . ' – Lumina Jewelry')
-            ->view('emails.order_placed');
+        return $this->subject('Your Lumina Order Confirmation - #' . $this->order->id)
+            ->view('emails.order_placed')
+            ->with([
+                'supportEmail' => config('mail.from.address'),
+                'websiteUrl' => config('app.url'),
+                'orderStatusUrl' => url('/dashboard'),
+            ]);
     }
 }

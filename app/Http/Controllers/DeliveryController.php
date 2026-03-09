@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderStatusUpdatedMail;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class DeliveryController extends Controller
 {
@@ -39,16 +41,31 @@ class DeliveryController extends Controller
         $request->validate([
             'status' => 'required|in:processing,shipped,delivered',
             'tracking_number' => 'nullable|string|max:100',
+            'courier_name' => 'nullable|string|max:100',
+            'tracking_url' => 'nullable|url|max:500',
         ]);
 
+        $previousStatus = $order->status;
         $wasDelivered = $order->status === 'delivered';
 
         $order->update([
             'status' => $request->status,
             'tracking_number' => $request->tracking_number,
+            'courier_name' => $request->input('courier_name'),
+            'tracking_url' => $request->input('tracking_url'),
             'shipped_at' => $request->status === 'shipped' ? ($order->shipped_at ?? now()) : $order->shipped_at,
             'delivered_at' => $request->status === 'delivered' ? now() : $order->delivered_at,
         ]);
+
+        if ($request->status !== $previousStatus && $order->user) {
+            try {
+                Mail::to($order->user->email)->send(
+                    new OrderStatusUpdatedMail($order->fresh(['user', 'items.product']), $previousStatus)
+                );
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
 
         if ($request->status === 'delivered' && !$wasDelivered && $order->user) {
             $pointsEarned = floor($order->total_price / 100); // 1 point per $100 spent

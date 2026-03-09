@@ -5,9 +5,28 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Order extends Model
 {
+    protected static function booted(): void
+    {
+        static::creating(function (Order $order): void {
+            if (empty($order->tracking_number)) {
+                $order->tracking_number = static::generateTrackingNumber();
+            }
+        });
+    }
+
+    protected static function generateTrackingNumber(): string
+    {
+        do {
+            $trackingNumber = 'TRK-' . now()->format('Ymd') . '-' . Str::upper(Str::random(8));
+        } while (static::where('tracking_number', $trackingNumber)->exists());
+
+        return $trackingNumber;
+    }
+
     protected $fillable = [
         'user_id',
         'total_price',
@@ -15,6 +34,8 @@ class Order extends Model
         'discount_amount',
         'status',
         'tracking_number',
+        'courier_name',
+        'tracking_url',
         'shipping_address',
         'contact_phone',
         'shipping_street',

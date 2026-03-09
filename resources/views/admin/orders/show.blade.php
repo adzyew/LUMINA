@@ -31,6 +31,8 @@
                     </dd>
                 </div>
                 <div class="flex justify-between"><dt class="text-gray-500 dark:text-gray-400">Tracking</dt><dd class="text-gray-900 dark:text-white">{{ $order->tracking_number ?? '—' }}</dd></div>
+                <div class="flex justify-between"><dt class="text-gray-500 dark:text-gray-400">Courier</dt><dd class="text-gray-900 dark:text-white">{{ $order->courier_name ?? '—' }}</dd></div>
+                <div class="flex justify-between"><dt class="text-gray-500 dark:text-gray-400">Tracking URL</dt><dd class="text-gray-900 dark:text-white break-all">{{ $order->tracking_url ?? '—' }}</dd></div>
                 @if($order->contact_phone)
                 <div class="flex justify-between"><dt class="text-gray-500 dark:text-gray-400">Contact</dt><dd class="text-gray-900 dark:text-white">{{ $order->contact_phone }}</dd></div>
                 @endif
@@ -54,10 +56,31 @@
                 </div>
                 <div>
                     <label class="block text-sm text-gray-500 dark:text-gray-400 mb-1">Tracking Number</label>
-                    <input type="text" name="tracking_number" value="{{ old('tracking_number', $order->tracking_number) }}" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-white/10 rounded-lg p-2 text-gray-900 dark:text-white" placeholder="e.g. TRK123456">
+                    <input type="text" name="tracking_number" value="{{ old('tracking_number', $order->tracking_number) }}" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-white/10 rounded-lg p-2 text-gray-900 dark:text-white read-only:text-gray-400" placeholder="e.g. TRK123456" readonly>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-500 dark:text-gray-400 mb-1">Courier Name</label>
+                    <input type="text" name="courier_name" value="{{ old('courier_name', $order->courier_name) }}" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-white/10 rounded-lg p-2 text-gray-900 dark:text-white" placeholder="e.g. J&T Express">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-500 dark:text-gray-400 mb-1">Tracking URL</label>
+                    <input type="url" name="tracking_url" value="{{ old('tracking_url', $order->tracking_url) }}" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-white/10 rounded-lg p-2 text-gray-900 dark:text-white" placeholder="https://courier.example/track/...">
                 </div>
                 <button type="submit" class="w-full py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400">Update Order</button>
             </form>
+
+            <div class="mt-6 pt-6 border-t border-gray-200 dark:border-white/10">
+                <p class="text-xs uppercase tracking-wide font-semibold text-gray-500 dark:text-gray-400 mb-3">Email Previews</p>
+                <div class="flex flex-wrap gap-2">
+                    <a target="_blank" href="{{ route('admin.orders.email_preview.placed', $order) }}" class="px-3 py-2 text-xs rounded-lg border border-gray-300 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5">Order Confirmation</a>
+                    <a target="_blank" href="{{ route('admin.orders.email_preview.status', ['order' => $order, 'status' => 'pending', 'previous_status' => 'pending']) }}" class="px-3 py-2 text-xs rounded-lg border border-gray-300 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5">Pending</a>
+                    <a target="_blank" href="{{ route('admin.orders.email_preview.status', ['order' => $order, 'status' => 'confirmed', 'previous_status' => 'pending']) }}" class="px-3 py-2 text-xs rounded-lg border border-gray-300 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5">Confirmed</a>
+                    <a target="_blank" href="{{ route('admin.orders.email_preview.status', ['order' => $order, 'status' => 'processing', 'previous_status' => 'confirmed']) }}" class="px-3 py-2 text-xs rounded-lg border border-gray-300 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5">Processing</a>
+                    <a target="_blank" href="{{ route('admin.orders.email_preview.status', ['order' => $order, 'status' => 'shipped', 'previous_status' => 'processing']) }}" class="px-3 py-2 text-xs rounded-lg border border-gray-300 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5">Shipped</a>
+                    <a target="_blank" href="{{ route('admin.orders.email_preview.status', ['order' => $order, 'status' => 'delivered', 'previous_status' => 'shipped']) }}" class="px-3 py-2 text-xs rounded-lg border border-gray-300 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5">Delivered</a>
+                    <a target="_blank" href="{{ route('admin.orders.email_preview.status', ['order' => $order, 'status' => 'cancelled', 'previous_status' => 'processing']) }}" class="px-3 py-2 text-xs rounded-lg border border-gray-300 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5">Cancelled</a>
+                </div>
+            </div>
         </div>
 
         <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6">

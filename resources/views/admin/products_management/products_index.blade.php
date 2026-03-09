@@ -20,11 +20,50 @@
             {{ session('success') }}
         </div>
     @endif
-    <div class="flex flex-wrap gap-2 mb-6">
-        <a href="{{ route('admin.products.index', ['filter' => 'all']) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? 'all') === 'all' ? 'bg-amber-300 text-black' : 'bg-gray-100 dark:bg-white/5 text-gray-600 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10' }}">All</a>
-        <a href="{{ route('admin.products.index', ['filter' => 'active']) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'active' ? 'bg-amber-300 text-black' : 'bg-gray-100 dark:bg-white/5 text-gray-600 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10' }}">Active</a>
-        <a href="{{ route('admin.products.index', ['filter' => 'archived']) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'archived' ? 'bg-amber-300 text-black' : 'bg-gray-100 dark:bg-white/5 text-gray-600 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10' }}">Archived</a>
+    <div class="flex flex-wrap gap-2 mb-4">
+        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'all'])) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? 'all') === 'all' ? 'bg-amber-300 text-black' : 'bg-gray-100 dark:bg-white/5 text-gray-600 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10' }}">All</a>
+        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'active'])) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'active' ? 'bg-amber-300 text-black' : 'bg-gray-100 dark:bg-white/5 text-gray-600 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10' }}">Active</a>
+        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'archived'])) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'archived' ? 'bg-amber-300 text-black' : 'bg-gray-100 dark:bg-white/5 text-gray-600 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10' }}">Archived</a>
     </div>
+
+    <form method="GET" action="{{ route('admin.products.index') }}" class="mb-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+        <input type="hidden" name="filter" value="{{ $filter ?? 'all' }}">
+
+        <div>
+            <label for="search" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">Search</label>
+            <input id="search" name="search" type="text" value="{{ $search ?? '' }}" placeholder="Name or description"
+                class="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-300">
+        </div>
+
+        <div>
+            <label for="category" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">Category</label>
+            <select id="category" name="category"
+                class="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-300">
+                <option value="">All Categories</option>
+                @foreach(($categories ?? collect()) as $categoryOption)
+                    @php($categoryLabel = trim((string) $categoryOption))
+                    @continue($categoryLabel === '')
+                    <option style="color:#111827; background-color:#ffffff;" value="{{ $categoryOption }}" {{ ($category ?? '') === $categoryOption ? 'selected' : '' }}>{{ $categoryLabel }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div>
+            <label for="stock" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">Stock Status</label>
+            <select id="stock" name="stock"
+                class="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-300">
+                <option style="color:#111827; background-color:#ffffff;" value="all" {{ ($stock ?? 'all') === 'all' ? 'selected' : '' }}>All Stock Levels</option>
+                <option style="color:#111827; background-color:#ffffff;" value="in_stock" {{ ($stock ?? '') === 'in_stock' ? 'selected' : '' }}>In Stock (6+)</option>
+                <option style="color:#111827; background-color:#ffffff;" value="low_stock" {{ ($stock ?? '') === 'low_stock' ? 'selected' : '' }}>Low Stock (1-5)</option>
+                <option style="color:#111827; background-color:#ffffff;" value="out_of_stock" {{ ($stock ?? '') === 'out_of_stock' ? 'selected' : '' }}>Out of Stock (0)</option>
+            </select>
+        </div>
+
+        <div class="flex items-end gap-2">
+            <button type="submit" class="px-4 py-2 rounded-lg bg-amber-300 text-black font-semibold hover:bg-amber-400 transition-colors">Apply</button>
+            <a href="{{ route('admin.products.index') }}" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-white/10 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Reset</a>
+        </div>
+    </form>
 
     <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-200 dark:border-white/5">
         <table class="w-full text-left border-collapse">
@@ -34,6 +73,7 @@
                     <th class="p-4">Image</th>
                     <th class="p-4">Name</th>
                     <th class="p-4">Category</th>
+                    <th class="p-4">Stock</th>
                     <th class="p-4">Price</th>
                     <th class="p-4 text-center">Actions</th>
                 </tr>
@@ -47,6 +87,7 @@
                     </td>
                     <td class="p-4 font-medium text-gray-900 dark:text-white">{{ $product->name }}</td>
                     <td class="p-4 text-gray-900 dark:text-white font-bold">{{ $product->category }}</td>
+                    <td class="p-4 text-gray-700 dark:text-gray-300">{{ $product->stock_quantity ?? 0 }}</td>
                     <td class="p-4 text-amber-300 font-bold">₱{{ number_format($product->price, 2) }}</td>
                     <td class="p-4">
                         <div class="flex justify-center gap-3">

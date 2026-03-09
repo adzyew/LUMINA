@@ -17,20 +17,20 @@
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-none">
         <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Total Products</h3>
         <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $totalProducts }}</p>
-        <a href="{{ route('admin.products.index') }}" class="text-sm text-amber-500 hover:text-amber-400 mt-2 inline-block">View all →</a>
+            <a href="{{ route('admin.products.index', ['filter' => 'all']) }}" class="text-sm text-amber-500 hover:text-amber-400 mt-2 inline-block">View all →</a>
     </div>
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-none">
         <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Low Stock (1–5 units)</h3>
         <p class="text-3xl font-bold {{ $lowStock > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-900 dark:text-white' }}">{{ $lowStock }}</p>
         @if($lowStock > 0)
-        <a href="{{ route('admin.products.index') }}" class="text-sm text-amber-500 hover:text-amber-400 mt-2 inline-block">Restock →</a>
+            <a href="{{ route('admin.products.index', ['filter' => 'active', 'stock' => 'low_stock']) }}" class="text-sm text-amber-500 hover:text-amber-400 mt-2 inline-block">Restock →</a>
         @endif
     </div>
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-none">
         <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Out of Stock</h3>
         <p class="text-3xl font-bold {{ $outOfStock > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' }}">{{ $outOfStock }}</p>
         @if($outOfStock > 0)
-        <a href="{{ route('admin.products.index') }}" class="text-sm text-amber-500 hover:text-amber-400 mt-2 inline-block">Restock now →</a>
+            <a href="{{ route('admin.products.index', ['filter' => 'active', 'stock' => 'out_of_stock']) }}" class="text-sm text-amber-500 hover:text-amber-400 mt-2 inline-block">Restock now →</a>
         @endif
     </div>
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-none">
@@ -42,7 +42,7 @@
 <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-none">
     <div class="flex justify-between items-center mb-6">
         <h3 class="text-lg font-bold text-gray-900 dark:text-white">Recent Products</h3>
-        <a href="{{ route('admin.products.index') }}" class="text-sm text-amber-500 hover:text-amber-400">View All</a>
+        <a href="{{ route('admin.products.index', ['filter' => 'active']) }}" class="text-sm text-amber-500 hover:text-amber-400">View All</a>
     </div>
     <div class="overflow-x-auto">
         <table class="w-full text-left">

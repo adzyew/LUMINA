@@ -6,6 +6,7 @@
     @include('partials.theme_init')
     <title>Edit Profile | Lumina</title>
     @vite('resources/css/app.css')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.3/build/css/intlTelInput.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="bg-gray-50 text-gray-900 dark:bg-black dark:text-white font-sans antialiased min-h-screen flex flex-col transition-colors pt-16">
@@ -75,8 +76,11 @@
 
             <div>
                 <label for="phone" class="block text-sm font-medium text-gray-400 mb-2">Phone</label>
-                <input type="text" name="phone" id="phone" value="{{ old('phone', $user->phone) }}" required
-                    class="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-amber-300 focus:ring-1 focus:ring-amber-300 transition-colors">
+                <input type="text" name="phone" id="phone" value="{{ old('phone', $user->phone) }}" required maxlength="11" inputmode="numeric" pattern="09[0-9]{9}"
+                    class="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-amber-300 focus:ring-1 focus:ring-amber-300 transition-colors"
+                    placeholder="09171234567"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length > 11) this.value = this.value.slice(0, 11);">
+                <p class="text-gray-500 text-xs mt-1">Use Philippine format: <code>09XXXXXXXXX</code>.</p>
             </div>
 
             <div class="mt-4">
@@ -129,7 +133,48 @@
 
     @include('partials.footer')
 
+ <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.3/build/js/intlTelInput.min.js"></script>
  <script>
+function normalizePhilippineMobile(value) {
+    const digits = (value || '').replace(/\D/g, '');
+
+    if (/^09\d{9}$/.test(digits)) {
+        return digits;
+    }
+
+    if (/^9\d{9}$/.test(digits)) {
+        return `0${digits}`;
+    }
+
+    if (/^639\d{9}$/.test(digits)) {
+        return `0${digits.slice(2)}`;
+    }
+
+    return digits;
+}
+
+const phoneInput = document.getElementById('phone');
+if (phoneInput && window.intlTelInput) {
+    window.intlTelInput(phoneInput, {
+        initialCountry: 'ph',
+        onlyCountries: ['ph'],
+        separateDialCode: true,
+        nationalMode: true,
+        autoPlaceholder: 'polite',
+    });
+
+    phoneInput.addEventListener('blur', function () {
+        phoneInput.value = normalizePhilippineMobile(phoneInput.value);
+    });
+
+    const profileForm = phoneInput.closest('form');
+    if (profileForm) {
+        profileForm.addEventListener('submit', function () {
+            phoneInput.value = normalizePhilippineMobile(phoneInput.value);
+        });
+    }
+}
+
 const citySelect = document.getElementById('city');
 const barangaySelect = document.getElementById('barangay');
 const zipInput = document.getElementById('zip');
