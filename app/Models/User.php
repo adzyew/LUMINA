@@ -41,11 +41,16 @@ class User extends Authenticatable implements MustVerifyEmail
         // Shipping defaults
         'shipping_street',
         'shipping_city',
+        'shipping_region',
+        'shipping_barangay',
         'shipping_province',
         'shipping_postal_code',
         'shipping_country',
         'shipping_address',
         'points_balance',
+        'notify_order_updates',
+        'notify_promotions',
+        'notify_loyalty',
     ];
 
     /**
@@ -71,6 +76,9 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'archived_at' => 'datetime',
+            'notify_order_updates' => 'boolean',
+            'notify_promotions' => 'boolean',
+            'notify_loyalty' => 'boolean',
         ];
     }
 

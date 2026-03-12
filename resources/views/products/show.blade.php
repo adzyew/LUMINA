@@ -17,7 +17,7 @@
 
     @include('partials.navbar')
 
-    <main class="grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+    <main class="grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12 w-full">
         <a href="{{ url()->previous() ?? route('products.index') }}" class="inline-flex items-center gap-2 text-gray-400 hover:text-amber-300 text-sm font-medium mb-10 transition-colors group">
             <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             Back to Collection
@@ -153,11 +153,11 @@
                     @endif
                 </div>
                 @auth
-                    <button onclick="document.getElementById('reviewForm').classList.toggle('hidden')" class="px-8 py-3.5 bg-white/5 text-white font-bold rounded-full hover:bg-white/10 border border-white/10 transition-colors">
+                    <button onclick="document.getElementById('reviewForm').classList.toggle('hidden')" class="w-full sm:w-auto px-8 py-3.5 bg-white/5 text-white font-bold rounded-full hover:bg-white/10 border border-white/10 transition-colors text-center">
                         Write a Review
                     </button>
                 @else
-                    <a href="{{ route('login') }}" class="px-8 py-3.5 bg-white/5 text-white font-bold rounded-full hover:bg-white/10 border border-white/10 transition-colors">
+                    <a href="{{ route('login') }}" class="w-full sm:w-auto px-8 py-3.5 bg-white/5 text-white font-bold rounded-full hover:bg-white/10 border border-white/10 transition-colors text-center">
                         Login to Review
                     </a>
                 @endauth
@@ -183,9 +183,9 @@
                     <label for="comment" class="block text-gray-400 text-sm font-medium mb-3">Your Review</label>
                     <textarea name="comment" id="comment" rows="4" class="w-full px-5 py-4 bg-gray-900/80 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:border-amber-300 transition-colors" placeholder="Share your thoughts about this product..."></textarea>
                 </div>
-                <div class="flex gap-4">
-                    <button type="submit" class="px-8 py-3.5 bg-amber-300 text-black font-bold rounded-full hover:bg-amber-400 transition-colors">Submit Review</button>
-                    <button type="button" onclick="document.getElementById('reviewForm').classList.add('hidden')" class="px-8 py-3.5 bg-transparent text-gray-400 font-semibold rounded-full hover:text-white transition-colors">Cancel</button>
+                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                    <button type="submit" class="w-full sm:w-auto px-8 py-3.5 bg-amber-300 text-black font-bold rounded-full hover:bg-amber-400 transition-colors">Submit Review</button>
+                    <button type="button" onclick="document.getElementById('reviewForm').classList.add('hidden')" class="w-full sm:w-auto px-8 py-3.5 bg-transparent text-gray-400 font-semibold rounded-full hover:text-white transition-colors">Cancel</button>
                 </div>
             </form>
             @endauth
@@ -211,7 +211,7 @@
                             </div>
                         </div>
                         @if($review->comment)
-                            <p class="text-gray-400 leading-relaxed pl-16">{{ $review->comment }}</p>
+                            <p class="text-gray-400 leading-relaxed pl-0 sm:pl-16">{{ $review->comment }}</p>
                         @endif
                     </div>
                 @empty

@@ -21,7 +21,8 @@
                 
                 <div class="lg:w-3/4">
                     <div class="bg-gray-900 border border-white/10 rounded-lg overflow-hidden shadow-2xl">
-                        <table class="w-full text-left">
+                        <div class="overflow-x-auto">
+                        <table class="w-full text-left min-w-[620px]">
                             <thead class="bg-black text-amber-300 text-lg font-bold tracking-wider">
                                 <tr>
                                     <th class="p-4 sm:p-6">Product</th>
@@ -91,6 +92,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 </div>
 

@@ -21,11 +21,22 @@ class CloudinaryService
         ]);
     }
 
-    public function uploadImage(string $path, string $folder = 'products'): array
+    public function uploadImage(string $path, string $folder = 'products', ?string $publicId = null, ?string $uploadPreset = null): array
     {
-        $upload = $this->cloudinary->uploadApi()->upload($path, [
+        $options = [
             'folder' => $folder,
-        ]);
+        ];
+
+        if ($publicId) {
+            $options['public_id'] = $publicId;
+            $options['overwrite'] = true;
+        }
+
+        if ($uploadPreset) {
+            $options['upload_preset'] = $uploadPreset;
+        }
+
+        $upload = $this->cloudinary->uploadApi()->upload($path, $options);
 
         return [
             'url'       => $upload['secure_url'],

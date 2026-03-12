@@ -1,24 +1,15 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <title>My Wishlist | Lumina</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    @include('partials.theme_init')
-    @vite('resources/css/app.css')
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body class="bg-gray-50 text-gray-900 dark:bg-black dark:text-white relative antialiased transition-colors">
+@extends('layouts.customer')
 
+@section('title', 'My Wishlist | Lumina')
+
+@section('content')
     <div class="fixed inset-0 -z-50 overflow-hidden">
         <img src="{{ asset('IMAGES/BG.png') }}" alt="" class="w-full h-full object-cover"/>
         <div class="absolute inset-0 bg-gray-900/20 dark:bg-black/40 backdrop-blur-sm"></div>
     </div>
 
-    @include('partials.navbar')
-
-    <section class="relative min-h-[12rem] pt-20 flex items-center justify-center">
-        <div class="container mx-auto px-4 text-center">
+    <section class="relative min-h-48 pt-12 flex items-center justify-center">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-10 max-w-7xl text-center">
             <h1 class="text-4xl sm:text-5xl font-playfair font-bold leading-tight">
                 My <span class="text-amber-300">Wishlist</span>
             </h1>
@@ -26,7 +17,7 @@
         </div>
     </section>
 
-    <main class="container mx-auto px-4 sm:px-6 pb-16">
+    <main class="container mx-auto px-4 sm:px-6 lg:px-10 pb-16 max-w-7xl">
         @if($wishlistItems->count() > 0)
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @foreach($wishlistItems as $item)
@@ -75,7 +66,4 @@
             </div>
         @endif
     </main>
-
-    @include('partials.footer')
-</body>
-</html>
+@endsection

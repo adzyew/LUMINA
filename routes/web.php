@@ -79,6 +79,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/orders', [AuthController::class, 'orders'])->name('orders.index');
     Route::get('/dashboard/profile/edit', [AuthController::class, 'editProfile'])->name('profile.edit');
     Route::put('/dashboard/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/dashboard/deactivate', [AuthController::class, 'deactivateAccount'])->name('account.deactivate');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 

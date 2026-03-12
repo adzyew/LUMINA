@@ -1,19 +1,9 @@
-<!doctype html>
-<html class="scroll-smooth">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    @include('partials.theme_init')
-    <title>My Dashboard | Lumina</title>
-    @vite('resources/css/app.css')
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
-</head>
-<body class="bg-gray-50 text-gray-900 dark:bg-black dark:text-white font-sans antialiased min-h-screen flex flex-col transition-colors pt-16">
+@extends('layouts.customer')
 
-    @include('partials.navbar')
+@section('title', 'My Dashboard | Lumina')
 
-    <div class="grow container mx-auto px-4 sm:px-6 py-12">
-        
+@section('content')
+    <div class="container mx-auto px-4 sm:px-6 lg:px-10 py-12 max-w-7xl">
         @if(session('success'))
             <div class="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded-xl text-green-400 text-sm">
                 {{ session('success') }}
@@ -22,20 +12,12 @@
         
         <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/10 pb-6">
             <div>
-                <h1 class="text-3xl md:text-4xl font-playfair font-bold text-white mb-2">My Account</h1>
+                <h1 class="text-3xl md:text-4xl font-playfair font-bold text-white mb-2">Account Overview</h1>
                 <p class="text-gray-400">Manage your profile and view your order history.</p>
             </div>
             <a href="{{ route('products.index') }}" class="mt-4 md:mt-0 text-amber-300 hover:text-white transition-colors text-sm font-semibold flex items-center gap-1">
                 Continue Shopping &rarr;
             </a>
-        </div>
-
-        <div class="bg-gradient-to-r from-amber-300 to-amber-500 rounded-2xl p-6 text-black shadow-lg mb-8">
-            <h2 class="text-xl font-bold font-playfair mb-1">Lumina Rewards</h2>
-            <p class="text-sm opacity-90 mb-4">You earn 1 point for every ₱100 spent!</p>
-            <div class="text-4xl font-black">
-                {{ auth()->user()->points_balance }} <span class="text-lg font-medium">pts</span>
-            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -51,9 +33,7 @@
                     @endif
                     <h2 class="text-center text-xl font-bold text-white mb-1">{{ Auth::user()->name }}</h2>
                     <p class="text-center text-gray-500 text-sm mb-6">{{ Auth::user()->email }}</p>
-                    <a href="{{ route('profile.edit') }}" class="block w-full py-2.5 text-center bg-amber-300 text-black font-bold rounded-xl hover:bg-amber-400 transition-colors text-sm mb-6">
-                        Edit Profile
-                    </a>
+                    
 
                     <div class="space-y-3">
                         <div class="flex justify-between p-3 bg-black/50 rounded-lg border border-white/5">
@@ -65,6 +45,13 @@
                             <span class="text-green-400 text-sm font-bold flex items-center gap-1">
                                 <span class="w-2 h-2 bg-green-400 rounded-full"></span> Active
                             </span>
+                        </div>
+                        <div class="p-3 bg-black/50 rounded-lg border border-amber-300/20">
+                            <div class="flex items-center justify-between">
+                                <span class="text-amber-200 text-xs font-semibold uppercase tracking-wider">Lumina Rewards</span>
+                                <span class="text-amber-300 text-sm font-bold">{{ Auth::user()->points_balance }} pts</span>
+                            </div>
+                            <p class="text-[11px] text-gray-500 mt-1">Earn 1 point for every ₱100 spent.</p>
                         </div>
                     </div>
                 </div>
@@ -133,8 +120,4 @@
             </div>
         </div>
     </div>
-
-    @include('partials.footer')
-
-</body>
-</html>
+@endsection

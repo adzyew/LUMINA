@@ -37,19 +37,6 @@
                     <li><a href="#" class="hover:text-amber-600 dark:hover:text-amber-300 transition-colors">Terms of Service</a></li>
                 </ul>
             </div>
-
-            <div>
-                <h4 class="font-bold text-amber-900 dark:text-white mb-6 uppercase tracking-wider text-sm">Stay Updated</h4>
-                <p class="text-amber-900/80 dark:text-gray-400 text-sm mb-4">Subscribe to receive updates, access to exclusive deals, and more.</p>
-                <form class="flex flex-col gap-3">
-                    <div class="relative">
-                        <input type="email" placeholder="Enter your email" class="w-full px-4 py-3 bg-white dark:bg-white/5 border border-amber-200 dark:border-white/10 rounded-lg focus:outline-none focus:border-amber-500 text-sm text-amber-900 dark:text-white transition-colors placeholder-amber-700/50 dark:placeholder-gray-600">
-                    </div>
-                    <button type="button" class="w-full px-4 py-3 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-all text-sm uppercase tracking-wide">
-                        Subscribe
-                    </button>
-                </form>
-            </div>
         </div>
 
         <div class=" mt-8 pt-8 border-t border-amber-200/50 dark:border-white/10 flex flex-col sm:flex-row justify-center items-center gap-4">
