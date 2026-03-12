@@ -11,7 +11,9 @@
 </head>
 <body class="bg-[#F8F8F8] text-gray-900 dark:bg-gray-900 dark:text-gray-100 font-sans antialiased flex h-screen overflow-hidden transition-colors">
 
-    <aside class="w-64 bg-[#F8F8F8]/95 dark:bg-gray-900 backdrop-blur-md border-r border-gray-200 dark:border-white/10 hidden md:flex flex-col shrink-0 flex-shrink-0">
+    <div id="adminSidebarOverlay" class="fixed inset-0 z-30 hidden bg-black/40 backdrop-blur-sm md:hidden" onclick="closeAdminSidebar()"></div>
+
+    <aside id="adminSidebar" class="fixed inset-y-0 left-0 z-40 w-64 -translate-x-full md:translate-x-0 md:static bg-[#F8F8F8]/95 dark:bg-gray-900 backdrop-blur-md border-r border-gray-200 dark:border-white/10 flex flex-col shrink-0 transition-transform duration-200 ease-out">
         @php
             $isAdmin = auth()->user()->hasRole('admin') || (auth()->user()->is_admin ?? false);
             $staffDepartment = null;
@@ -43,7 +45,9 @@
                 $dashboardActive = request()->routeIs('admin.admin_dashboard') || request()->routeIs('admin.inventory.dashboard') || request()->routeIs('admin.sales.dashboard') || request()->routeIs('admin.delivery.dashboard');
             @endphp
             <a href="{{ $dashboardUrl }}" class="flex items-center gap-3 px-4 py-3 {{ $dashboardActive ? 'bg-amber-300 text-black font-bold' : 'text-black dark:text-gray-200 hover:text-amber-300 font-bold' }} rounded-lg transition-colors">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+                </svg>
                 Dashboard
             </a>
             
@@ -79,7 +83,9 @@
             @if($isAdmin || $staffDepartment === 'Delivery')
             @can('deliveries.manage')
             <a href="{{ route('admin.deliveries.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.deliveries.*') ? 'bg-amber-300 text-black font-bold' : 'text-black dark:text-gray-200 hover:text-amber-300 font-bold' }} rounded-lg transition-colors">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+            </svg>
                 Deliveries
             </a>
             @endcan
@@ -87,8 +93,8 @@
 
             @role('admin')
                 <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.users.*') ? 'bg-amber-300 text-black font-bold' : 'text-black dark:text-gray-200 hover:text-amber-300 font-bold' }} rounded-lg transition-colors">
-                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                     </svg>
                     Users
                 </a>
@@ -116,7 +122,14 @@
         </div>
     </aside>
 
-    <main class="flex-1 min-w-0 overflow-y-auto bg-[#F4F4F4] dark:bg-gray-900 p-6 sm:p-10 transition-colors">
+    <main class="flex-1 min-w-0 overflow-y-auto bg-[#F4F4F4] dark:bg-gray-900 p-4 sm:p-8 md:p-10 transition-colors">
+        <div class="md:hidden sticky top-0 z-20 -mx-4 mb-4 px-4 py-3 bg-[#F8F8F8]/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200 dark:border-white/10 flex items-center justify-between">
+            <button type="button" onclick="openAdminSidebar()" class="inline-flex items-center justify-center rounded-lg border border-gray-300 dark:border-white/10 p-2 text-gray-700 dark:text-gray-200" aria-label="Open sidebar menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+            <span class="font-playfair font-bold text-lg text-black dark:text-white">Lumina Admin</span>
+            <div class="w-10"></div>
+        </div>
         @yield('content')
     </main>
 
@@ -159,6 +172,35 @@
 
 </body>
         <script>
+            function openAdminSidebar() {
+                const sidebar = document.getElementById('adminSidebar');
+                const overlay = document.getElementById('adminSidebarOverlay');
+                if (sidebar) sidebar.classList.remove('-translate-x-full');
+                if (overlay) overlay.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+            }
+
+            function closeAdminSidebar() {
+                const sidebar = document.getElementById('adminSidebar');
+                const overlay = document.getElementById('adminSidebarOverlay');
+                if (sidebar) sidebar.classList.add('-translate-x-full');
+                if (overlay) overlay.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+
+            window.addEventListener('resize', function () {
+                if (window.innerWidth >= 768) {
+                    const overlay = document.getElementById('adminSidebarOverlay');
+                    if (overlay) overlay.classList.add('hidden');
+                    document.body.classList.remove('overflow-hidden');
+                } else {
+                    const sidebar = document.getElementById('adminSidebar');
+                    if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+                        sidebar.classList.add('-translate-x-full');
+                    }
+                }
+            });
+
             function showLogoutModal() {
                 const modal = document.getElementById('logoutModal');
                 modal.classList.remove('hidden');

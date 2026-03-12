@@ -189,37 +189,38 @@
 
 <script>
     function toggleMobileMenu() {
-    document.getElementById('mobileMenu').classList.toggle('hidden');
-}
-function toggleUserDropdown() {
-    var d = document.getElementById('userDropdown');
-    if (d) d.classList.toggle('hidden');
-}
-document.addEventListener('click', function(e) {
-    var w = document.getElementById('userDropdownWrapper');
-    var d = document.getElementById('userDropdown');
-    if (w && d && !w.contains(e.target)) d.classList.add('hidden');
-
-function showLogoutModal() {
-    const modal = document.getElementById('logoutModal');
-    modal.classList.remove('hidden');
+        const menu = document.getElementById('mobileMenu');
+        if (menu) menu.classList.toggle('hidden');
     }
 
-function hideLogoutModal() {
-    const modal = document.getElementById('logoutModal');
-    modal.classList.add('hidden');
+    function toggleUserDropdown() {
+        const dropdown = document.getElementById('userDropdown');
+        if (dropdown) dropdown.classList.toggle('hidden');
     }
-});
 
+    function showLogoutModal() {
+        const modal = document.getElementById('logoutModal');
+        if (modal) modal.classList.remove('hidden');
+    }
 
-            function showLogoutModal() {
-                const modal = document.getElementById('logoutModal');
-                modal.classList.remove('hidden');
-            }
+    function hideLogoutModal() {
+        const modal = document.getElementById('logoutModal');
+        if (modal) modal.classList.add('hidden');
+    }
 
-            function hideLogoutModal() {
-                const modal = document.getElementById('logoutModal');
-                modal.classList.add('hidden');
-            }
+    document.addEventListener('click', function (e) {
+        const wrapper = document.getElementById('userDropdownWrapper');
+        const dropdown = document.getElementById('userDropdown');
+        if (wrapper && dropdown && !wrapper.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
+
+    window.addEventListener('resize', function () {
+        if (window.innerWidth >= 768) {
+            const menu = document.getElementById('mobileMenu');
+            if (menu) menu.classList.add('hidden');
+        }
+    });
 
 </script>

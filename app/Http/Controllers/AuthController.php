@@ -118,21 +118,53 @@ class AuthController extends Controller
         return view('user.profile_edit', ['user' => Auth::user()]);
     }
 
-    public function updateProfile(Request $request)
+    public function updateProfile(Request $request, CloudinaryService $cloudinary)
 {
     $validated = $request->validate([
-        'name' => 'required|string|max:255',
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
         'phone' => ['required', 'regex:/^09\\d{9}$/'],
+        'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        'current_password' => 'nullable|string',
+        'new_password' => 'nullable|string|min:8|confirmed',
 
         'shipping_street' => 'nullable|string|max:255',
         'shipping_city' => 'required|string|max:100',
         'shipping_barangay' => 'required|string|max:100',
+        'shipping_region' => 'nullable|string|max:100',
         'shipping_postal_code' => 'required|string|max:20',
+        'notify_order_updates' => 'nullable|boolean',
+        'notify_promotions' => 'nullable|boolean',
+        'notify_loyalty' => 'nullable|boolean',
     ], [
         'phone.regex' => 'Please enter a valid Philippine mobile number (e.g. 09171234567).',
     ]);
 
     $user = auth()->user();
+
+    $validated['name'] = trim($validated['first_name'] . ' ' . $validated['last_name']);
+    $validated['notify_order_updates'] = $request->boolean('notify_order_updates');
+    $validated['notify_promotions'] = $request->boolean('notify_promotions');
+    $validated['notify_loyalty'] = $request->boolean('notify_loyalty');
+
+    if ($request->filled('new_password')) {
+        if (!$request->filled('current_password') || !Hash::check($request->input('current_password'), $user->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect.'])->withInput();
+        }
+        $validated['password'] = $request->input('new_password');
+    }
+
+    if ($request->hasFile('profile_photo')) {
+        if ($user->profile_photo_public_id) {
+            $cloudinary->deleteImage($user->profile_photo_public_id);
+        }
+
+        $file = $request->file('profile_photo');
+        $publicId = 'profile_pictures/user_' . $user->id;
+        $uploaded = $cloudinary->uploadImage($file->getRealPath(), 'profile_pictures', $publicId, 'profile_pictures');
+        $validated['profile_photo_url'] = $uploaded['url'];
+        $validated['profile_photo_public_id'] = $uploaded['public_id'];
+    }
 
     // ✅ BUILD FULL SHIPPING ADDRESS HERE
     $validated['shipping_address'] = implode(', ', array_filter([
@@ -147,8 +179,21 @@ class AuthController extends Controller
     // ✅ SAVE EVERYTHING
     $user->update($validated);
 
-    return back()->with('success', 'Profile updated successfully.');
+    return redirect()->route('dashboard')->with('success', 'Profile updated successfully.');
 }
+
+    public function deactivateAccount(Request $request)
+    {
+        $user = Auth::user();
+        $user->archived_at = now();
+        $user->save();
+
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->with('success', 'Your account has been deactivated.');
+    }
 
     public function login(Request $request)
     {

@@ -1,24 +1,14 @@
-<!doctype html>
-<html class="scroll-smooth">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    @include('partials.theme_init')
-    <title>My Orders | Lumina</title>
-    @vite('resources/css/app.css')
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
-</head>
-<body class="bg-gray-50 text-gray-900 dark:bg-black dark:text-white font-sans antialiased min-h-screen flex flex-col transition-colors pt-16">
+@extends('layouts.customer')
 
-    @include('partials.navbar')
+@section('title', 'My Orders | Lumina')
 
-    <div class="grow container mx-auto px-4 sm:px-6 py-12 max-w-5xl">
+@section('content')
+    <div class="container mx-auto px-4 sm:px-6 lg:px-10 py-12 max-w-7xl">
         <div class="flex items-center justify-between mb-8">
             <div>
                 <h1 class="text-3xl md:text-4xl font-playfair font-bold text-white mb-2">My Orders</h1>
                 <p class="text-gray-400">Track all your orders and their latest status.</p>
             </div>
-            <a href="{{ route('dashboard') }}" class="text-sm text-amber-300 hover:text-amber-200 font-semibold">Back to Dashboard</a>
         </div>
 
         <div class="space-y-4">
@@ -69,8 +59,4 @@
             <div class="mt-8">{{ $orders->links() }}</div>
         @endif
     </div>
-
-    @include('partials.footer')
-
-</body>
-</html>
+@endsection
