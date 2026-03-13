@@ -1,0 +1,18 @@
+[providers]
+# Ensure we use a modern Node version for Tailwind v4 and Vite
+node = "20"
+# Match your composer.json PHP requirement
+php = "8.4" 
+
+[phases.install]
+# Install PHP dependencies first, then Node dependencies
+cmds = [
+    "composer install --optimize-autoloader --no-dev --no-interaction",
+    "npm install"
+]
+
+[phases.build]
+# Run Vite to compile your frontend assets
+cmds = [
+    "npm run build"
+]
