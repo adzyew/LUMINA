@@ -161,6 +161,21 @@
                         <div class="p-5">
                             <h3 class="font-playfair font-semibold text-gray-900 mb-1 group-hover:text-amber-600 transition-colors">{{ $product->name }}</h3>
                             <p class="text-gray-500 text-sm mb-3 line-clamp-2">{{ Str::limit($product->description ?? '', 60) }}</p>
+                            @php
+                                $avgRating = (float) ($product->reviews_avg_rating ?? 0);
+                                $reviewCount = (int) ($product->reviews_count ?? 0);
+                                $filledStars = (int) round($avgRating);
+                            @endphp
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="flex items-center gap-0.5">
+                                    @for($star = 1; $star <= 5; $star++)
+                                        <svg class="w-4 h-4 {{ $star <= $filledStars ? 'text-amber-400' : 'text-gray-300' }}" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.95a1 1 0 00.95.69h4.154c.969 0 1.371 1.24.588 1.81l-3.36 2.441a1 1 0 00-.364 1.118l1.285 3.95c.3.922-.755 1.688-1.538 1.118l-3.36-2.44a1 1 0 00-1.175 0l-3.36 2.44c-.783.57-1.838-.196-1.539-1.118l1.286-3.95a1 1 0 00-.364-1.118L2.07 9.377c-.783-.57-.38-1.81.588-1.81h4.154a1 1 0 00.95-.69l1.287-3.95z" />
+                                        </svg>
+                                    @endfor
+                                </div>
+                                <span class="text-xs text-gray-500">{{ number_format($avgRating, 1) }} ({{ $reviewCount }})</span>
+                            </div>
                             <p class="text-xl font-bold text-amber-600">₱{{ number_format($product->price ?? 0, 0) }}</p>
                 </div>
                     </a>
@@ -274,6 +289,21 @@
                         <div class="p-5">
                             <p class="text-xs text-amber-600 uppercase tracking-wider mb-1">{{ $product->category ?? 'Jewelry' }}</p>
                             <h3 class="font-playfair font-semibold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors">{{ $product->name }}</h3>
+                            @php
+                                $avgRating = (float) ($product->reviews_avg_rating ?? 0);
+                                $reviewCount = (int) ($product->reviews_count ?? 0);
+                                $filledStars = (int) round($avgRating);
+                            @endphp
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="flex items-center gap-0.5">
+                                    @for($star = 1; $star <= 5; $star++)
+                                        <svg class="w-4 h-4 {{ $star <= $filledStars ? 'text-amber-400' : 'text-gray-300' }}" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.95a1 1 0 00.95.69h4.154c.969 0 1.371 1.24.588 1.81l-3.36 2.441a1 1 0 00-.364 1.118l1.285 3.95c.3.922-.755 1.688-1.538 1.118l-3.36-2.44a1 1 0 00-1.175 0l-3.36 2.44c-.783.57-1.838-.196-1.539-1.118l1.286-3.95a1 1 0 00-.364-1.118L2.07 9.377c-.783-.57-.38-1.81.588-1.81h4.154a1 1 0 00.95-.69l1.287-3.95z" />
+                                        </svg>
+                                    @endfor
+                                </div>
+                                <span class="text-xs text-gray-500">{{ number_format($avgRating, 1) }} ({{ $reviewCount }})</span>
+                            </div>
                             <p class="text-xl font-bold text-amber-600">₱{{ number_format($product->price ?? 0, 0) }}</p>
                         </div>
                     </a>
@@ -372,6 +402,21 @@
                             <p class="text-xs text-amber-600 uppercase tracking-wider mb-1">{{ $product->category ?? 'Jewelry' }}</p>
                             <h3 class="font-playfair font-semibold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors line-clamp-2">{{ $product->name }}</h3>
                             <p class="text-gray-500 text-sm mb-3 line-clamp-2">{{ Str::limit($product->description ?? '', 60) }}</p>
+                            @php
+                                $avgRating = (float) ($product->reviews_avg_rating ?? 0);
+                                $reviewCount = (int) ($product->reviews_count ?? 0);
+                                $filledStars = (int) round($avgRating);
+                            @endphp
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="flex items-center gap-0.5">
+                                    @for($star = 1; $star <= 5; $star++)
+                                        <svg class="w-4 h-4 {{ $star <= $filledStars ? 'text-amber-400' : 'text-gray-300' }}" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.95a1 1 0 00.95.69h4.154c.969 0 1.371 1.24.588 1.81l-3.36 2.441a1 1 0 00-.364 1.118l1.285 3.95c.3.922-.755 1.688-1.538 1.118l-3.36-2.44a1 1 0 00-1.175 0l-3.36 2.44c-.783.57-1.838-.196-1.539-1.118l1.286-3.95a1 1 0 00-.364-1.118L2.07 9.377c-.783-.57-.38-1.81.588-1.81h4.154a1 1 0 00.95-.69l1.287-3.95z" />
+                                        </svg>
+                                    @endfor
+                                </div>
+                                <span class="text-xs text-gray-500">{{ number_format($avgRating, 1) }} ({{ $reviewCount }})</span>
+                            </div>
                             <div class="flex items-center justify-between">
                                 <p class="text-xl font-bold text-amber-600">₱{{ number_format($product->price ?? 0, 0) }}</p>
                                 <span class="text-sm text-amber-600 font-medium group-hover:underline">View →</span>

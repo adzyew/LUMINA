@@ -7,6 +7,10 @@
     {{-- Top Bar --}}
     <div class="flex items-center justify-between mb-10 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl px-6 py-3 shadow-sm dark:shadow-none">
         {{-- Search --}}
+        <header class="flex items-center gap-3">
+        <h1 class="text-3xl font-playfair font-bold text-gray-900 dark:text-white">Overview</h1>
+        <p class="text-gray-600 dark:text-gray-400 text-sm mt-3">Welcome back, Admin!</p>
+    </header>
         <div class="">
         </div>
         {{-- Right Side --}}
@@ -46,7 +50,7 @@
                     </div>
                     {{-- Links --}}
                     <div class="py-1">
-                        <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                        <a href="{{ route('admin.profile.show') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                             My Profile
                         </a>
@@ -94,12 +98,6 @@
         });
         
     </script>
-
-    {{-- Page Header --}}
-    <header class="mb-8">
-        <h1 class="text-3xl font-playfair font-bold text-gray-900 dark:text-white">Overview</h1>
-        <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Welcome back, Admin.</p>
-    </header>
 
     {{-- Stats Cards --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

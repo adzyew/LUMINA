@@ -12,12 +12,58 @@ use App\Models\Order;
 use App\Mail\TestMail;
 use App\Services\CloudinaryService;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Carbon;
 
 class AuthController extends Controller
 {
+    private const OTP_MAX_ATTEMPTS = 3;
+    private const OTP_LOCK_MINUTES = 60;
+
+    private function secondsUntil(mixed $value): int
+    {
+        if (!$value) {
+            return 0;
+        }
+
+        if ($value instanceof Carbon) {
+            return max(0, $value->getTimestamp() - time());
+        }
+
+        try {
+            return max(0, Carbon::parse((string) $value)->getTimestamp() - time());
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+
     public function showLogin()
     {
         return view('auth.login');
+    }
+
+    public function showVerifySms(Request $request)
+    {
+        if (Auth::check() && Auth::user()->is_verified) {
+            return redirect()->route('dashboard');
+        }
+
+        $email = session('email');
+        if (!$email && Auth::check() && !Auth::user()->is_verified) {
+            $email = Auth::user()->email;
+            session(['email' => $email]);
+        }
+
+        if (!$email) {
+            return redirect()->route('login')->with('error', 'Session expired. Please login again.');
+        }
+
+        $expiresAt = Cache::get('otp_expires_' . $email);
+        $remainingSeconds = $this->secondsUntil($expiresAt);
+
+        $lockUntil = Cache::get('otp_lock_until_' . $email);
+        $lockRemainingSeconds = $this->secondsUntil($lockUntil);
+
+        return view('auth.verify-sms', compact('remainingSeconds', 'lockRemainingSeconds'));
     }
 
     public function showRegister()
@@ -52,17 +98,18 @@ class AuthController extends Controller
         // Combine first and last name
         $fullName = trim($request->first_name . ' ' . $request->last_name);
 
-        // 1️⃣ Create user (NOT logged in yet)
-        $user = User::create([
+        // 1) Store pending registration in cache (no DB record until OTP is verified)
+        $pendingRegistration = [
             'name' => $fullName,
             'phone' => $request->phone,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'email_verified_at' => null,
-            'is_verified' => false,
-        ]);
+            'password' => Hash::make($request->password),
+        ];
 
-        // 2️⃣ Generate OTP
+        $pendingTtl = now()->addHours(2);
+        Cache::put('pending_registration_' . $request->email, $pendingRegistration, $pendingTtl);
+
+        // 2) Generate OTP
         $otp = rand(100000, 999999);
 
         $expiresAt = now()->addMinutes(5);
@@ -70,22 +117,13 @@ class AuthController extends Controller
         Cache::put('otp_' . $request->email, $otp, $expiresAt);
         Cache::put('otp_expires_' . $request->email, $expiresAt, $expiresAt);
 
-        // 3️⃣ Send OTP email
+        // 3) Send OTP email
         Mail::to($request->email)->send(new TestMail($otp));
 
-        // 4️⃣ Save email in session (VERY IMPORTANT)
+        // 4) Save email in session
         session([
             'email' => $request->email,
         ]);
-
-        // 5️⃣ Log the user in so they can access the protected verify page
-        try {
-            Auth::login($user);
-            // mark session as not yet verified for middleware
-            session(['otp_verified' => false]);
-        } catch (\Throwable $e) {
-            // ignore login failures; user can still verify after logging in
-        }
 
         return redirect()->route('verify-sms');
     }
@@ -93,14 +131,20 @@ class AuthController extends Controller
 
     public function user_dashboard(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
+        if (!$user instanceof User) {
+            abort(403);
+        }
         $orders = $user->orders()->with('items.product')->latest()->get();
         return view("user.user_dashboard", compact('user', 'orders'));
     }
 
     public function orders(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
+        if (!$user instanceof User) {
+            abort(403);
+        }
 
         $orders = $user->orders()
             ->with('items.product')
@@ -109,6 +153,11 @@ class AuthController extends Controller
             ->withQueryString();
 
         return view('user.orders', compact('orders'));
+    }
+
+    public function showProfile()
+    {
+        return view('user.profile_show', ['user' => Auth::user()]);
     }
 
     
@@ -125,10 +174,19 @@ class AuthController extends Controller
         'last_name' => 'required|string|max:255',
         'phone' => ['required', 'regex:/^09\\d{9}$/'],
         'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-        'current_password' => 'nullable|string',
-        'new_password' => 'nullable|string|min:8|confirmed',
+        'current_password' => 'nullable|required_with:new_password|string',
+        'new_password' => [
+            'nullable',
+            'string',
+            'min:8',
+            'regex:/[a-z]/',
+            'regex:/[A-Z]/',
+            'regex:/[0-9]/',
+            'confirmed',
+        ],
 
         'shipping_street' => 'nullable|string|max:255',
+        'shipping_secondary_address' => 'nullable|string|max:255',
         'shipping_city' => 'required|string|max:100',
         'shipping_barangay' => 'required|string|max:100',
         'shipping_region' => 'nullable|string|max:100',
@@ -138,9 +196,14 @@ class AuthController extends Controller
         'notify_loyalty' => 'nullable|boolean',
     ], [
         'phone.regex' => 'Please enter a valid Philippine mobile number (e.g. 09171234567).',
+        'new_password.min' => 'Password must be at least 8 characters.',
+        'new_password.regex' => 'Password must include uppercase, lowercase, and a number.',
     ]);
 
-    $user = auth()->user();
+    $user = Auth::user();
+    if (!$user instanceof User) {
+        abort(403);
+    }
 
     $validated['name'] = trim($validated['first_name'] . ' ' . $validated['last_name']);
     $validated['notify_order_updates'] = $request->boolean('notify_order_updates');
@@ -169,6 +232,7 @@ class AuthController extends Controller
     // ✅ BUILD FULL SHIPPING ADDRESS HERE
     $validated['shipping_address'] = implode(', ', array_filter([
         $validated['shipping_street'] ?? null,
+        $validated['shipping_secondary_address'] ?? null,
         $validated['shipping_barangay'],
         $validated['shipping_city'],
         'Metro Manila',
@@ -179,13 +243,16 @@ class AuthController extends Controller
     // ✅ SAVE EVERYTHING
     $user->update($validated);
 
-    return redirect()->route('dashboard')->with('success', 'Profile updated successfully.');
+    return redirect()->route('profile.show')->with('success', 'Profile updated successfully.');
 }
 
     public function deactivateAccount(Request $request)
     {
         $user = Auth::user();
-        $user->archived_at = now();
+        if (!$user instanceof User) {
+            abort(403);
+        }
+        $user->archived_at = Carbon::now();
         $user->save();
 
         Auth::logout();
@@ -301,12 +368,6 @@ class AuthController extends Controller
     }
 
     // 5. IF NOT VERIFIED: Send OTP
-    
-    // --> FIX: Log the user in so they can access the auth-protected verify-sms route
-    Auth::login($user);
-    
-    // --> FIX: Tell your custom middleware they are NOT verified yet
-    session(['otp_verified' => false]); 
     session(['email' => $user->email]);
 
     $otp = rand(100000, 999999);
@@ -356,6 +417,18 @@ class AuthController extends Controller
         return redirect()->route('login')->with('error', 'Session expired.');
     }
 
+    $attemptsKey = 'otp_attempts_' . $email;
+    $lockKey = 'otp_lock_until_' . $email;
+
+    $lockRemainingSeconds = $this->secondsUntil(Cache::get($lockKey));
+    if ($lockRemainingSeconds > 0) {
+        $minutes = intdiv($lockRemainingSeconds, 60);
+        $seconds = $lockRemainingSeconds % 60;
+        return back()->withErrors([
+            'otp' => 'Too many incorrect attempts. Try again in ' . sprintf('%02d:%02d', $minutes, $seconds) . '.',
+        ]);
+    }
+
     // 3. Verify OTP Matches Cache
     $enteredOtp = implode('', $request->code);
     $cachedOtp  = Cache::get('otp_' . $email);
@@ -368,12 +441,42 @@ class AuthController extends Controller
     ]);
 
     if (!$cachedOtp || $enteredOtp != $cachedOtp) {
+        $attempts = (int) Cache::increment($attemptsKey);
+        if ($attempts === 1) {
+            Cache::put($attemptsKey, 1, now()->addMinutes(self::OTP_LOCK_MINUTES));
+        }
+
+        if ($attempts >= self::OTP_MAX_ATTEMPTS) {
+            $lockUntil = now()->addMinutes(self::OTP_LOCK_MINUTES);
+            Cache::put($lockKey, $lockUntil, $lockUntil);
+            Cache::forget($attemptsKey);
+
+            return back()->withErrors([
+                'otp' => 'Too many incorrect attempts. You are locked for 1 hour.',
+            ]);
+        }
+
+        $remainingAttempts = self::OTP_MAX_ATTEMPTS - $attempts;
         Log::warning('verifyOtp failed: invalid or expired code', ['email' => $email]);
-        return back()->withErrors(['otp' => 'Invalid or expired verification code.']);
+        return back()->withErrors([
+            'otp' => 'Invalid or expired verification code. ' . $remainingAttempts . ' attempt(s) remaining.',
+        ]);
     }
 
-    // 4. Find User
+    // 4. Resolve user: create from pending registration only after OTP passes
+    $pendingRegistration = Cache::get('pending_registration_' . $email);
     $user = User::where('email', $email)->first();
+
+    if (!$user && is_array($pendingRegistration)) {
+        $user = User::create([
+            'name' => $pendingRegistration['name'] ?? $email,
+            'phone' => $pendingRegistration['phone'] ?? null,
+            'email' => $pendingRegistration['email'] ?? $email,
+            'password' => $pendingRegistration['password'] ?? Hash::make(str()->random(24)),
+            'is_verified' => true,
+            'email_verified_at' => now(),
+        ]);
+    }
 
     if ($user) {
         // ✅ A. Mark User as Verified
@@ -387,6 +490,9 @@ class AuthController extends Controller
         // ✅ C. Clean Up
         Cache::forget('otp_' . $email);
         Cache::forget('otp_expires_' . $email);
+        Cache::forget($attemptsKey);
+        Cache::forget($lockKey);
+        Cache::forget('pending_registration_' . $email);
         session(['otp_verified' => true]);
         // Clear the `email` session key used while verifying
         $request->session()->forget('email');
@@ -419,11 +525,26 @@ class AuthController extends Controller
                 ->with('error', 'Session expired.');
         }
 
+        $lockKey = 'otp_lock_until_' . $email;
+        $lockRemainingSeconds = $this->secondsUntil(Cache::get($lockKey));
+        if ($lockRemainingSeconds > 0) {
+            return back()->with('error', 'You are temporarily locked due to failed attempts. Please wait before retrying.');
+        }
+
+        $expiresAt = Cache::get('otp_expires_' . $email);
+        $remainingSeconds = $this->secondsUntil($expiresAt);
+        if ($remainingSeconds > 0) {
+            $minutes = intdiv($remainingSeconds, 60);
+            $seconds = $remainingSeconds % 60;
+            return back()->with('error', 'Please wait ' . sprintf('%02d:%02d', $minutes, $seconds) . ' before resending OTP.');
+        }
+
         $otp = rand(100000, 999999);
         $expiresAt = now()->addMinutes(5);
 
         Cache::put('otp_' . $email, $otp, $expiresAt);
         Cache::put('otp_expires_' . $email, $expiresAt, $expiresAt);
+        Cache::forget('otp_attempts_' . $email);
 
         Mail::to($email)->send(new TestMail($otp));
 
@@ -472,9 +593,11 @@ class AuthController extends Controller
 
         $email = session('password_reset_email');
         $expiresAt = Cache::get('password_reset_expires_' . $email);
-        $remainingSeconds = $expiresAt ? max(0, $expiresAt->getTimestamp() - time()) : 300;
+        $remainingSeconds = $this->secondsUntil($expiresAt);
+        $lockUntil = Cache::get('password_reset_lock_until_' . $email);
+        $lockRemainingSeconds = $this->secondsUntil($lockUntil);
 
-        return view('auth.verify-password-reset', compact('remainingSeconds'));
+        return view('auth.verify-password-reset', compact('remainingSeconds', 'lockRemainingSeconds'));
     }
 
     public function verifyPasswordResetOtp(Request $request)
@@ -486,15 +609,45 @@ class AuthController extends Controller
             return redirect()->route('password.request')->with('error', 'Session expired. Please request a new OTP.');
         }
 
+        $attemptsKey = 'password_reset_attempts_' . $email;
+        $lockKey = 'password_reset_lock_until_' . $email;
+
+        $lockRemainingSeconds = $this->secondsUntil(Cache::get($lockKey));
+        if ($lockRemainingSeconds > 0) {
+            $minutes = intdiv($lockRemainingSeconds, 60);
+            $seconds = $lockRemainingSeconds % 60;
+            return back()->withErrors([
+                'code' => 'Too many incorrect attempts. Try again in ' . sprintf('%02d:%02d', $minutes, $seconds) . '.',
+            ]);
+        }
+
         $enteredOtp = implode('', $request->code);
         $cachedOtp = Cache::get('password_reset_otp_' . $email);
 
         if (!$cachedOtp || $enteredOtp != $cachedOtp) {
-            return back()->withErrors(['code' => 'Invalid or expired verification code.']);
+            $attempts = (int) Cache::increment($attemptsKey);
+            if ($attempts === 1) {
+                Cache::put($attemptsKey, 1, now()->addMinutes(self::OTP_LOCK_MINUTES));
+            }
+
+            if ($attempts >= self::OTP_MAX_ATTEMPTS) {
+                $lockUntil = now()->addMinutes(self::OTP_LOCK_MINUTES);
+                Cache::put($lockKey, $lockUntil, $lockUntil);
+                Cache::forget($attemptsKey);
+
+                return back()->withErrors([
+                    'code' => 'Too many incorrect attempts. You are locked for 1 hour.',
+                ]);
+            }
+
+            $remainingAttempts = self::OTP_MAX_ATTEMPTS - $attempts;
+            return back()->withErrors(['code' => 'Invalid or expired verification code. ' . $remainingAttempts . ' attempt(s) remaining.']);
         }
 
         Cache::forget('password_reset_otp_' . $email);
         Cache::forget('password_reset_expires_' . $email);
+        Cache::forget($attemptsKey);
+        Cache::forget($lockKey);
 
         session(['password_reset_verified' => true]);
 
@@ -508,11 +661,26 @@ class AuthController extends Controller
             return redirect()->route('password.request')->with('error', 'Session expired.');
         }
 
+        $lockKey = 'password_reset_lock_until_' . $email;
+        $lockRemainingSeconds = $this->secondsUntil(Cache::get($lockKey));
+        if ($lockRemainingSeconds > 0) {
+            return back()->with('error', 'You are temporarily locked due to failed attempts. Please wait before retrying.');
+        }
+
+        $expiresAt = Cache::get('password_reset_expires_' . $email);
+        $remainingSeconds = $this->secondsUntil($expiresAt);
+        if ($remainingSeconds > 0) {
+            $minutes = intdiv($remainingSeconds, 60);
+            $seconds = $remainingSeconds % 60;
+            return back()->with('error', 'Please wait ' . sprintf('%02d:%02d', $minutes, $seconds) . ' before resending OTP.');
+        }
+
         $otp = rand(100000, 999999);
         $expiresAt = now()->addMinutes(5);
 
         Cache::put('password_reset_otp_' . $email, $otp, $expiresAt);
         Cache::put('password_reset_expires_' . $email, $expiresAt, $expiresAt);
+        Cache::forget('password_reset_attempts_' . $email);
 
         try {
             Mail::to($email)->send(new TestMail($otp));
@@ -535,7 +703,18 @@ class AuthController extends Controller
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'password' => 'required|min:8|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'confirmed',
+            ],
+        ], [
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.regex' => 'Password must include uppercase, lowercase, and a number.',
         ]);
 
         $email = session('password_reset_email');

@@ -8,9 +8,6 @@
         <h1 class="text-3xl font-playfair font-bold text-gray-900 dark:text-white">Inventory Dashboard</h1>
         <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Welcome back, {{ auth()->user()->name }}.</p>
     </div>
-    <a href="{{ route('admin.products.create') }}" class="px-5 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors">
-        + Add Product
-    </a>
 </header>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

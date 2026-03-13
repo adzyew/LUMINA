@@ -10,11 +10,6 @@
             <h1 class="text-3xl font-playfair font-bold text-gray-900 dark:text-white mb-2">Sales & Orders</h1>
             <p class="text-gray-600 dark:text-gray-400">Manage incoming orders and track store revenue.</p>
         </div>
-        <div class="flex gap-3">
-            <a href="{{ route('admin.staff.dashboard') }}" class="px-5 py-2.5 bg-gray-100 dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-full text-gray-700 dark:text-white text-sm font-semibold hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
-                Back to Hub
-            </a>
-        </div>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">

@@ -21,6 +21,7 @@ class RolePermissionSeeder extends Seeder
             'inventory.view',
             'inventory.create',
             'inventory.update',
+            'inventory.archive',
             'inventory.delete',
             'sales.view',
             'deliveries.manage',
@@ -51,6 +52,7 @@ class RolePermissionSeeder extends Seeder
             'inventory.view',
             'inventory.create',
             'inventory.update',
+            'inventory.archive',
             'inventory.delete',
         ]);
 

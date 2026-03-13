@@ -83,19 +83,17 @@
                 </td>
                 <td class="p-4">
                     <div class="flex justify-center gap-3">
-                        @if($user->hasRole('admin'))
-                            <span class="text-gray-500 text-sm">—</span>
-                        @else
-                            <a href="{{ route('admin.users.edit', $user) }}" class="inline-flex items-center px-4 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 hover:text-white transition-colors text-sm">Edit</a>
+                        <a href="{{ route('admin.users.show', $user) }}" class="inline-flex items-center px-4 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 hover:text-white transition-colors text-sm">View</a>
+                        @if(!$user->hasRole('admin'))
                             @if($user->archived_at)
                                 <form action="{{ route('admin.users.unarchive', $user) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-500 text-white font-bold rounded-lg hover:bg-gray-400 transition-colors text-sm">Unarchive</button>
                                 </form>
-                                <form action="{{ route('admin.users.destroy', $user) }}" method="POST" onsubmit="return confirm('Permanently delete this user? This cannot be undone.');">
+                                <form id="delete-user-form-{{ $user->id }}" action="{{ route('admin.users.destroy', $user) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors text-sm">Delete</button>
+                                    <button type="button" onclick="showDeleteModal('{{ $user->id }}', '{{ $user->name }}')" class="inline-flex items-center px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors text-sm">Delete</button>
                                 </form>
                             @else
                                 <form action="{{ route('admin.users.archive', $user) }}" method="POST" onsubmit="return confirm('Archive this user? They will be prevented from logging in.');">
@@ -119,4 +117,98 @@
 @if($users->hasPages())
     <div class="mt-6">{{ $users->links() }}</div>
 @endif
+
+<div id="deleteUserModal" class="fixed inset-0 z-100 hidden" aria-labelledby="delete-user-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="hideDeleteModal()"></div>
+
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-xl bg-white dark:bg-gray-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm border border-gray-200 dark:border-white/10">
+                <div class="px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-500/20 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg font-semibold leading-6 text-gray-900 dark:text-white" id="delete-user-title">Confirm Permanent Delete</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">You are about to permanently delete <span id="deleteUserName" class="font-semibold"></span>. This cannot be undone.</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Please wait <span id="deleteCountdown" class="font-semibold text-red-500">10</span> seconds to confirm.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-800/50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button id="deleteConfirmBtn" type="button" onclick="confirmDeleteUser()" disabled class="inline-flex w-full justify-center rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white opacity-50 cursor-not-allowed sm:ml-3 sm:w-auto transition-colors">
+                        Delete
+                    </button>
+                    <button type="button" onclick="hideDeleteModal()" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 sm:mt-0 sm:w-auto transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let deleteTimer = null;
+    let selectedDeleteFormId = null;
+
+    function showDeleteModal(userId, userName) {
+        selectedDeleteFormId = 'delete-user-form-' + userId;
+
+        const modal = document.getElementById('deleteUserModal');
+        const nameEl = document.getElementById('deleteUserName');
+        const countdownEl = document.getElementById('deleteCountdown');
+        const confirmBtn = document.getElementById('deleteConfirmBtn');
+
+        nameEl.textContent = userName;
+        confirmBtn.disabled = true;
+        confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        countdownEl.textContent = '10';
+        modal.classList.remove('hidden');
+
+        let secondsLeft = 10;
+        if (deleteTimer) {
+            clearInterval(deleteTimer);
+        }
+
+        deleteTimer = setInterval(() => {
+            secondsLeft--;
+            countdownEl.textContent = String(secondsLeft);
+
+            if (secondsLeft <= 0) {
+                clearInterval(deleteTimer);
+                deleteTimer = null;
+                confirmBtn.disabled = false;
+                confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }, 1000);
+    }
+
+    function hideDeleteModal() {
+        const modal = document.getElementById('deleteUserModal');
+        modal.classList.add('hidden');
+        selectedDeleteFormId = null;
+
+        if (deleteTimer) {
+            clearInterval(deleteTimer);
+            deleteTimer = null;
+        }
+    }
+
+    function confirmDeleteUser() {
+        if (!selectedDeleteFormId) {
+            return;
+        }
+
+        const form = document.getElementById(selectedDeleteFormId);
+        if (form) {
+            form.submit();
+        }
+    }
+</script>
 @endsection

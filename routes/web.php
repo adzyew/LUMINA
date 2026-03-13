@@ -50,6 +50,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/products/{product}/review', [ReviewController::class, 'store'])->name('reviews.store');
 });
 
+// OTP verification routes (session-based, no auth required)
+Route::get('/verify-sms', [AuthController::class, 'showVerifySms'])->name('verify-sms');
+Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])->name('verify.otp');
+Route::post('/resend-otp', [AuthController::class, 'resendOtp'])->name('otp.resend');
+
 // --- 1. GUEST ROUTES ---
 Route::middleware('guest')->group(function () {
 
@@ -71,12 +76,9 @@ Route::middleware('guest')->group(function () {
 
 //  AUTHENTICATED USER ROUTES ---
 Route::middleware('auth')->group(function () {
-    Route::get('/verify-sms', fn () => view('auth.verify-sms'))->name('verify-sms');
-    Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])->name('verify.otp');
-    Route::post('/resend-otp', [AuthController::class, 'resendOtp'])->name('otp.resend');
-    
     Route::get('/dashboard', [AuthController::class, 'user_dashboard'])->name('dashboard');
     Route::get('/dashboard/orders', [AuthController::class, 'orders'])->name('orders.index');
+    Route::get('/dashboard/profile', [AuthController::class, 'showProfile'])->name('profile.show');
     Route::get('/dashboard/profile/edit', [AuthController::class, 'editProfile'])->name('profile.edit');
     Route::put('/dashboard/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
     Route::post('/dashboard/deactivate', [AuthController::class, 'deactivateAccount'])->name('account.deactivate');
