@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\DeliveryController;
@@ -39,6 +40,17 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
         Route::get('delivery/dashboard', [StaffDashboardController::class, 'deliveryDashboard'])
             ->middleware('permission:deliveries.manage')
             ->name('delivery.dashboard');
+
+        // Admin/staff self profile
+        Route::get('profile', [ProfileController::class, 'show'])
+            ->middleware('role_or_permission:admin|inventory_manager|sales_staff|delivery_staff|inventory.view|sales.view|deliveries.manage')
+            ->name('profile.show');
+        Route::get('profile/edit', [ProfileController::class, 'edit'])
+            ->middleware('role_or_permission:admin|inventory_manager|sales_staff|delivery_staff|inventory.view|sales.view|deliveries.manage')
+            ->name('profile.edit');
+        Route::put('profile', [ProfileController::class, 'update'])
+            ->middleware('role_or_permission:admin|inventory_manager|sales_staff|delivery_staff|inventory.view|sales.view|deliveries.manage')
+            ->name('profile.update');
 
         Route::get('/dashboard', function () {
             $completedStatuses = ['confirmed', 'processing', 'shipped', 'delivered'];
@@ -103,7 +115,7 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
 
         // USERS (Admin Only)
         Route::resource('users', UserManagementController::class)
-                ->only(['index', 'create', 'store', 'edit', 'update'])
+            ->only(['index', 'create', 'store', 'show'])
                 ->middleware('role:admin');
 
         // archive/unarchive/delete users
@@ -184,10 +196,10 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
             ->name('products.destroy');
         // archive/unarchive products
         Route::post('products/{product}/archive', [ProductController::class, 'archive'])
-            ->middleware('permission:inventory.update')
+            ->middleware('permission:inventory.archive')
             ->name('products.archive');
         Route::post('products/{product}/unarchive', [ProductController::class, 'unarchive'])
-            ->middleware('permission:inventory.update')
+            ->middleware('permission:inventory.archive')
             ->name('products.unarchive');
 
         // ORDERS

@@ -89,7 +89,7 @@
                                         @if($user->profile_photo_url)
                                             <img src="{{ $user->profile_photo_url }}" alt="Profile" class="w-24 h-24 rounded-full object-cover border border-amber-300/40">
                                         @else
-                                            <div class="w-24 h-24 bg-gradient-to-br from-amber-300 to-amber-600 rounded-full flex items-center justify-center text-black text-2xl font-bold">
+                                            <div class="w-24 h-24 bg-linear-to-br from-amber-300 to-amber-600 rounded-full flex items-center justify-center text-black text-2xl font-bold">
                                                 {{ strtoupper(substr($user->name, 0, 1)) }}
                                             </div>
                                             
@@ -203,6 +203,11 @@
                                     placeholder="Street, building, house no."
                                     class="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white">
 
+                                <input type="text" name="shipping_secondary_address"
+                                    value="{{ old('shipping_secondary_address', $user->shipping_secondary_address) }}"
+                                    placeholder="Secondary address (optional: unit, landmark, floor)"
+                                    class="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white">
+
                                 <select id="city" name="shipping_city" required
                                     class="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-white">
                                     <option value="">Loading cities...</option>
@@ -275,7 +280,7 @@
                     <button type="submit" class="px-6 py-3 bg-amber-300 text-black font-bold rounded-xl hover:bg-amber-400 transition-colors">
                         Save Changes
                     </button>
-                    <a href="{{ route('dashboard') }}" class="px-6 py-3 bg-white/5 text-gray-300 font-semibold rounded-xl hover:bg-white/10 border border-white/10 text-center transition-colors">
+                    <a href="{{ route('profile.show') }}" class="px-6 py-3 bg-white/5 text-gray-300 font-semibold rounded-xl hover:bg-white/10 border border-white/10 text-center transition-colors">
                         Cancel
                     </a>
                 </div>

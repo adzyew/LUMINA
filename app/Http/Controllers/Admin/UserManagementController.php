@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 
 class UserManagementController extends Controller
 {
@@ -51,9 +52,20 @@ class UserManagementController extends Controller
      */
     public function create()
     {
+        $this->ensureArchivePermissionExists();
         $roles = Role::whereIn('name', $this->staffRoleNames())->orderBy('name')->get();
         $permissions = Permission::orderBy('name')->get();
         return view('admin.users.create', compact('roles', 'permissions'));
+    }
+
+    /**
+     * Display complete user details.
+     */
+    public function show(User $user)
+    {
+        $user->load(['roles.permissions', 'permissions']);
+
+        return view('admin.users.show', compact('user'));
     }
 
     /**
@@ -88,58 +100,11 @@ class UserManagementController extends Controller
     }
 
     /**
-     * Show form to edit user (assign role + additional permissions).
-     * Admins cannot be edited.
-     */
-    public function edit(User $user)
-    {
-        if ($user->hasRole('admin')) {
-            abort(403, 'Admin users cannot be edited.');
-        }
-
-        $roles = Role::whereIn('name', $this->staffRoleNames())->orderBy('name')->get();
-        $permissions = Permission::orderBy('name')->get();
-        return view('admin.users.edit', compact('user', 'roles', 'permissions'));
-    }
-
-    /**
-     * Update user (name, email, role, permissions).
-     * Admins cannot be edited.
-     */
-    public function update(Request $request, User $user)
-    {
-        if ($user->hasRole('admin')) {
-            abort(403, 'Admin users cannot be edited.');
-        }
-
-        $staffRoleNames = $this->staffRoleNames();
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'role' => ['required', 'string', Rule::in($staffRoleNames)],
-            'permissions' => 'nullable|array',
-            'permissions.*' => 'exists:permissions,name',
-        ]);
-
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-        ]);
-
-        $user->syncRoles([$request->role]);
-
-        $user->syncPermissions($request->permissions ?? []);
-
-        return redirect()->route('admin.users.index')
-            ->with('success', 'User updated successfully.');
-    }
-
-    /**
      * Display roles list (table format like products).
      */
     public function rolesIndex()
     {
+        $this->ensureArchivePermissionExists();
         $roles = Role::with('permissions')->get();
         return view('admin.roles.index', compact('roles'));
     }
@@ -182,6 +147,7 @@ class UserManagementController extends Controller
      */
     public function editRole(Role $role)
     {
+        $this->ensureArchivePermissionExists();
         $permissions = Permission::all();
         return view('admin.roles.edit', compact('role', 'permissions'));
     }
@@ -205,7 +171,7 @@ class UserManagementController extends Controller
             return redirect()->back()->with('error', 'Cannot archive admin users.');
         }
 
-        $user->archived_at = now();
+        $user->archived_at = Carbon::now();
         $user->save();
 
         return redirect()->route('admin.users.index')->with('success', 'User archived.');
@@ -247,5 +213,10 @@ class UserManagementController extends Controller
             ->where('name', '!=', 'customer')
             ->pluck('name')
             ->all();
+    }
+
+    protected function ensureArchivePermissionExists(): void
+    {
+        Permission::firstOrCreate(['name' => 'inventory.archive']);
     }
 }

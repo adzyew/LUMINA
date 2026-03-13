@@ -9,25 +9,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         .font-playfair { font-family: 'Playfair Display', serif; }
-        /* Remove number spinners */
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
 
         .otp-error {
-            border-color: #ef4444 !important; /* red-500 */
+            border-color: #ef4444 !important;
             animation: pulseError 0.6s ease-in-out;
         }
 
+        .shake {
+            animation: shake 0.35s;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.45s ease-out;
+        }
+
         @keyframes pulseError {
-            0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
+            0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.55); }
             70% { box-shadow: 0 0 0 10px rgba(239,68,68,0); }
             100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
-        }
-        .shake {
-        animation: shake 0.35s;
         }
 
         @keyframes shake {
@@ -38,135 +42,191 @@
             100% { transform: translateX(0); }
         }
 
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-400 dark:bg-black dark:text-white font-sans antialiased flex flex-col min-h-screen transition-colors">
-
-
     <div class="grow flex items-center justify-center py-24 px-4 sm:px-6 relative">
-        
         <div class="fixed inset-0 -z-50 overflow-hidden">
             <img src="{{ asset('IMAGES/BG.png') }}" class="w-full h-full object-cover opacity-20" alt="">
             <div class="absolute inset-0 bg-linear-to-b from-black/30 via-black/50 to-black"></div>
         </div>
 
-        <div class="w-full max-w-md bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-amber-300/20 p-8 sm:p-10 relative overflow-hidden">
-            
-            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-1 bg-linear-to-r from-transparent via-amber-300 to-transparent opacity-50"></div>
+        <div class="fade-in-up w-full max-w-md bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-amber-300/20 p-8 sm:p-10 relative overflow-hidden">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1 bg-linear-to-r from-transparent via-amber-300 to-transparent opacity-50"></div>
 
             <div class="text-center mb-8">
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-300/10 mb-4 text-amber-300">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-10">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+                    </svg>
                 </div>
                 <h2 class="text-3xl font-playfair font-bold text-white mb-2">Verify it's you</h2>
                 <p class="text-gray-400 text-sm">
-                    We've sent a 6-digit verification code to<br> 
+                    We've sent a 6-digit verification code to<br>
                     <span class="text-white font-medium">{{ session('email') }}</span>
                 </p>
             </div>
-            @if (session('success'))
-                <div class="alert alert-success" style="color: green; margin-bottom: 15px;">
-                    {{ session('success') }}
-                </div>
+
+            @if(session('success'))
+                <div class="mb-4 p-3 rounded-xl border border-green-500/40 bg-green-500/20 text-green-300 text-sm">{{ session('success') }}</div>
             @endif
+            @if(session('error'))
+                <div class="mb-4 p-3 rounded-xl border border-red-500/40 bg-red-500/20 text-red-300 text-sm">{{ session('error') }}</div>
+            @endif
+            @if($errors->any())
+                <div class="mb-4 p-3 rounded-xl border border-red-500/40 bg-red-500/20 text-red-300 text-sm">{{ $errors->first() }}</div>
+            @endif
+
             <form method="POST" action="{{ route('verify.otp') }}" id="otpForm">
                 @csrf
-                
-                <div class="flex justify-between gap-2 mb-8">
+
+                <div class="flex justify-between gap-2 mb-8" id="otpInputsWrap">
                     @for($i = 0; $i < 6; $i++)
-                        <input type="number" name="code[]" class="otp-input w-12 h-14 sm:w-14 sm:h-16 bg-black border border-gray-700 rounded-lg text-center text-xl sm:text-2xl font-bold text-amber-300 focus:outline-none focus:border-amber-300 focus:ring-1 focus:ring-amber-300 transition-all placeholder-gray-800" 
-                        maxlength="1" inputmode="numeric" placeholder="-" required>
+                        <input type="number" name="code[]" class="otp-input w-12 h-14 sm:w-14 sm:h-16 bg-black border border-gray-700 rounded-lg text-center text-xl sm:text-2xl font-bold text-amber-300 focus:outline-none focus:border-amber-300 focus:ring-1 focus:ring-amber-300 transition-all placeholder-gray-800" maxlength="1" inputmode="numeric" placeholder="-" required>
                     @endfor
                 </div>
-                <p id="otp-timer" class="text-center text-sm text-gray-400 mb-6">
-                    OTP expires in <span class="text-amber-300 font-semibold">5:00</span>
-                </p>
 
-                <button type="submit" class="w-full py-4 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-all transform hover:scale-[1.02] shadow-lg shadow-amber-300/20 mb-6">
+                <p id="lock-timer" class="hidden text-center text-sm text-red-300 mb-3"></p>
+                <p id="otp-timer" class="text-center text-sm text-gray-400 mb-6"></p>
+
+                <button id="verifyBtn" type="submit" class="w-full py-4 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-all transform hover:scale-[1.02] shadow-lg shadow-amber-300/20 mb-6">
                     Verify Code
                 </button>
             </form>
 
             <div class="text-center">
-                <p class="text-gray-500 text-sm">
-            @if(($remainingSeconds ?? 0) > 0)
-                <button disabled>Resend OTP</button>
-                    @else
-                        <form method="POST" action="{{ route('otp.resend') }}">
-                            @csrf
-                            <button>Resend OTP</button>
-                        </form>
-                    @endif
-                </p>
+                <form method="POST" action="{{ route('otp.resend') }}" id="resendForm" class="inline-flex items-center gap-2">
+                    @csrf
+                    <p class="text-sm text-gray-500">Didn't receive a code?</p>
+                    <button id="resendBtn" type="submit" class="text-amber-300 text-sm font-semibold hover:text-amber-200 disabled:text-gray-600 disabled:cursor-not-allowed">
+                        Resend Code
+                    </button>
+                </form>
+                <p id="resendHint" class="mt-2 text-xs text-gray-500"></p>
                 <a href="{{ route('login') }}" class="block mt-4 text-xs text-gray-600 hover:text-gray-400">Back to Login</a>
             </div>
         </div>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('.otp-input');
+            const timerEl = document.getElementById('otp-timer');
+            const lockEl = document.getElementById('lock-timer');
+            const resendBtn = document.getElementById('resendBtn');
+            const resendHint = document.getElementById('resendHint');
+            const verifyBtn = document.getElementById('verifyBtn');
+            const otpInputsWrap = document.getElementById('otpInputsWrap');
 
-   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const inputs = document.querySelectorAll('.otp-input');
-        const timerEl = document.getElementById('otp-timer');
+            let otpRemaining = {{ (int) ($remainingSeconds ?? 0) }};
+            let lockRemaining = {{ (int) ($lockRemainingSeconds ?? 0) }};
 
-        /* =========================
-        OTP INPUT BEHAVIOR
-        ========================= */
-        inputs.forEach((input, index) => {
-            input.addEventListener('input', (e) => {
-                if (!/^\d$/.test(e.target.value)) {
-                    e.target.value = '';
+            const formatClock = (seconds) => {
+                const m = Math.floor(seconds / 60);
+                const s = seconds % 60;
+                return `${m}:${s.toString().padStart(2, '0')}`;
+            };
+
+            const setVerificationDisabled = (disabled) => {
+                inputs.forEach((input) => {
+                    input.disabled = disabled;
+                });
+                verifyBtn.disabled = disabled;
+                verifyBtn.classList.toggle('opacity-50', disabled);
+                verifyBtn.classList.toggle('cursor-not-allowed', disabled);
+            };
+
+            const updateResendState = () => {
+                if (lockRemaining > 0) {
+                    resendBtn.disabled = true;
+                    resendHint.textContent = `Resend available after lock: ${formatClock(lockRemaining)}`;
                     return;
                 }
-                if (index < inputs.length - 1) {
-                    inputs[index + 1].focus();
+
+                if (otpRemaining > 0) {
+                    resendBtn.disabled = true;
+                    resendHint.textContent = `You can resend in ${formatClock(otpRemaining)}`;
+                } else {
+                    resendBtn.disabled = false;
+                    resendHint.textContent = 'You can request a new code now.';
                 }
+            };
+
+            const updateTimerText = () => {
+                if (lockRemaining > 0) {
+                    lockEl.classList.remove('hidden');
+                    lockEl.textContent = `Too many attempts. Try again in ${formatClock(lockRemaining)}.`;
+                    timerEl.innerHTML = 'Verification temporarily locked';
+                    setVerificationDisabled(true);
+                    return;
+                }
+
+                lockEl.classList.add('hidden');
+                setVerificationDisabled(false);
+
+                if (otpRemaining > 0) {
+                    timerEl.innerHTML = `OTP expires in <span class="text-amber-300 font-semibold">${formatClock(otpRemaining)}</span>`;
+                } else {
+                    timerEl.textContent = 'OTP expired. Please resend a new code.';
+                }
+            };
+
+            inputs.forEach((input, index) => {
+                input.addEventListener('input', (e) => {
+                    if (!/^\d$/.test(e.target.value)) {
+                        e.target.value = '';
+                        return;
+                    }
+                    if (index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                });
+
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                });
+
+                input.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const paste = e.clipboardData.getData('text').slice(0, 6);
+                    if (/^\d{6}$/.test(paste)) {
+                        paste.split('').forEach((num, i) => {
+                            inputs[i].value = num;
+                        });
+                        inputs[5].focus();
+                    }
+                });
             });
 
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Backspace' && !e.target.value && index > 0) {
-                    inputs[index - 1].focus();
-                }
-            });
+            @if($errors->any())
+                otpInputsWrap.classList.add('shake');
+                inputs.forEach((input) => input.classList.add('otp-error'));
+                setTimeout(() => {
+                    otpInputsWrap.classList.remove('shake');
+                    inputs.forEach((input) => input.classList.remove('otp-error'));
+                }, 600);
+            @endif
 
-            input.addEventListener('paste', (e) => {
-                e.preventDefault();
-                const paste = e.clipboardData.getData('text').slice(0, 6);
-                if (/^\d{6}$/.test(paste)) {
-                    paste.split('').forEach((num, i) => inputs[i].value = num);
-                    inputs[5].focus();
+            updateTimerText();
+            updateResendState();
+
+            setInterval(() => {
+                if (lockRemaining > 0) {
+                    lockRemaining--;
+                } else if (otpRemaining > 0) {
+                    otpRemaining--;
                 }
-            });
+
+                updateTimerText();
+                updateResendState();
+            }, 1000);
         });
-
-        /* =========================
-        COUNTDOWN TIMER
-        ========================= */
-        let timeLeft = {{ (int) ($remainingSeconds ?? 300) }};
-
-        const countdown = setInterval(() => {
-            if (timeLeft <= 0) {
-                clearInterval(countdown);
-                timerEl.innerHTML = 'OTP expired';
-                return;
-            }
-
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-
-            timerEl.innerHTML = `
-                OTP expires in 
-                <span class="text-amber-300 font-semibold">
-                    ${minutes}:${seconds.toString().padStart(2, '0')}
-                </span>
-            `;
-
-            timeLeft--;
-        }, 1000);
-    });
-</script>
-
-
-
+    </script>
 </body>
 </html>

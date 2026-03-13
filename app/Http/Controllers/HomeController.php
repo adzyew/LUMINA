@@ -10,7 +10,12 @@ class HomeController extends Controller
 {
     public function home()
     {
-        $featuredProducts = Product::where('is_featured', 1)->latest()->take(6)->get();
+        $featuredProducts = Product::where('is_featured', 1)
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->latest()
+            ->take(6)
+            ->get();
         $heroSlides = Product::whereNotNull('image_url')->inRandomOrder()->take(6)->get();
         return view('welcome', compact('featuredProducts', 'heroSlides'));
     }
@@ -19,12 +24,29 @@ class HomeController extends Controller
      */
     public function index(): View
     {
-        $featuredProducts = Product::where('is_featured', 1)->latest()->take(8)->get();
+        $featuredProducts = Product::where('is_featured', 1)
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->latest()
+            ->take(8)
+            ->get();
         if ($featuredProducts->isEmpty()) {
-            $featuredProducts = Product::inRandomOrder()->take(8)->get();
+            $featuredProducts = Product::withAvg('reviews', 'rating')
+                ->withCount('reviews')
+                ->inRandomOrder()
+                ->take(8)
+                ->get();
         }
-        $latestProducts = Product::latest()->take(8)->get();
-        $browseProducts = Product::inRandomOrder()->take(12)->get();
+        $latestProducts = Product::withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->latest()
+            ->take(8)
+            ->get();
+        $browseProducts = Product::withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->inRandomOrder()
+            ->take(12)
+            ->get();
         $heroSlides = Product::whereNotNull('image_url')->inRandomOrder()->take(6)->get();
 
         return view('welcome', compact('featuredProducts', 'latestProducts', 'browseProducts', 'heroSlides'));

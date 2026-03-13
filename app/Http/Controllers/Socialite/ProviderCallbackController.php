@@ -37,10 +37,8 @@ class ProviderCallbackController extends Controller
             ]
         );
 
-        // 2. Log the user in
-        Auth::login($user);
-
         if ($user->is_verified) {
+            Auth::login($user);
             session(['otp_verified' => true]); // Satisfy the custom middleware
 
             // Redirect based on role
@@ -54,8 +52,8 @@ class ProviderCallbackController extends Controller
             return redirect()->route('dashboard');
         }
 
-        // 3. Mark the session as requiring OTP verification
-        session(['otp_verified' => false]);
+        // 3. Keep user as guest until OTP is verified
+        session(['email' => $user->email]);
 
 
         $otp = rand(100000, 999999);

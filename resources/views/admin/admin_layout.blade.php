@@ -42,7 +42,7 @@
                 $dashboardUrl = (auth()->user()->hasRole('admin') || (auth()->user()->is_admin ?? false))
                     ? route('admin.admin_dashboard')
                     : route('admin.staff.dashboard');
-                $dashboardActive = request()->routeIs('admin.admin_dashboard') || request()->routeIs('admin.inventory.dashboard') || request()->routeIs('admin.sales.dashboard') || request()->routeIs('admin.delivery.dashboard');
+                $dashboardActive = request()->routeIs('admin.admin_dashboard') || request()->routeIs('admin.staff.dashboard') || request()->routeIs('admin.inventory.dashboard') || request()->routeIs('admin.sales.dashboard') || request()->routeIs('admin.delivery.dashboard');
             @endphp
             <a href="{{ $dashboardUrl }}" class="flex items-center gap-3 px-4 py-3 {{ $dashboardActive ? 'bg-amber-300 text-black font-bold' : 'text-black dark:text-gray-200 hover:text-amber-300 font-bold' }} rounded-lg transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -72,7 +72,7 @@
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                 Analytics
             </a>
-            <a href="{{ route('admin.sales.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.sales.*') ? 'bg-amber-300 text-black font-bold' : 'text-black dark:text-gray-200 hover:text-amber-300 font-bold' }} rounded-lg transition-colors">
+            <a href="{{ route('admin.sales.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.sales.index') ? 'bg-amber-300 text-black font-bold' : 'text-black dark:text-gray-200 hover:text-amber-300 font-bold' }} rounded-lg transition-colors">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 Sales
             </a>
@@ -113,12 +113,22 @@
                 <span class="text-sm text-gray-500 dark:text-gray-400">Theme</span>
                 @include('partials.theme_toggle')
             </div>
-            <form action="{{ route('logout') }}" method="POST" onsubmit="return confirm('Are you sure you want to logout?');">
-                @csrf
-                <button type="button" onclick="showLogoutModal()" class="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition-colors">
-                    Logout
+            @if($isAdmin)
+            <div class="relative mt-2" id="adminAccountDropdownWrapper">
+                <button type="button" onclick="toggleAdminAccountDropdown()" class="w-full flex items-center justify-between gap-2 px-4 py-2 bg-gray-100 dark:bg-white/5 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-white/10 rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
+                    <span class="font-semibold">Account</span>
+                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </button>
-            </form>
+                <div id="adminAccountDropdownMenu" class="absolute bottom-full mb-2 left-0 right-0 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-lg shadow-xl z-50 hidden overflow-hidden">
+                    <a href="{{ route('admin.profile.show') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
+                        My Profile
+                    </a>
+                    <button type="button" onclick="showLogoutModal(); closeAdminAccountDropdown();" class="w-full text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
+                        Logout
+                    </button>
+                </div>
+            </div>
+            @endif
         </div>
     </aside>
 
@@ -130,6 +140,39 @@
             <span class="font-playfair font-bold text-lg text-black dark:text-white">Lumina Admin</span>
             <div class="w-10"></div>
         </div>
+        @if(!$isAdmin)
+            <div class="mb-6 flex justify-end">
+                <div class="relative" id="staffProfileDropdownWrapper">
+                    <button type="button" onclick="toggleStaffProfileDropdown()" class="flex items-center gap-3 cursor-pointer">
+                        <div class="w-9 h-9 rounded-full bg-amber-400 dark:bg-amber-300 flex items-center justify-center text-black font-bold text-sm shrink-0">
+                            {{ strtoupper(substr(Auth::user()->name ?? 'S', 0, 1)) }}
+                        </div>
+                        <div class="hidden sm:block text-left">
+                            <p class="text-sm font-semibold text-gray-800 dark:text-white leading-tight">{{ Auth::user()->name ?? 'Staff' }}</p>
+                            <p class="text-xs text-gray-400 leading-tight">{{ $staffDepartment ? $staffDepartment . ' Staff' : 'Staff' }}</p>
+                        </div>
+                        <svg id="staffProfileChevron" class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <div id="staffProfileDropdownMenu" class="absolute right-0 mt-3 w-52 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-2xl shadow-xl z-50 overflow-hidden opacity-0 scale-95 pointer-events-none transition-all duration-150 ease-out origin-top-right">
+                        <div class="px-4 py-3 border-b border-gray-100 dark:border-white/10">
+                            <p class="text-sm font-semibold text-gray-800 dark:text-white">{{ Auth::user()->name ?? 'Staff' }}</p>
+                            <p class="text-xs text-gray-400 truncate">{{ Auth::user()->email ?? '' }}</p>
+                        </div>
+                        <div class="py-1">
+                        <a href="{{ route('admin.profile.show') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
+                            My Profile
+                        </a>
+                        <button type="button" onclick="showLogoutModal(); closeStaffProfileDropdown();" class="w-full text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
+                            Logout
+                        </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
         @yield('content')
     </main>
 
@@ -210,5 +253,55 @@
                 const modal = document.getElementById('logoutModal');
                 modal.classList.add('hidden');
             }
+
+            function toggleAdminAccountDropdown() {
+                const menu = document.getElementById('adminAccountDropdownMenu');
+                if (menu) menu.classList.toggle('hidden');
+            }
+
+            function closeAdminAccountDropdown() {
+                const menu = document.getElementById('adminAccountDropdownMenu');
+                if (menu) menu.classList.add('hidden');
+            }
+
+            function toggleStaffProfileDropdown() {
+                const menu = document.getElementById('staffProfileDropdownMenu');
+                const chevron = document.getElementById('staffProfileChevron');
+                if (!menu || !chevron) return;
+
+                const isOpen = !menu.classList.contains('opacity-0');
+                if (isOpen) {
+                    menu.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                    menu.classList.remove('opacity-100', 'scale-100');
+                    chevron.classList.remove('rotate-180');
+                } else {
+                    menu.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+                    menu.classList.add('opacity-100', 'scale-100');
+                    chevron.classList.add('rotate-180');
+                }
+            }
+
+            function closeStaffProfileDropdown() {
+                const menu = document.getElementById('staffProfileDropdownMenu');
+                const chevron = document.getElementById('staffProfileChevron');
+                if (!menu || !chevron) return;
+
+                menu.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                menu.classList.remove('opacity-100', 'scale-100');
+                chevron.classList.remove('rotate-180');
+            }
+
+            document.addEventListener('click', function (e) {
+                const wrapper = document.getElementById('adminAccountDropdownWrapper');
+                const menu = document.getElementById('adminAccountDropdownMenu');
+                if (wrapper && menu && !wrapper.contains(e.target)) {
+                    menu.classList.add('hidden');
+                }
+
+                const staffWrapper = document.getElementById('staffProfileDropdownWrapper');
+                if (staffWrapper && !staffWrapper.contains(e.target)) {
+                    closeStaffProfileDropdown();
+                }
+            });
         </script>
 </html>

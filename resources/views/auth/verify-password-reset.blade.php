@@ -10,6 +10,11 @@
     <style>
         .font-playfair { font-family: 'Playfair Display', serif; }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .fade-in-up { animation: fadeInUp 0.45s ease-out; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900 dark:bg-black dark:text-white font-sans antialiased flex flex-col min-h-screen transition-colors">
@@ -21,10 +26,12 @@
             <div class="absolute inset-0 bg-linear-to-b from-black/60 via-black/90 to-black"></div>
         </div>
 
-        <div class="w-full max-w-md bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-amber-300/20 p-8 sm:p-10">
+        <div class="fade-in-up w-full max-w-md bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-amber-300/20 p-8 sm:p-10">
             <div class="text-center mb-8">
                 <div class="inline-flex justify-center w-16 h-16 rounded-full bg-amber-300/10 mb-4 text-amber-300">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-9 mt-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+                </svg>
                 </div>
                 <h2 class="text-3xl font-playfair font-bold text-white mb-2">Enter Verification Code</h2>
                 <p class="text-gray-400 text-sm">We've sent a 6-digit OTP to<br><span class="text-white font-medium">{{ session('password_reset_email') }}</span></p>
@@ -44,15 +51,18 @@
                         <input type="number" name="code[]" class="otp-input w-12 h-14 sm:w-14 sm:h-16 bg-black border border-gray-700 rounded-lg text-center text-xl font-bold text-amber-300 focus:outline-none focus:border-amber-300 focus:ring-1 focus:ring-amber-300" maxlength="1" inputmode="numeric" required>
                     @endfor
                 </div>
-                <p id="otp-timer" class="text-center text-sm text-gray-400 mb-6">OTP expires in <span class="text-amber-300 font-semibold">5:00</span></p>
-                <button type="submit" class="w-full py-4 bg-amber-300 text-black font-bold rounded-xl hover:bg-amber-400 transition-colors mb-6">Verify & Reset Password</button>
+                <p id="lock-timer" class="hidden text-center text-sm text-red-300 mb-3"></p>
+                <p id="otp-timer" class="text-center text-sm text-gray-400 mb-6"></p>
+                <button id="verifyBtn" type="submit" class="w-full py-4 bg-amber-300 text-black font-bold rounded-xl hover:bg-amber-400 transition-colors mb-6">Verify & Reset Password</button>
             </form>
 
             <div class="text-center">
-                <form method="POST" action="{{ route('password.resend-otp') }}" class="inline">
+                <p class="text-sm text-gray-500 mb-2">Didn't receive a code?</p>
+                <form method="POST" action="{{ route('password.resend-otp') }}" class="inline" id="resendForm">
                     @csrf
-                    <button type="submit" class="text-amber-300 text-sm hover:text-amber-200">Resend OTP</button>
+                    <button id="resendBtn" type="submit" class="text-amber-300 text-sm font-semibold hover:text-amber-200 disabled:text-gray-600 disabled:cursor-not-allowed">Resend OTP</button>
                 </form>
+                <p id="resendHint" class="mt-2 text-xs text-gray-500"></p>
                 <a href="{{ route('password.request') }}" class="block mt-4 text-xs text-gray-500 hover:text-gray-400">Use different email</a>
             </div>
         </div>
@@ -63,7 +73,60 @@
         document.addEventListener('DOMContentLoaded', () => {
             const inputs = document.querySelectorAll('.otp-input');
             const timerEl = document.getElementById('otp-timer');
-            let timeLeft = {{ (int) ($remainingSeconds ?? 300) }};
+            const lockEl = document.getElementById('lock-timer');
+            const resendBtn = document.getElementById('resendBtn');
+            const resendHint = document.getElementById('resendHint');
+            const verifyBtn = document.getElementById('verifyBtn');
+            let otpRemaining = {{ (int) ($remainingSeconds ?? 0) }};
+            let lockRemaining = {{ (int) ($lockRemainingSeconds ?? 0) }};
+
+            const formatClock = (seconds) => {
+                const m = Math.floor(seconds / 60);
+                const s = seconds % 60;
+                return `${m}:${s.toString().padStart(2,'0')}`;
+            };
+
+            const setVerificationDisabled = (disabled) => {
+                inputs.forEach((input) => input.disabled = disabled);
+                verifyBtn.disabled = disabled;
+                verifyBtn.classList.toggle('opacity-50', disabled);
+                verifyBtn.classList.toggle('cursor-not-allowed', disabled);
+            };
+
+            const updateResendState = () => {
+                if (lockRemaining > 0) {
+                    resendBtn.disabled = true;
+                    resendHint.textContent = `Resend available after lock: ${formatClock(lockRemaining)}`;
+                    return;
+                }
+
+                if (otpRemaining > 0) {
+                    resendBtn.disabled = true;
+                    resendHint.textContent = `You can resend in ${formatClock(otpRemaining)}`;
+                } else {
+                    resendBtn.disabled = false;
+                    resendHint.textContent = 'You can request a new code now.';
+                }
+            };
+
+            const updateTimerText = () => {
+                if (lockRemaining > 0) {
+                    lockEl.classList.remove('hidden');
+                    lockEl.textContent = `Too many attempts. Try again in ${formatClock(lockRemaining)}.`;
+                    timerEl.textContent = 'Verification temporarily locked';
+                    setVerificationDisabled(true);
+                    return;
+                }
+
+                lockEl.classList.add('hidden');
+                setVerificationDisabled(false);
+
+                if (otpRemaining > 0) {
+                    timerEl.innerHTML = `OTP expires in <span class="text-amber-300 font-semibold">${formatClock(otpRemaining)}</span>`;
+                } else {
+                    timerEl.textContent = 'OTP expired. Please resend a new code.';
+                }
+            };
 
             inputs.forEach((input, index) => {
                 input.addEventListener('input', (e) => {
@@ -80,11 +143,18 @@
                 });
             });
 
-            const countdown = setInterval(() => {
-                if (timeLeft <= 0) { clearInterval(countdown); timerEl.innerHTML = 'OTP expired'; return; }
-                const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
-                timerEl.innerHTML = `OTP expires in <span class="text-amber-300 font-semibold">${m}:${s.toString().padStart(2,'0')}</span>`;
-                timeLeft--;
+            updateTimerText();
+            updateResendState();
+
+            setInterval(() => {
+                if (lockRemaining > 0) {
+                    lockRemaining--;
+                } else if (otpRemaining > 0) {
+                    otpRemaining--;
+                }
+
+                updateTimerText();
+                updateResendState();
             }, 1000);
         });
     </script>

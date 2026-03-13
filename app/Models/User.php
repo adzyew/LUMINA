@@ -40,6 +40,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'role',
         // Shipping defaults
         'shipping_street',
+        'shipping_secondary_address',
         'shipping_city',
         'shipping_region',
         'shipping_barangay',

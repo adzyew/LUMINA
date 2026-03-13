@@ -69,7 +69,6 @@
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-white border-b border-gray-200 dark:border-white/10 text-sm">
-                    <th class="p-4">ID</th>
                     <th class="p-4">Image</th>
                     <th class="p-4">Name</th>
                     <th class="p-4">Category</th>
@@ -81,7 +80,6 @@
             <tbody class="divide-y divide-gray-200 dark:divide-white/10">
                 @foreach($products as $product)
                 <tr class="hover:bg-amber-300/12 transition duration-300">
-                    <td class="p-4 text-gray-500 dark:text-gray-400">{{ $product->id }}</td>
                     <td class="p-4">
                         <img src="{{ $product->image_url }}" class="w-12 h-12 object-cover rounded border border-gray-200 dark:border-white/10">
                     </td>
