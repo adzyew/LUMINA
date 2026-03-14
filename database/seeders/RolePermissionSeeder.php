@@ -25,6 +25,7 @@ class RolePermissionSeeder extends Seeder
             'inventory.delete',
             'sales.view',
             'deliveries.manage',
+            'reviews.moderate',
         ];
 
         foreach ($permissions as $permission) {
@@ -36,6 +37,7 @@ class RolePermissionSeeder extends Seeder
         $inventoryManager = Role::firstOrCreate(['name' => 'inventory_manager']);
         $salesStaff = Role::firstOrCreate(['name' => 'sales_staff']);
         $deliveryStaff = Role::firstOrCreate(['name' => 'delivery_staff']);
+        $feedbackModerator = Role::firstOrCreate(['name' => 'feedback_moderator']);
 
         // Admin gets everything
         $admin->syncPermissions(Permission::all());
@@ -62,8 +64,11 @@ class RolePermissionSeeder extends Seeder
         // Delivery Staff - manage shipments
         $deliveryStaff->syncPermissions(['deliveries.manage']);
 
+        // Feedback Moderator - review and moderation access
+        $feedbackModerator->syncPermissions(['reviews.moderate']);
+
         // Sync existing admin users (is_admin=true) with admin role
-        User::where('is_admin', true)->each(function ($user) use ($admin) {
+        User::where('is_admin', true)->each(function (User $user) use ($admin) {
             $user->assignRole($admin);
         });
     }

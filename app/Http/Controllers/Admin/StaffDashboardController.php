@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -24,8 +25,9 @@ class StaffDashboardController extends Controller
         $canInventory = $user->can('inventory.view');
         $canSales = $user->can('sales.view');
         $canDelivery = $user->can('deliveries.manage');
+        $canFeedback = $user->can('reviews.moderate');
 
-        if (!$canInventory && !$canSales && !$canDelivery) {
+        if (!$canInventory && !$canSales && !$canDelivery && !$canFeedback) {
             return redirect()->route('admin.admin_dashboard');
         }
 
@@ -56,10 +58,20 @@ class StaffDashboardController extends Controller
             ];
         }
 
+        $feedbackStats = null;
+        if ($canFeedback) {
+            $feedbackStats = [
+                'pending' => Review::where('status', 'pending')->count(),
+                'flagged' => Review::where('is_flagged', true)->count(),
+                'approved' => Review::where('status', 'approved')->count(),
+            ];
+        }
+
         return view('admin.staff.dashboard', compact(
             'inventoryStats',
             'salesStats',
-            'deliveryStats'
+            'deliveryStats',
+            'feedbackStats'
         ));
     }
 

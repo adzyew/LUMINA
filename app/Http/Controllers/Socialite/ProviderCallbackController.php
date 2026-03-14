@@ -25,15 +25,25 @@ class ProviderCallbackController extends Controller
             return redirect()->route('login')->withErrors(['provider' => 'Authentication failed. Please try again.']);
         }
 
+        $socialEmail = (string) ($socialUser->getEmail() ?? '');
+        $socialName = (string) ($socialUser->getName() ?? '');
+        $providerId = (string) ($socialUser->getId() ?? '');
+        $providerToken = null;
+        $providerRefreshToken = null;
+
+        if ($socialEmail === '') {
+            return redirect()->route('login')->withErrors(['provider' => 'Unable to read email from provider account.']);
+        }
+
         // 1. Find or create the user
         $user = User::updateOrCreate(
-            ['email' => $socialUser->email],
+            ['email' => $socialEmail],
             [
-                'name'                   => $socialUser->name,
-                'provider_id'            => $socialUser->id,
+                'name'                   => $socialName,
+                'provider_id'            => $providerId,
                 'provider_name'          => $provider,
-                'provider_token'         => $socialUser->token,
-                'provider_refresh_token' => $socialUser->refreshToken,
+                'provider_token'         => $providerToken,
+                'provider_refresh_token' => $providerRefreshToken,
             ]
         );
 
@@ -45,7 +55,7 @@ class ProviderCallbackController extends Controller
             if ($user->is_admin || $user->hasRole('admin')) {
                 return redirect()->route('admin.admin_dashboard'); 
             }
-            if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('deliveries.manage')) {
+            if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('deliveries.manage') || $user->can('reviews.moderate')) {
                 return redirect()->route('admin.staff.dashboard'); 
             }
 
@@ -57,11 +67,13 @@ class ProviderCallbackController extends Controller
 
 
         $otp = rand(100000, 999999);
-        $expiresAt = now()->addMinutes(5);
+        $expiresAt = now()->addMinutes(2);
+        $resendAvailableAt = now()->addMinutes(2);
 
 
         Cache::put('otp_' . $user->email, $otp, $expiresAt);
         Cache::put('otp_expires_' . $user->email, $expiresAt, $expiresAt);
+        Cache::put('otp_resend_available_at_' . $user->email, $resendAvailableAt, $resendAvailableAt);
 
         Mail::to($user->email)->send(new TestMail($otp)); 
 
