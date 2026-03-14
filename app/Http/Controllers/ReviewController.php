@@ -9,6 +9,15 @@ use Illuminate\Support\Facades\Auth;
 
 class ReviewController extends Controller
 {
+    private const FLAG_TERMS = [
+        'spam',
+        'scam',
+        'fake',
+        'hate',
+        'offensive',
+        'irrelevant',
+    ];
+
     public function store(Request $request, Product $product)
     {
         if (!Auth::check()) {
@@ -20,6 +29,13 @@ class ReviewController extends Controller
             'comment' => 'nullable|string|max:1000',
         ]);
 
+        $comment = (string) $request->input('comment', '');
+        $flaggedTerm = $this->detectFlaggedTerm($comment);
+        $isFlagged = $flaggedTerm !== null;
+
+        $status = 'pending';
+        $flagReason = $isFlagged ? 'Contains potentially inappropriate keyword: ' . $flaggedTerm : null;
+
         Review::updateOrCreate(
             [
                 'user_id' => Auth::id(),
@@ -27,10 +43,29 @@ class ReviewController extends Controller
             ],
             [
                 'rating' => $request->rating,
-                'comment' => $request->comment,
+                'comment' => $comment,
+                'status' => $status,
+                'is_flagged' => $isFlagged,
+                'flag_reason' => $flagReason,
+                'moderated_by' => null,
+                'moderated_at' => null,
+                'moderation_reason' => null,
             ]
         );
 
-        return back()->with('success', 'Thank you for your review!');
+        return back()->with('success', 'Thank you for your review! It is pending moderation.');
+    }
+
+    private function detectFlaggedTerm(string $comment): ?string
+    {
+        $normalized = strtolower($comment);
+
+        foreach (self::FLAG_TERMS as $term) {
+            if (str_contains($normalized, $term)) {
+                return $term;
+            }
+        }
+
+        return null;
     }
 }

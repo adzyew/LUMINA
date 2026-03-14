@@ -11,8 +11,12 @@ class HomeController extends Controller
     public function home()
     {
         $featuredProducts = Product::where('is_featured', 1)
-            ->withAvg('reviews', 'rating')
-            ->withCount('reviews')
+            ->withAvg(['reviews' => function ($query) {
+                $query->where('status', 'approved');
+            }], 'rating')
+            ->withCount(['reviews' => function ($query) {
+                $query->where('status', 'approved');
+            }])
             ->latest()
             ->take(6)
             ->get();
@@ -25,25 +29,41 @@ class HomeController extends Controller
     public function index(): View
     {
         $featuredProducts = Product::where('is_featured', 1)
-            ->withAvg('reviews', 'rating')
-            ->withCount('reviews')
+            ->withAvg(['reviews' => function ($query) {
+                $query->where('status', 'approved');
+            }], 'rating')
+            ->withCount(['reviews' => function ($query) {
+                $query->where('status', 'approved');
+            }])
             ->latest()
             ->take(8)
             ->get();
         if ($featuredProducts->isEmpty()) {
-            $featuredProducts = Product::withAvg('reviews', 'rating')
-                ->withCount('reviews')
+            $featuredProducts = Product::withAvg(['reviews' => function ($query) {
+                $query->where('status', 'approved');
+            }], 'rating')
+                ->withCount(['reviews' => function ($query) {
+                    $query->where('status', 'approved');
+                }])
                 ->inRandomOrder()
                 ->take(8)
                 ->get();
         }
-        $latestProducts = Product::withAvg('reviews', 'rating')
-            ->withCount('reviews')
+        $latestProducts = Product::withAvg(['reviews' => function ($query) {
+            $query->where('status', 'approved');
+        }], 'rating')
+            ->withCount(['reviews' => function ($query) {
+                $query->where('status', 'approved');
+            }])
             ->latest()
             ->take(8)
             ->get();
-        $browseProducts = Product::withAvg('reviews', 'rating')
-            ->withCount('reviews')
+        $browseProducts = Product::withAvg(['reviews' => function ($query) {
+            $query->where('status', 'approved');
+        }], 'rating')
+            ->withCount(['reviews' => function ($query) {
+                $query->where('status', 'approved');
+            }])
             ->inRandomOrder()
             ->take(12)
             ->get();

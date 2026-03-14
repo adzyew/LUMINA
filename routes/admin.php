@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\Admin\FeedbackModerationController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\Admin\StaffDashboardController;
@@ -29,7 +30,7 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
 
         // Staff dashboards (inventory, sales, delivery)
         Route::get('staff/dashboard', [StaffDashboardController::class, 'index'])
-            ->middleware('role_or_permission:admin|inventory.view|sales.view|deliveries.manage')
+            ->middleware('role_or_permission:admin|inventory.view|sales.view|deliveries.manage|reviews.moderate')
             ->name('staff.dashboard');
         Route::get('inventory/dashboard', [StaffDashboardController::class, 'inventoryDashboard'])
             ->middleware('permission:inventory.view')
@@ -43,14 +44,30 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
 
         // Admin/staff self profile
         Route::get('profile', [ProfileController::class, 'show'])
-            ->middleware('role_or_permission:admin|inventory_manager|sales_staff|delivery_staff|inventory.view|sales.view|deliveries.manage')
+            ->middleware('role_or_permission:admin|inventory_manager|sales_staff|delivery_staff|feedback_moderator|inventory.view|sales.view|deliveries.manage|reviews.moderate')
             ->name('profile.show');
         Route::get('profile/edit', [ProfileController::class, 'edit'])
-            ->middleware('role_or_permission:admin|inventory_manager|sales_staff|delivery_staff|inventory.view|sales.view|deliveries.manage')
+            ->middleware('role_or_permission:admin|inventory_manager|sales_staff|delivery_staff|feedback_moderator|inventory.view|sales.view|deliveries.manage|reviews.moderate')
             ->name('profile.edit');
         Route::put('profile', [ProfileController::class, 'update'])
-            ->middleware('role_or_permission:admin|inventory_manager|sales_staff|delivery_staff|inventory.view|sales.view|deliveries.manage')
+            ->middleware('role_or_permission:admin|inventory_manager|sales_staff|delivery_staff|feedback_moderator|inventory.view|sales.view|deliveries.manage|reviews.moderate')
             ->name('profile.update');
+
+        Route::get('feedback', [FeedbackModerationController::class, 'index'])
+            ->middleware('permission:reviews.moderate')
+            ->name('feedback.index');
+        Route::patch('feedback/{review}/approve', [FeedbackModerationController::class, 'approve'])
+            ->middleware('permission:reviews.moderate')
+            ->name('feedback.approve');
+        Route::patch('feedback/{review}/reject', [FeedbackModerationController::class, 'reject'])
+            ->middleware('permission:reviews.moderate')
+            ->name('feedback.reject');
+        Route::patch('feedback/{review}/remove', [FeedbackModerationController::class, 'remove'])
+            ->middleware('permission:reviews.moderate')
+            ->name('feedback.remove');
+        Route::patch('feedback/{review}/flag', [FeedbackModerationController::class, 'flag'])
+            ->middleware('permission:reviews.moderate')
+            ->name('feedback.flag');
 
         Route::get('/dashboard', function () {
             $completedStatuses = ['confirmed', 'processing', 'shipped', 'delivered'];

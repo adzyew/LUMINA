@@ -49,7 +49,7 @@
                     </a>
                 @endif
                 @auth
-                    @if(auth()->user()->hasRole('admin') || (auth()->user()->is_admin ?? false) || auth()->user()->can('inventory.view') || auth()->user()->can('sales.view') || auth()->user()->can('deliveries.manage'))
+                    @if(auth()->user()->hasRole('admin') || (auth()->user()->is_admin ?? false) || auth()->user()->can('inventory.view') || auth()->user()->can('sales.view') || auth()->user()->can('deliveries.manage') || auth()->user()->can('reviews.moderate'))
                         @php
                             $adminLink = (auth()->user()->hasRole('admin') || (auth()->user()->is_admin ?? false)) ? route('admin.admin_dashboard') : route('admin.staff.dashboard');
                         @endphp
@@ -119,7 +119,7 @@
                 <a href="{{ url('/#contact') }}" class="px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">Contact</a>
                 <div class="pt-3 mt-3 border-t border-gray-200 dark:border-white/10 space-y-1">
                  @auth   
-                        @if(auth()->user()->hasRole('admin') || (auth()->user()->is_admin ?? false) || auth()->user()->can('inventory.view') || auth()->user()->can('sales.view') || auth()->user()->can('deliveries.manage'))
+                        @if(auth()->user()->hasRole('admin') || (auth()->user()->is_admin ?? false) || auth()->user()->can('inventory.view') || auth()->user()->can('sales.view') || auth()->user()->can('deliveries.manage') || auth()->user()->can('reviews.moderate'))
                             @php
                                 $adminLinkMobile = (auth()->user()->hasRole('admin') || (auth()->user()->is_admin ?? false)) ? route('admin.admin_dashboard') : route('admin.staff.dashboard');
                                 $adminLabel = auth()->user()->hasRole('admin') || (auth()->user()->is_admin ?? false) ? 'Admin Panel' : 'Staff Panel';

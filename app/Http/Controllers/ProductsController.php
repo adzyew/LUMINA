@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductsController extends Controller
 {
@@ -28,10 +29,27 @@ class ProductsController extends Controller
 
     public function show(Product $product)
     {
-        $product->load(['reviews.user', 'wishlistedBy', 'images']);
-        $reviews = $product->reviews()->with('user')->latest()->paginate(5);
-        $averageRating = $product->reviews()->avg('rating');
-        $isWishlisted = auth()->check() && auth()->user()->wishlist()->where('product_id', $product->id)->exists();
+        $product->load(['wishlistedBy', 'images']);
+
+        $reviews = $product->reviews()
+            ->with('user')
+            ->where(function ($query) {
+                $query->where('status', 'approved');
+
+                if (Auth::check()) {
+                    $query->orWhere(function ($ownQuery) {
+                        $ownQuery->where('user_id', Auth::id())
+                            ->where('status', 'pending');
+                    });
+                }
+            })
+            ->latest()
+            ->paginate(5);
+
+        $averageRating = (float) ($product->reviews()->where('status', 'approved')->avg('rating') ?? 0);
+        /** @var \App\Models\User|null $currentUser */
+        $currentUser = Auth::user();
+        $isWishlisted = $currentUser ? $currentUser->wishlist()->where('product_id', $product->id)->exists() : false;
         
         return view('products.show', compact('product', 'reviews', 'averageRating', 'isWishlisted'));
     }

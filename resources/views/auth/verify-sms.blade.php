@@ -91,6 +91,7 @@
                 </div>
 
                 <p id="lock-timer" class="hidden text-center text-sm text-red-300 mb-3"></p>
+                <p id="attempts-info" class="text-center text-sm text-amber-200 mb-2"></p>
                 <p id="otp-timer" class="text-center text-sm text-gray-400 mb-6"></p>
 
                 <button id="verifyBtn" type="submit" class="w-full py-4 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-all transform hover:scale-[1.02] shadow-lg shadow-amber-300/20 mb-6">
@@ -117,6 +118,7 @@
             const inputs = document.querySelectorAll('.otp-input');
             const timerEl = document.getElementById('otp-timer');
             const lockEl = document.getElementById('lock-timer');
+            const attemptsInfoEl = document.getElementById('attempts-info');
             const resendBtn = document.getElementById('resendBtn');
             const resendHint = document.getElementById('resendHint');
             const verifyBtn = document.getElementById('verifyBtn');
@@ -124,6 +126,7 @@
 
             let otpRemaining = {{ (int) ($remainingSeconds ?? 0) }};
             let lockRemaining = {{ (int) ($lockRemainingSeconds ?? 0) }};
+            let attemptsRemaining = {{ (int) ($attemptsRemaining ?? 0) }};
 
             const formatClock = (seconds) => {
                 const m = Math.floor(seconds / 60);
@@ -160,6 +163,7 @@
                 if (lockRemaining > 0) {
                     lockEl.classList.remove('hidden');
                     lockEl.textContent = `Too many attempts. Try again in ${formatClock(lockRemaining)}.`;
+                    attemptsInfoEl.textContent = 'Attempts left: 0 / 3';
                     timerEl.innerHTML = 'Verification temporarily locked';
                     setVerificationDisabled(true);
                     return;
@@ -169,10 +173,12 @@
                 setVerificationDisabled(false);
 
                 if (otpRemaining > 0) {
-                    timerEl.innerHTML = `OTP expires in <span class="text-amber-300 font-semibold">${formatClock(otpRemaining)}</span>`;
+                    timerEl.innerHTML = `Resend code available in <span class="text-amber-300 font-semibold">${formatClock(otpRemaining)}</span>`;
                 } else {
-                    timerEl.textContent = 'OTP expired. Please resend a new code.';
+                    timerEl.textContent = 'You can resend a new code now.';
                 }
+
+                attemptsInfoEl.textContent = `Attempts left: ${attemptsRemaining} / 3`;
             };
 
             inputs.forEach((input, index) => {

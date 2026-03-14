@@ -107,6 +107,35 @@
         </a>
         @endcan
 
+        @can('reviews.moderate')
+        <a href="{{ route('admin.feedback.index') }}" class="group bg-white dark:bg-gray-900/60 rounded-4xl p-8 border border-gray-200 dark:border-white/5 hover:border-amber-300/30 transition-all duration-300 hover:-translate-y-1 shadow-xl">
+            <div class="w-14 h-14 bg-rose-500/10 rounded-full flex items-center justify-center mb-6 border border-rose-500/20 group-hover:scale-110 transition-transform">
+                <svg class="w-7 h-7 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16h6M7 4h10a2 2 0 012 2v12l-3-2-3 2-3-2-3 2V6a2 2 0 012-2z"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Feedback Moderation</h3>
+            <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6">Review customer comments, approve or reject submissions, and monitor satisfaction quality.</p>
+            @if($feedbackStats)
+            <div class="grid grid-cols-3 gap-2 mb-6">
+                <div class="rounded-lg bg-amber-500/10 border border-amber-500/20 p-2 text-center">
+                    <p class="text-[10px] uppercase text-amber-600 dark:text-amber-400">Pending</p>
+                    <p class="text-sm font-bold text-amber-700 dark:text-amber-300">{{ $feedbackStats['pending'] }}</p>
+                </div>
+                <div class="rounded-lg bg-rose-500/10 border border-rose-500/20 p-2 text-center">
+                    <p class="text-[10px] uppercase text-rose-600 dark:text-rose-400">Flagged</p>
+                    <p class="text-sm font-bold text-rose-700 dark:text-rose-300">{{ $feedbackStats['flagged'] }}</p>
+                </div>
+                <div class="rounded-lg bg-green-500/10 border border-green-500/20 p-2 text-center">
+                    <p class="text-[10px] uppercase text-green-600 dark:text-green-400">Approved</p>
+                    <p class="text-sm font-bold text-green-700 dark:text-green-300">{{ $feedbackStats['approved'] }}</p>
+                </div>
+            </div>
+            @endif
+            <span class="text-amber-300 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                Moderate Reviews <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+            </span>
+        </a>
+        @endcan
+
     </div>
 
     <div class="bg-gray-50 dark:bg-black/40 rounded-4xl p-8 border border-gray-200 dark:border-white/5 shadow-xl">
