@@ -17,7 +17,9 @@ use Illuminate\Support\Carbon;
 class AuthController extends Controller
 {
     private const OTP_MAX_ATTEMPTS = 3;
-    private const OTP_LOCK_MINUTES = 60;
+    private const OTP_LOCK_MINUTES = 5;
+    private const OTP_EXPIRES_MINUTES = 2;
+    private const OTP_RESEND_COOLDOWN_MINUTES = 2;
 
     private function secondsUntil(mixed $value): int
     {
@@ -34,6 +36,21 @@ class AuthController extends Controller
         } catch (\Throwable $e) {
             return 0;
         }
+    }
+
+    private function getOtpLockRemainingSeconds(string $lockKey): int
+    {
+        $remainingSeconds = $this->secondsUntil(Cache::get($lockKey));
+        $maxLockSeconds = self::OTP_LOCK_MINUTES * 60;
+
+        // Normalize legacy lock entries that were created before policy was changed.
+        if ($remainingSeconds > $maxLockSeconds) {
+            $newLockUntil = now()->addMinutes(self::OTP_LOCK_MINUTES);
+            Cache::put($lockKey, $newLockUntil, $newLockUntil);
+            return $maxLockSeconds;
+        }
+
+        return $remainingSeconds;
     }
 
     public function showLogin()
@@ -57,13 +74,18 @@ class AuthController extends Controller
             return redirect()->route('login')->with('error', 'Session expired. Please login again.');
         }
 
-        $expiresAt = Cache::get('otp_expires_' . $email);
-        $remainingSeconds = $this->secondsUntil($expiresAt);
+        $resendAvailableAt = Cache::get('otp_resend_available_at_' . $email);
+        $remainingSeconds = $this->secondsUntil($resendAvailableAt);
 
-        $lockUntil = Cache::get('otp_lock_until_' . $email);
-        $lockRemainingSeconds = $this->secondsUntil($lockUntil);
+        $lockRemainingSeconds = $this->getOtpLockRemainingSeconds('otp_lock_until_' . $email);
 
-        return view('auth.verify-sms', compact('remainingSeconds', 'lockRemainingSeconds'));
+        $attemptsUsed = (int) Cache::get('otp_attempts_' . $email, 0);
+        $attemptsRemaining = max(0, self::OTP_MAX_ATTEMPTS - $attemptsUsed);
+        if ($lockRemainingSeconds > 0) {
+            $attemptsRemaining = 0;
+        }
+
+        return view('auth.verify-sms', compact('remainingSeconds', 'lockRemainingSeconds', 'attemptsRemaining'));
     }
 
     public function showRegister()
@@ -112,13 +134,19 @@ class AuthController extends Controller
         // 2) Generate OTP
         $otp = rand(100000, 999999);
 
-        $expiresAt = now()->addMinutes(5);
+        $expiresAt = now()->addMinutes(self::OTP_EXPIRES_MINUTES);
+        $resendAvailableAt = now()->addMinutes(self::OTP_RESEND_COOLDOWN_MINUTES);
 
         Cache::put('otp_' . $request->email, $otp, $expiresAt);
         Cache::put('otp_expires_' . $request->email, $expiresAt, $expiresAt);
+        Cache::put('otp_resend_available_at_' . $request->email, $resendAvailableAt, $resendAvailableAt);
 
         // 3) Send OTP email
-        Mail::to($request->email)->send(new TestMail($otp));
+        try {
+            Mail::to($request->email)->send(new TestMail($otp));
+        } catch (\Exception $e) {
+            Log::error('Registration OTP email failed: ' . $e->getMessage());
+        }
 
         // 4) Save email in session
         session([
@@ -282,10 +310,12 @@ class AuthController extends Controller
             // Generate new OTP
             $otp = rand(100000, 999999);
 
-            $expiresAt = now()->addMinutes(5);
+            $expiresAt = now()->addMinutes(self::OTP_EXPIRES_MINUTES);
+            $resendAvailableAt = now()->addMinutes(self::OTP_RESEND_COOLDOWN_MINUTES);
 
             Cache::put('otp_' . $user->email, $otp, $expiresAt);
             Cache::put('otp_expires_' . $user->email, $expiresAt, $expiresAt);
+            Cache::put('otp_resend_available_at_' . $user->email, $resendAvailableAt, $resendAvailableAt);
 
             // Send OTP
             Mail::to($user->email)->send(new TestMail($otp));
@@ -359,7 +389,7 @@ class AuthController extends Controller
         if ($user->is_admin || $user->hasRole('admin')) {
             return redirect()->route('admin.admin_dashboard'); // Go to Admin Panel
         }
-        if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('deliveries.manage')) {
+        if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('deliveries.manage') || $user->can('reviews.moderate')) {
             return redirect()->route('admin.staff.dashboard'); // Staff dashboard
         }
 
@@ -371,10 +401,12 @@ class AuthController extends Controller
     session(['email' => $user->email]);
 
     $otp = rand(100000, 999999);
-    $expiresAt = now()->addMinutes(5);
+    $expiresAt = now()->addMinutes(self::OTP_EXPIRES_MINUTES);
+    $resendAvailableAt = now()->addMinutes(self::OTP_RESEND_COOLDOWN_MINUTES);
 
     Cache::put('otp_' . $user->email, $otp, $expiresAt);
     Cache::put('otp_expires_' . $user->email, $expiresAt, $expiresAt);
+    Cache::put('otp_resend_available_at_' . $user->email, $resendAvailableAt, $resendAvailableAt);
 
     try {
         Mail::to($user->email)->send(new TestMail($otp));
@@ -396,7 +428,12 @@ class AuthController extends Controller
 
         $otp = rand(100000, 999999); // Generate a random 6-digit OTP
 
-        Cache::put('otp_' . $request->email, $otp, now()->addMinutes(10));
+        $expiresAt = now()->addMinutes(self::OTP_EXPIRES_MINUTES);
+        $resendAvailableAt = now()->addMinutes(self::OTP_RESEND_COOLDOWN_MINUTES);
+
+        Cache::put('otp_' . $request->email, $otp, $expiresAt);
+        Cache::put('otp_expires_' . $request->email, $expiresAt, $expiresAt);
+        Cache::put('otp_resend_available_at_' . $request->email, $resendAvailableAt, $resendAvailableAt);
 
         Mail::to($request->email)->send(new TestMail($otp));
 
@@ -408,6 +445,7 @@ class AuthController extends Controller
     // 1. Validate Input
     $request->validate([
         'code' => 'required|array|size:6',
+        'code.*' => 'required|digits:1',
     ]);
 
     // 2. Get Email from Session
@@ -420,7 +458,7 @@ class AuthController extends Controller
     $attemptsKey = 'otp_attempts_' . $email;
     $lockKey = 'otp_lock_until_' . $email;
 
-    $lockRemainingSeconds = $this->secondsUntil(Cache::get($lockKey));
+    $lockRemainingSeconds = $this->getOtpLockRemainingSeconds($lockKey);
     if ($lockRemainingSeconds > 0) {
         $minutes = intdiv($lockRemainingSeconds, 60);
         $seconds = $lockRemainingSeconds % 60;
@@ -441,10 +479,7 @@ class AuthController extends Controller
     ]);
 
     if (!$cachedOtp || $enteredOtp != $cachedOtp) {
-        $attempts = (int) Cache::increment($attemptsKey);
-        if ($attempts === 1) {
-            Cache::put($attemptsKey, 1, now()->addMinutes(self::OTP_LOCK_MINUTES));
-        }
+        $attempts = $this->incrementOtpAttempts($attemptsKey);
 
         if ($attempts >= self::OTP_MAX_ATTEMPTS) {
             $lockUntil = now()->addMinutes(self::OTP_LOCK_MINUTES);
@@ -452,7 +487,7 @@ class AuthController extends Controller
             Cache::forget($attemptsKey);
 
             return back()->withErrors([
-                'otp' => 'Too many incorrect attempts. You are locked for 1 hour.',
+                'otp' => 'Too many incorrect attempts. You are locked for 5 minutes.',
             ]);
         }
 
@@ -490,6 +525,7 @@ class AuthController extends Controller
         // ✅ C. Clean Up
         Cache::forget('otp_' . $email);
         Cache::forget('otp_expires_' . $email);
+        Cache::forget('otp_resend_available_at_' . $email);
         Cache::forget($attemptsKey);
         Cache::forget($lockKey);
         Cache::forget('pending_registration_' . $email);
@@ -503,8 +539,8 @@ class AuthController extends Controller
         if (($user->is_admin ?? false) || $user->hasRole('admin')) {
             return redirect()->route('admin.admin_dashboard')->with('success', 'Account verified!');
         }
-        if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('deliveries.manage')) {
-            return redirect()->route('staff.dashboard')->with('success', 'Account verified!');
+        if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('deliveries.manage') || $user->can('reviews.moderate')) {
+            return redirect()->route('admin.staff.dashboard')->with('success', 'Account verified!');
         }
 
         return redirect()->route('dashboard')->with('success', 'Account verified!');
@@ -512,6 +548,23 @@ class AuthController extends Controller
 
     return back()->with('error', 'User not found.');
 }
+
+    private function incrementOtpAttempts(string $attemptsKey): int
+    {
+        $ttl = now()->addMinutes(self::OTP_LOCK_MINUTES);
+
+        // Ensure the key exists first so increment works consistently across drivers.
+        Cache::add($attemptsKey, 0, $ttl);
+
+        $incremented = Cache::increment($attemptsKey);
+        if ($incremented === false || $incremented === null) {
+            $current = (int) Cache::get($attemptsKey, 0);
+            $incremented = $current + 1;
+            Cache::put($attemptsKey, $incremented, $ttl);
+        }
+
+        return (int) $incremented;
+    }
     
 
 
@@ -526,13 +579,13 @@ class AuthController extends Controller
         }
 
         $lockKey = 'otp_lock_until_' . $email;
-        $lockRemainingSeconds = $this->secondsUntil(Cache::get($lockKey));
+        $lockRemainingSeconds = $this->getOtpLockRemainingSeconds($lockKey);
         if ($lockRemainingSeconds > 0) {
             return back()->with('error', 'You are temporarily locked due to failed attempts. Please wait before retrying.');
         }
 
-        $expiresAt = Cache::get('otp_expires_' . $email);
-        $remainingSeconds = $this->secondsUntil($expiresAt);
+        $resendAvailableAt = Cache::get('otp_resend_available_at_' . $email);
+        $remainingSeconds = $this->secondsUntil($resendAvailableAt);
         if ($remainingSeconds > 0) {
             $minutes = intdiv($remainingSeconds, 60);
             $seconds = $remainingSeconds % 60;
@@ -540,10 +593,12 @@ class AuthController extends Controller
         }
 
         $otp = rand(100000, 999999);
-        $expiresAt = now()->addMinutes(5);
+        $expiresAt = now()->addMinutes(self::OTP_EXPIRES_MINUTES);
+        $newResendAvailableAt = now()->addMinutes(self::OTP_RESEND_COOLDOWN_MINUTES);
 
         Cache::put('otp_' . $email, $otp, $expiresAt);
         Cache::put('otp_expires_' . $email, $expiresAt, $expiresAt);
+        Cache::put('otp_resend_available_at_' . $email, $newResendAvailableAt, $newResendAvailableAt);
         Cache::forget('otp_attempts_' . $email);
 
         Mail::to($email)->send(new TestMail($otp));
