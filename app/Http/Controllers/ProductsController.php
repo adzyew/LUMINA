@@ -10,6 +10,11 @@ class ProductsController extends Controller
 {
     public function index(Request $request)
     {
+        $request->validate([
+            'search'   => 'nullable|string|max:100',
+            'category' => 'nullable|string|max:100',
+        ]);
+
         $products = Product::query();
 
         if ($request->filled('category')) {

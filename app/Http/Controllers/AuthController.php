@@ -435,7 +435,11 @@ class AuthController extends Controller
         Cache::put('otp_expires_' . $request->email, $expiresAt, $expiresAt);
         Cache::put('otp_resend_available_at_' . $request->email, $resendAvailableAt, $resendAvailableAt);
 
-        Mail::to($request->email)->send(new TestMail($otp));
+        try {
+            Mail::to($request->email)->send(new TestMail($otp));
+        } catch (\Exception $e) {
+            Log::error('sendOtp email failed: ' . $e->getMessage());
+        }
 
         return redirect()->route('verify-sms')->with('success', 'OTP sent to your email!');
     }
@@ -601,7 +605,11 @@ class AuthController extends Controller
         Cache::put('otp_resend_available_at_' . $email, $newResendAvailableAt, $newResendAvailableAt);
         Cache::forget('otp_attempts_' . $email);
 
-        Mail::to($email)->send(new TestMail($otp));
+        try {
+            Mail::to($email)->send(new TestMail($otp));
+        } catch (\Exception $e) {
+            Log::error('Resend OTP email failed: ' . $e->getMessage());
+        }
 
         return back()->with('success', 'A new OTP has been sent.');
     }
