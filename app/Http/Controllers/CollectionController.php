@@ -9,6 +9,13 @@ class CollectionController extends Controller
 {
     public function index(Request $request)
     {
+        $request->validate([
+            'search'   => 'nullable|string|max:100',
+            'category' => 'nullable|string|max:100',
+            'material' => 'nullable|string|max:100',
+            'sort'     => 'nullable|in:price_asc,price_desc,latest',
+        ]);
+
         $products = Product::query();
 
         if ($request->filled('category')) {

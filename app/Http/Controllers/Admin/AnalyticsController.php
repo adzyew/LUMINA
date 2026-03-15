@@ -73,6 +73,12 @@ class AnalyticsController extends Controller
 
     public function exportOrders(Request $request): StreamedResponse
     {
+        $request->validate([
+            'from'   => 'nullable|date',
+            'to'     => 'nullable|date|after_or_equal:from',
+            'status' => 'nullable|in:pending,confirmed,processing,shipped,delivered,cancelled',
+        ]);
+
         $query = Order::with(['user', 'items.product'])->latest();
 
         if ($request->filled('from')) {

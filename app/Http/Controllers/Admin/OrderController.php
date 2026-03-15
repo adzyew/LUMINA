@@ -13,6 +13,10 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
+        $request->validate([
+            'status' => 'nullable|in:pending,confirmed,processing,shipped,delivered,cancelled',
+        ]);
+
         $query = Order::with(['user', 'items.product'])->latest();
 
         if ($request->filled('status')) {

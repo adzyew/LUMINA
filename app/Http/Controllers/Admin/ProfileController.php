@@ -70,7 +70,7 @@ class ProfileController extends Controller
                     ->withInput();
             }
 
-            $user->password = $validated['new_password'];
+            $user->password = Hash::make($validated['new_password']);
         }
 
         $user->save();

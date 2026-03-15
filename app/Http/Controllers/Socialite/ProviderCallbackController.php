@@ -9,6 +9,7 @@ use App\Mail\TestMail;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class ProviderCallbackController extends Controller
@@ -75,7 +76,11 @@ class ProviderCallbackController extends Controller
         Cache::put('otp_expires_' . $user->email, $expiresAt, $expiresAt);
         Cache::put('otp_resend_available_at_' . $user->email, $resendAvailableAt, $resendAvailableAt);
 
-        Mail::to($user->email)->send(new TestMail($otp)); 
+        try {
+            Mail::to($user->email)->send(new TestMail($otp));
+        } catch (\Exception $e) {
+            Log::error('OAuth OTP email failed: ' . $e->getMessage());
+        }
 
         return redirect()->route('verify-sms'); 
     }

@@ -11,6 +11,10 @@ class DeliveryController extends Controller
 {
     public function index(Request $request)
     {
+        $request->validate([
+            'status' => 'nullable|in:processing,shipped,delivered',
+        ]);
+
         $query = Order::with(['user', 'items.product'])
             ->whereIn('status', ['processing', 'shipped', 'delivered'])
             ->latest();
