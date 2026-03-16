@@ -37,6 +37,18 @@
                     <li><a href="#" class="hover:text-amber-600 dark:hover:text-amber-300 transition-colors">Terms of Service</a></li>
                 </ul>
             </div>
+
+            <div>
+                <h4 class="font-bold text-amber-900 dark:text-white mb-6 uppercase tracking-wider text-sm">Our Team</h4>
+                <ul class="space-y-3 text-amber-900/80 dark:text-gray-400 text-sm">
+                    <li><span class="font-semibold text-amber-900 dark:text-white">Project Manager:</span> Jandusay, Jexabelle</li>
+                    <li><span class="font-semibold text-amber-900 dark:text-white">Business Analyst:</span> Aldea, Glydel P.</li>
+                    <li><span class="font-semibold text-amber-900 dark:text-white">Front-End Developer:</span> Millano, Alena Beatriz P.</li>
+                    <li><span class="font-semibold text-amber-900 dark:text-white">Back-End Developer:</span> Talub, Meriel Ady A.</li>
+                    <li><span class="font-semibold text-amber-900 dark:text-white">Quality Assurance:</span> Alarcon, Mary Grace L.</li>
+                    <li><span class="font-semibold text-amber-900 dark:text-white">Quality Assurance:</span> Lanoba Jr., John R.</li>
+                </ul>
+            </div>
         </div>
 
         <div class=" mt-8 pt-8 border-t border-amber-200/50 dark:border-white/10 flex flex-col sm:flex-row justify-center items-center gap-4">

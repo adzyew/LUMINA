@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Mail\OrderPlacedMail;
 use App\Mail\OrderStatusUpdatedMail;
+use App\Models\InventoryLog;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -82,6 +83,26 @@ class OrderController extends Controller
             'delivered_at' => $request->status === 'delivered' ? now() : $order->delivered_at,
         ]);
 
+        // Restore stock when cancelling a non-cancelled order
+        if ($request->status === 'cancelled' && $previousStatus !== 'cancelled') {
+            $order->load('items.product');
+            foreach ($order->items as $item) {
+                if ($item->product) {
+                    $previousStock = $item->product->stock_quantity;
+                    $item->product->increment('stock_quantity', $item->quantity);
+                    InventoryLog::create([
+                        'product_id'      => $item->product_id,
+                        'user_id'         => auth()->id(),
+                        'quantity_change' => $item->quantity,
+                        'previous_stock'  => $previousStock,
+                        'new_stock'       => $previousStock + $item->quantity,
+                        'reason'          => 'Stock restored — Order #' . $order->id . ' cancelled.',
+                        'reference_id'    => $order->id,
+                    ]);
+                }
+            }
+        }
+
         if ($request->status !== $previousStatus && $order->user) {
             try {
                 Mail::to($order->user->email)->send(
@@ -99,5 +120,14 @@ class OrderController extends Controller
         }
 
         return redirect()->back()->with('success', 'Order updated successfully.');
+    }
+
+    public function destroy(Order $order)
+    {
+        $orderId = $order->id;
+        $order->delete();
+
+        return redirect()->route('admin.orders.index')
+            ->with('success', "Order #{$orderId} deleted successfully.");
     }
 }

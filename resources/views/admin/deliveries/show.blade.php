@@ -57,7 +57,7 @@
         </div>
 
         <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Order Items</h3>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Order Details</h3>
             <div class="space-y-4">
                 @forelse($order->items as $item)
                 <div class="flex justify-between py-2 border-b border-gray-100 dark:border-white/5">

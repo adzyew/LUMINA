@@ -254,7 +254,7 @@ class AuthController extends Controller
         if (!$request->filled('current_password') || !Hash::check($request->input('current_password'), $user->password)) {
             return back()->withErrors(['current_password' => 'Current password is incorrect.'])->withInput();
         }
-        $validated['password'] = $request->input('new_password');
+        $validated['password'] = Hash::make($request->input('new_password'));
     }
 
     if ($request->hasFile('profile_photo')) {

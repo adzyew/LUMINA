@@ -45,7 +45,7 @@
         <form method="GET" action="{{ route('admin.feedback.index') }}" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3">
             <input type="text" name="q" value="{{ request('q') }}" placeholder="Search comment, user, product" class="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-800/60 px-4 py-2.5 text-sm">
             <select name="status" class="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-800/60 px-4 py-2.5 text-sm">
-                <option value="">All statuses</option>
+                <option value="">All Status</option>
                 <option value="pending" @selected(request('status') === 'pending')>Pending</option>
                 <option value="approved" @selected(request('status') === 'approved')>Approved</option>
                 <option value="rejected" @selected(request('status') === 'rejected')>Rejected</option>

@@ -237,6 +237,7 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
         Route::get('orders/{order}/email-preview/placed', [AdminOrderController::class, 'previewPlacedEmail'])->middleware('permission:sales.view')->name('orders.email_preview.placed');
         Route::get('orders/{order}/email-preview/status', [AdminOrderController::class, 'previewStatusEmail'])->middleware('permission:sales.view')->name('orders.email_preview.status');
         Route::put('orders/{order}', [AdminOrderController::class, 'update'])->middleware('permission:sales.view')->name('orders.update');
+        Route::delete('orders/{order}', [AdminOrderController::class, 'destroy'])->middleware('permission:sales.view')->name('orders.destroy');
 
         // SALES
         Route::get('sales', [SalesController::class, 'index'])
@@ -253,4 +254,7 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
         Route::put('deliveries/{order}', [DeliveryController::class, 'update'])
             ->middleware('permission:deliveries.manage')
             ->name('deliveries.update');
+
+        // HELP — accessible by all authenticated admin/staff
+        Route::get('help', fn() => view('admin.help'))->name('help');
     });

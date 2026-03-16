@@ -69,6 +69,12 @@
                 <button type="submit" class="w-full py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400">Update Order</button>
             </form>
 
+            <form method="POST" action="{{ route('admin.orders.destroy', $order) }}" class="mt-3" onsubmit="return confirm('Delete this order? This cannot be undone.');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="w-full py-2.5 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700">Delete Order</button>
+            </form>
+
             <div class="mt-6 pt-6 border-t border-gray-200 dark:border-white/10">
                 <p class="text-xs uppercase tracking-wide font-semibold text-gray-500 dark:text-gray-400 mb-3">Email Previews</p>
                 <div class="flex flex-wrap gap-2">

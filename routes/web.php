@@ -16,40 +16,6 @@ use App\Models\Product;
 Route::get('/auth/{provider}', ProviderController::class)->name('auth.redirect');
 Route::get('/auth/{provider}/callback', ProviderCallbackController::class)->name('auth.callback');
 
-Route::get('/home', [HomeController::class, 'index'])->name('home');
-
-// --- 3. PUBLIC ROUTES ---
-
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::get('/add-to-cart/{id}', [CartController::class, 'addToCart'])->name('cart.add');
-Route::delete('/remove-from-cart', [CartController::class, 'remove'])->name('cart.remove');
-Route::post('/cart/update', [CartController::class, 'updateQuantity'])->name('cart.update');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
-    Route::post('/place-order', [CartController::class, 'placeOrder'])->name('place.order');
-});
-
-Route::get('/', [HomeController::class, 'index']);
-Route::get('/collection', [CollectionController::class, 'index'])->name('collection');
-
-Route::get('/products', [ProductsController::class, 'index'])
-    ->name('products.index');
-
-Route::get('/products/{product}', [ProductsController::class, 'show'])
-    ->name('products.show');
-
-// Wishlist routes
-Route::post('/wishlist/toggle/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
-Route::middleware('auth')->group(function () {
-    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
-});
-
-// Review routes
-Route::middleware('auth')->group(function () {
-    Route::post('/products/{product}/review', [ReviewController::class, 'store'])->name('reviews.store');
-});
-
 // OTP verification routes (session-based, no auth required)
 Route::middleware('throttle:10,1')->group(function () {
     Route::get('/verify-sms', [AuthController::class, 'showVerifySms'])->name('verify-sms');
@@ -57,9 +23,8 @@ Route::middleware('throttle:10,1')->group(function () {
     Route::post('/resend-otp', [AuthController::class, 'resendOtp'])->name('otp.resend');
 });
 
-// --- 1. GUEST ROUTES ---
+// --- GUEST ROUTES ---
 Route::middleware('guest')->group(function () {
-
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'loginPost'])->middleware('throttle:5,1')->name('login.post');
 
@@ -76,15 +41,42 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1')->name('password.update');
 });
 
-//  AUTHENTICATED USER ROUTES ---
-Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [AuthController::class, 'user_dashboard'])->name('dashboard');
-    Route::get('/dashboard/orders', [AuthController::class, 'orders'])->name('orders.index');
-    Route::get('/dashboard/orders/{order}', [AuthController::class, 'showOrder'])->name('orders.show');
-    Route::get('/dashboard/profile', [AuthController::class, 'showProfile'])->name('profile.show');
-    Route::get('/dashboard/profile/edit', [AuthController::class, 'editProfile'])->name('profile.edit');
-    Route::put('/dashboard/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
-    Route::post('/dashboard/deactivate', [AuthController::class, 'deactivateAccount'])->name('account.deactivate');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+// --- CUSTOMER ROUTES (guests allowed, but admin/staff are redirected to their dashboard) ---
+Route::middleware('customer')->group(function () {
+    // Public browsing
+    Route::get('/', [HomeController::class, 'index']);
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/collection', [CollectionController::class, 'index'])->name('collection');
+    Route::get('/products', [ProductsController::class, 'index'])->name('products.index');
+    Route::get('/products/{product}', [ProductsController::class, 'show'])->name('products.show');
+
+    // Cart
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::get('/add-to-cart/{id}', [CartController::class, 'addToCart'])->name('cart.add');
+    Route::delete('/remove-from-cart', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/update', [CartController::class, 'updateQuantity'])->name('cart.update');
+
+    // Wishlist toggle (public)
+    Route::post('/wishlist/toggle/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+
+    // Authenticated customer-only routes
+    Route::middleware('auth')->group(function () {
+        Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
+        Route::post('/place-order', [CartController::class, 'placeOrder'])->name('place.order');
+
+        Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+
+        Route::post('/products/{product}/review', [ReviewController::class, 'store'])->name('reviews.store');
+
+        Route::get('/dashboard', [AuthController::class, 'user_dashboard'])->name('dashboard');
+        Route::get('/dashboard/orders', [AuthController::class, 'orders'])->name('orders.index');
+        Route::get('/dashboard/orders/{order}', [AuthController::class, 'showOrder'])->name('orders.show');
+        Route::get('/dashboard/profile', [AuthController::class, 'showProfile'])->name('profile.show');
+        Route::get('/dashboard/profile/edit', [AuthController::class, 'editProfile'])->name('profile.edit');
+        Route::put('/dashboard/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
+        Route::post('/dashboard/deactivate', [AuthController::class, 'deactivateAccount'])->name('account.deactivate');
+    });
 });
+
+Route::middleware('auth')->post('/logout', [AuthController::class, 'logout'])->name('logout');
 
