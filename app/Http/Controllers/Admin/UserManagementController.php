@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
@@ -21,13 +21,28 @@ class UserManagementController extends Controller
     {
         $filter = $request->get('filter', 'all');
 
+        // "All" tab: return staff and customers as separate groups (no pagination)
+        if ($filter === 'all') {
+            $staffUsers = User::with('roles')
+                ->whereNull('archived_at')
+                ->whereHas('roles')
+                ->latest()
+                ->get();
+
+            $customerUsers = User::with('roles')
+                ->whereNull('archived_at')
+                ->whereDoesntHave('roles')
+                ->latest()
+                ->get();
+
+            return view('admin.users.index', compact('staffUsers', 'customerUsers', 'filter'));
+        }
+
         $query = User::with('roles')->latest();
 
-        // By default show only non-archived users in the "All" list.
         if ($filter === 'archived') {
             $query->whereNotNull('archived_at');
         } else {
-            // exclude archived for all other filters (including 'all')
             $query->whereNull('archived_at');
 
             if ($filter === 'admin') {
@@ -69,6 +84,53 @@ class UserManagementController extends Controller
     }
 
     /**
+     * Show form to edit a staff user.
+     */
+    public function edit(User $user)
+    {
+        if ($user->hasRole('admin')) {
+            return redirect()->route('admin.users.index')->with('error', 'Cannot edit admin users.');
+        }
+
+        $roles = Role::whereIn('name', $this->staffRoleNames())->orderBy('name')->get();
+        $currentRole = $user->roles->first()?->name;
+
+        return view('admin.users.edit', compact('user', 'roles', 'currentRole'));
+    }
+
+    /**
+     * Update a staff user's details and role.
+     */
+    public function update(Request $request, User $user)
+    {
+        if ($user->hasRole('admin')) {
+            return redirect()->route('admin.users.index')->with('error', 'Cannot edit admin users.');
+        }
+
+        $staffRoleNames = $this->staffRoleNames();
+
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => 'nullable|string|min:8|confirmed',
+            'role'     => ['required', 'string', Rule::in($staffRoleNames)],
+        ]);
+
+        $user->name  = $request->name;
+        $user->email = $request->email;
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+        $user->syncRoles([$request->role]);
+
+        return redirect()->route('admin.users.index', ['filter' => 'staff'])
+            ->with('success', "'{$user->name}' has been updated successfully.");
+    }
+
+    /**
      * Store a new user (staff or customer).
      * Admins cannot be created via this form.
      */
@@ -105,8 +167,10 @@ class UserManagementController extends Controller
     public function rolesIndex()
     {
         $this->ensureArchivePermissionExists();
-        $roles = Role::with('permissions')->get();
-        return view('admin.roles.index', compact('roles'));
+        $tab = request('tab', 'active');
+        $activeRoles = Role::with('permissions')->whereNull('archived_at')->get();
+        $archivedRoles = Role::with('permissions')->whereNotNull('archived_at')->get();
+        return view('admin.roles.index', compact('activeRoles', 'archivedRoles', 'tab'));
     }
     public function storeRole(Request $request)
     {
@@ -127,8 +191,8 @@ class UserManagementController extends Controller
         $role = Role::findOrFail($id);
 
         // 1. SAFETY CHECK: Prevent deleting core system roles
-        if (in_array(strtolower($role->name), ['admin', 'staff'])) {
-            return redirect()->back()->with('error', 'System protection: You cannot delete the core Admin or Staff roles.');
+        if (in_array(strtolower($role->name), ['admin'])) {
+            return redirect()->back()->with('error', 'System protection: You cannot delete the core Admin role.');
         }
 
         // 2. SAFETY CHECK: Prevent deleting roles that users are still using
@@ -162,6 +226,29 @@ class UserManagementController extends Controller
             ->with('success', 'Permissions updated successfully.');
     }
 
+    public function showRole(Role $role)
+    {
+        $role->load('permissions');
+        return view('admin.roles.show', compact('role'));
+    }
+
+    public function archiveRole(Role $role)
+    {
+        if (in_array(strtolower($role->name), ['admin'])) {
+            return redirect()->back()->with('error', 'The Admin role cannot be archived.');
+        }
+        $role->archived_at = Carbon::now();
+        $role->save();
+        return redirect()->back()->with('success', Str::headline($role->name) . ' role has been archived.');
+    }
+
+    public function restoreRole(Role $role)
+    {
+        $role->archived_at = null;
+        $role->save();
+        return redirect()->back()->with('success', Str::headline($role->name) . ' role has been restored.');
+    }
+
     /**
      * Archive a user account (admin only cannot be archived)
      */
@@ -186,6 +273,21 @@ class UserManagementController extends Controller
         $user->save();
 
         return redirect()->route('admin.users.index')->with('success', 'User unarchived.');
+    }
+
+    /**
+     * Manually verify a staff user's email (admin only).
+     */
+    public function verify(User $user)
+    {
+        if ($user->hasRole('admin')) {
+            return redirect()->back()->with('error', 'Cannot manually verify admin users.');
+        }
+
+        $user->email_verified_at = now();
+        $user->save();
+
+        return redirect()->back()->with('success', "'{$user->name}' has been verified.");
     }
 
     /**

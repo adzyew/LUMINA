@@ -43,6 +43,12 @@
                             <p class="text-white font-medium">{{ $order->tracking_number ?? 'Pending assignment' }}</p>
                         </div>
                     </div>
+
+                    <div class="mt-4 flex justify-end">
+                        <a href="{{ route('orders.show', $order) }}" class="px-4 py-2 bg-amber-300 hover:bg-amber-400 text-black font-bold rounded-xl text-sm transition-colors">
+                            View Details
+                        </a>
+                    </div>
                 </div>
             @empty
                 <div class="text-center py-16 bg-gray-900/40 rounded-2xl border border-white/10">

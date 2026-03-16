@@ -80,6 +80,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [AuthController::class, 'user_dashboard'])->name('dashboard');
     Route::get('/dashboard/orders', [AuthController::class, 'orders'])->name('orders.index');
+    Route::get('/dashboard/orders/{order}', [AuthController::class, 'showOrder'])->name('orders.show');
     Route::get('/dashboard/profile', [AuthController::class, 'showProfile'])->name('profile.show');
     Route::get('/dashboard/profile/edit', [AuthController::class, 'editProfile'])->name('profile.edit');
     Route::put('/dashboard/profile', [AuthController::class, 'updateProfile'])->name('profile.update');

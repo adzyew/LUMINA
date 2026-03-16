@@ -174,86 +174,87 @@
 
     {{-- Department Status Overview --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
+        {{-- Inventory Status Chart --}}
         <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-none">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Inventory Status</h3>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-                <div class="rounded-xl border border-blue-500/20 bg-blue-500/10 p-3">
-                    <p class="text-[11px] uppercase tracking-wide text-blue-600 dark:text-blue-400">Total</p>
-                    <p class="text-xl font-bold text-blue-700 dark:text-blue-300">{{ $inventoryStatuses['total'] ?? 0 }}</p>
-                </div>
-                <div class="rounded-xl border border-green-500/20 bg-green-500/10 p-3">
-                    <p class="text-[11px] uppercase tracking-wide text-green-600 dark:text-green-400">In Stock</p>
-                    <p class="text-xl font-bold text-green-700 dark:text-green-300">{{ $inventoryStatuses['in_stock'] ?? 0 }}</p>
-                </div>
-                <div class="rounded-xl border border-amber-500/20 bg-amber-500/10 p-3">
-                    <p class="text-[11px] uppercase tracking-wide text-amber-600 dark:text-amber-400">Low Stock</p>
-                    <p class="text-xl font-bold text-amber-700 dark:text-amber-300">{{ $inventoryStatuses['low_stock'] ?? 0 }}</p>
-                </div>
-                <div class="rounded-xl border border-red-500/20 bg-red-500/10 p-3">
-                    <p class="text-[11px] uppercase tracking-wide text-red-600 dark:text-red-400">Out Stock</p>
-                    <p class="text-xl font-bold text-red-700 dark:text-red-300">{{ $inventoryStatuses['out_of_stock'] ?? 0 }}</p>
-                </div>
-            </div>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Inventory Status</h3>
+            <p class="text-xs text-gray-400 mb-2">{{ $inventoryStatuses['total'] ?? 0 }} total products</p>
+            <div id="inventoryChart"></div>
         </div>
 
+        {{-- Sales Status Chart --}}
         <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-none">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Sales Status</h3>
-            </div>
-            <div class="grid grid-cols-3 gap-2">
-                <div class="rounded-lg border border-amber-500/20 bg-amber-500/10 p-2 text-center">
-                    <p class="text-[10px] uppercase text-amber-600 dark:text-amber-400">Pending</p>
-                    <p class="font-bold text-amber-700 dark:text-amber-300">{{ $salesStatuses['pending'] ?? 0 }}</p>
-                </div>
-                <div class="rounded-lg border border-blue-500/20 bg-blue-500/10 p-2 text-center">
-                    <p class="text-[10px] uppercase text-blue-600 dark:text-blue-400">Confirmed</p>
-                    <p class="font-bold text-blue-700 dark:text-blue-300">{{ $salesStatuses['confirmed'] ?? 0 }}</p>
-                </div>
-                <div class="rounded-lg border border-indigo-500/20 bg-indigo-500/10 p-2 text-center">
-                    <p class="text-[10px] uppercase text-indigo-600 dark:text-indigo-400">Processing</p>
-                    <p class="font-bold text-indigo-700 dark:text-indigo-300">{{ $salesStatuses['processing'] ?? 0 }}</p>
-                </div>
-                <div class="rounded-lg border border-purple-500/20 bg-purple-500/10 p-2 text-center">
-                    <p class="text-[10px] uppercase text-purple-600 dark:text-purple-400">Shipped</p>
-                    <p class="font-bold text-purple-700 dark:text-purple-300">{{ $salesStatuses['shipped'] ?? 0 }}</p>
-                </div>
-                <div class="rounded-lg border border-green-500/20 bg-green-500/10 p-2 text-center">
-                    <p class="text-[10px] uppercase text-green-600 dark:text-green-400">Delivered</p>
-                    <p class="font-bold text-green-700 dark:text-green-300">{{ $salesStatuses['delivered'] ?? 0 }}</p>
-                </div>
-                <div class="rounded-lg border border-red-500/20 bg-red-500/10 p-2 text-center">
-                    <p class="text-[10px] uppercase text-red-600 dark:text-red-400">Cancelled</p>
-                    <p class="font-bold text-red-700 dark:text-red-300">{{ $salesStatuses['cancelled'] ?? 0 }}</p>
-                </div>
-            </div>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Sales Status</h3>
+            <p class="text-xs text-gray-400 mb-2">{{ array_sum($salesStatuses ?? []) }} total orders</p>
+            <div id="salesStatusChart"></div>
         </div>
 
+        {{-- Delivery Status Chart --}}
         <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-none">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Delivery Status</h3>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-                <div class="rounded-xl border border-amber-500/20 bg-amber-500/10 p-3">
-                    <p class="text-[11px] uppercase tracking-wide text-amber-600 dark:text-amber-400">To Ship</p>
-                    <p class="text-xl font-bold text-amber-700 dark:text-amber-300">{{ $deliveryStatuses['to_ship'] ?? 0 }}</p>
-                </div>
-                <div class="rounded-xl border border-blue-500/20 bg-blue-500/10 p-3">
-                    <p class="text-[11px] uppercase tracking-wide text-blue-600 dark:text-blue-400">In Transit</p>
-                    <p class="text-xl font-bold text-blue-700 dark:text-blue-300">{{ $deliveryStatuses['in_transit'] ?? 0 }}</p>
-                </div>
-                <div class="rounded-xl border border-green-500/20 bg-green-500/10 p-3">
-                    <p class="text-[11px] uppercase tracking-wide text-green-600 dark:text-green-400">Delivered</p>
-                    <p class="text-xl font-bold text-green-700 dark:text-green-300">{{ $deliveryStatuses['delivered'] ?? 0 }}</p>
-                </div>
-                <div class="rounded-xl border border-red-500/20 bg-red-500/10 p-3">
-                    <p class="text-[11px] uppercase tracking-wide text-red-600 dark:text-red-400">Cancelled</p>
-                    <p class="text-xl font-bold text-red-700 dark:text-red-300">{{ $deliveryStatuses['cancelled'] ?? 0 }}</p>
-                </div>
-            </div>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Delivery Status</h3>
+            <p class="text-xs text-gray-400 mb-2">{{ array_sum($deliveryStatuses ?? []) }} total shipments</p>
+            <div id="deliveryChart"></div>
         </div>
     </div>
+
+    <script>
+        const isDark = document.documentElement.classList.contains('dark');
+
+        new ApexCharts(document.getElementById('inventoryChart'), {
+            chart: { type: 'donut', height: 220, background: 'transparent' },
+            series: [
+                {{ $inventoryStatuses['in_stock'] ?? 0 }},
+                {{ $inventoryStatuses['low_stock'] ?? 0 }},
+                {{ $inventoryStatuses['out_of_stock'] ?? 0 }}
+            ],
+            labels: ['In Stock', 'Low Stock', 'Out of Stock'],
+            colors: ['#10b981', '#f59e0b', '#ef4444'],
+            legend: { position: 'bottom', labels: { colors: isDark ? '#9ca3af' : '#6b7280' } },
+            dataLabels: { enabled: false },
+            plotOptions: { pie: { donut: { size: '65%', labels: { show: true, total: { show: true, label: 'In Stock', color: isDark ? '#fff' : '#111', formatter: () => '{{ $inventoryStatuses["in_stock"] ?? 0 }}' } } } } },
+            stroke: { show: false },
+            theme: { mode: isDark ? 'dark' : 'light' },
+            tooltip: { theme: isDark ? 'dark' : 'light' },
+        }).render();
+
+        new ApexCharts(document.getElementById('salesStatusChart'), {
+            chart: { type: 'donut', height: 220, background: 'transparent' },
+            series: [
+                {{ $salesStatuses['pending'] ?? 0 }},
+                {{ $salesStatuses['confirmed'] ?? 0 }},
+                {{ $salesStatuses['processing'] ?? 0 }},
+                {{ $salesStatuses['shipped'] ?? 0 }},
+                {{ $salesStatuses['delivered'] ?? 0 }},
+                {{ $salesStatuses['cancelled'] ?? 0 }}
+            ],
+            labels: ['Pending', 'Confirmed', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
+            colors: ['#f59e0b', '#3b82f6', '#6366f1', '#a855f7', '#10b981', '#ef4444'],
+            legend: { position: 'bottom', labels: { colors: isDark ? '#9ca3af' : '#6b7280' } },
+            dataLabels: { enabled: false },
+            plotOptions: { pie: { donut: { size: '65%', labels: { show: true, total: { show: true, label: 'Total', color: isDark ? '#fff' : '#111' } } } } },
+            stroke: { show: false },
+            theme: { mode: isDark ? 'dark' : 'light' },
+            tooltip: { theme: isDark ? 'dark' : 'light' },
+        }).render();
+
+        new ApexCharts(document.getElementById('deliveryChart'), {
+            chart: { type: 'donut', height: 220, background: 'transparent' },
+            series: [
+                {{ $deliveryStatuses['to_ship'] ?? 0 }},
+                {{ $deliveryStatuses['in_transit'] ?? 0 }},
+                {{ $deliveryStatuses['delivered'] ?? 0 }},
+                {{ $deliveryStatuses['cancelled'] ?? 0 }}
+            ],
+            labels: ['To Ship', 'In Transit', 'Delivered', 'Cancelled'],
+            colors: ['#f59e0b', '#3b82f6', '#10b981', '#ef4444'],
+            legend: { position: 'bottom', labels: { colors: isDark ? '#9ca3af' : '#6b7280' } },
+            dataLabels: { enabled: false },
+            plotOptions: { pie: { donut: { size: '65%', labels: { show: true, total: { show: true, label: 'Delivered', color: isDark ? '#fff' : '#111', formatter: () => '{{ $deliveryStatuses["delivered"] ?? 0 }}' } } } } },
+            stroke: { show: false },
+            theme: { mode: isDark ? 'dark' : 'light' },
+            tooltip: { theme: isDark ? 'dark' : 'light' },
+        }).render();
+    </script>
 
     {{-- Bottom Grid --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -296,7 +297,7 @@
         </div>
 
         {{-- Right Panel --}}
-        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 h-fit shadow-sm dark:shadow-none">
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-4 h-fit shadow-sm dark:shadow-none">
             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Order Status</h3>
             <div class="space-y-2 mb-6">
                 @php
@@ -308,19 +309,6 @@
                     <span class="text-gray-900 dark:text-white font-medium">{{ $ordersByStatus[$key] ?? 0 }}</span>
                 </div>
                 @endforeach
-            </div>
-
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
-            <div class="space-y-4">
-                <a href="{{ route('admin.analytics.index') }}" class="block w-full py-3 bg-amber-400 dark:bg-amber-300 text-black font-bold text-center rounded-lg hover:bg-amber-500 dark:hover:bg-amber-400 transition-colors">
-                    View Analytics
-                </a>
-                <a href="{{ route('admin.products.create') }}" class="block w-full py-3 bg-gray-100 dark:bg-white/5 text-gray-900 dark:text-white font-semibold text-center rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 transition-colors">
-                    + Add New Product
-                </a>
-                <a href="{{ route('admin.users.index') }}" class="block w-full py-3 bg-gray-100 dark:bg-white/5 text-gray-900 dark:text-white font-semibold text-center rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 transition-colors">
-                    Manage Users & Roles
-                </a>
             </div>
         </div>
     </div>

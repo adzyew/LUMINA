@@ -51,11 +51,36 @@ class AnalyticsController extends Controller
             ->take(10)
             ->get();
 
+        $ordersLast24Hours = [];
+        for ($i = 23; $i >= 0; $i--) {
+            $hour = now()->subHours($i);
+            $ordersLast24Hours[$hour->format('H:i')] = Order::whereIn('status', $completedStatuses)
+                ->whereBetween('created_at', [$hour->copy()->startOfHour(), $hour->copy()->endOfHour()])
+                ->sum('total_price');
+        }
+
         $ordersLast7Days = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = now()->subDays($i);
             $ordersLast7Days[$date->format('M d')] = Order::whereIn('status', $completedStatuses)
                 ->whereDate('created_at', $date)
+                ->sum('total_price');
+        }
+
+        $ordersLast30Days = [];
+        for ($i = 29; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $ordersLast30Days[$date->format('M d')] = Order::whereIn('status', $completedStatuses)
+                ->whereDate('created_at', $date)
+                ->sum('total_price');
+        }
+
+        $ordersLast12Months = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $ordersLast12Months[$month->format('M Y')] = Order::whereIn('status', $completedStatuses)
+                ->whereMonth('created_at', $month->month)
+                ->whereYear('created_at', $month->year)
                 ->sum('total_price');
         }
 
@@ -67,7 +92,10 @@ class AnalyticsController extends Controller
             'ordersByStatus',
             'topProducts',
             'topCustomers',
-            'ordersLast7Days'
+            'ordersLast24Hours',
+            'ordersLast7Days',
+            'ordersLast30Days',
+            'ordersLast12Months'
         ));
     }
 
