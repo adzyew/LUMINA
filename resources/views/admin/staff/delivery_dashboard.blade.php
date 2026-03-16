@@ -3,15 +3,16 @@
 @section('title', 'Delivery Dashboard | Lumina')
 
 @section('content')
-<header class="flex justify-between items-center mb-10">
-    <div>
-        <h1 class="text-3xl font-playfair font-bold text-gray-900 dark:text-white">Delivery Dashboard</h1>
-        <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Welcome back, {{ auth()->user()->name }}.</p>
-    </div>
+@include('admin.staff.partials.topbar', [
+    'title' => 'Delivery Dashboard',
+    'subtitle' => 'Welcome back, ' . auth()->user()->name . '.',
+])
+
+<div class="mb-8 flex justify-end">
     <a href="{{ route('admin.deliveries.index') }}" class="px-5 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors">
         View All Shipments
     </a>
-</header>
+</div>
 
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-none">

@@ -144,7 +144,7 @@
     </section>
 
     {{-- Featured Collections --}}
-    <section class="py-20 bg-gray-50 scroll-fade-in">
+    <section id="about" class="py-20 bg-gray-50 scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10 scroll-slide-left">
                 <h2 class="text-3xl font-playfair font-bold text-gray-900">Featured Collections</h2>

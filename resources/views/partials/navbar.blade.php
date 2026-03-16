@@ -13,10 +13,10 @@
 
                 <!-- Navigation Links - Desktop -->
                 <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
-                <a href="{{ url('/') }}" class="text-inherit hover:text-amber-500 transition-colors duration-300 lg:text-lg font-sans font-semibold">Home</a>
-                <a href="{{ route('products.index') }}" class="text-inherit hover:text-amber-500 transition-colors duration-300 lg:text-lg font-sans font-semibold">Collections</a>
-                <a href="{{ url('/#features') }}" class="text-inherit hover:text-amber-500 transition-colors duration-300 lg:text-lg font-sans font-semibold">About</a>
-                <a href="{{ url('/#contact') }}" class="text-inherit hover:text-amber-500 transition-colors duration-300 lg:text-lg font-sans font-semibold">Contact</a>
+                <a href="{{ url('/') }}" data-nav-target="home" class="nav-link text-gray-900 dark:text-white hover:text-amber-500 transition-colors duration-300 lg:text-lg font-sans font-semibold">Home</a>
+                <a href="{{ route('products.index') }}" data-nav-target="collections" class="nav-link text-gray-900 dark:text-white hover:text-amber-500 transition-colors duration-300 lg:text-lg font-sans font-semibold">Collections</a>
+                <a href="{{ url('/#about') }}" data-nav-target="about" class="nav-link text-gray-900 dark:text-white hover:text-amber-500 transition-colors duration-300 lg:text-lg font-sans font-semibold">About</a>
+                <a href="{{ url('/#contact') }}" data-nav-target="contact" class="nav-link text-gray-900 dark:text-white hover:text-amber-500 transition-colors duration-300 lg:text-lg font-sans font-semibold">Contact</a>
                 </div>
 
             <!-- Icons & Actions - Desktop -->
@@ -98,7 +98,7 @@
                     </div>
                 @else
                     @if(!($authPage ?? false))
-                        <a href="{{ route('login') }}" class="hidden md:inline-flex px-4 py-2 text-base font-semibold text-inherit hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors border s rounded-lg hover:bg-amber-400 ">Log In</a>
+                        <a href="{{ route('login') }}" class="hidden md:inline-flex px-4 py-2 text-base font-semibold text-amber-500 hover:text-amber-400 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors border border-amber-400 dark:border-amber-300 rounded-lg">Log In</a>
                         <a href="{{ route('register.form') }}" class="hidden md:inline-flex px-4 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors text-base">Sign Up</a>
                     @endif
                 @endauth
@@ -113,10 +113,10 @@
         {{-- Mobile Menu --}}
         <div id="mobileMenu" class="hidden md:hidden mt-4 pt-4 border-t border-gray-200 dark:border-white/10">
             <div class="flex flex-col space-y-1">
-                <a href="{{ url('/') }}" class="px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">Home</a>
-                <a href="{{ route('products.index') }}" class="px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">Collections</a>
-                <a href="{{ url('/#features') }}" class="px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">About</a>
-                <a href="{{ url('/#contact') }}" class="px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">Contact</a>
+                <a href="{{ url('/') }}" data-nav-target="home" class="nav-link px-4 py-3 text-gray-900 dark:text-white hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">Home</a>
+                <a href="{{ route('products.index') }}" data-nav-target="collections" class="nav-link px-4 py-3 text-gray-900 dark:text-white hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">Collections</a>
+                <a href="{{ url('/#about') }}" data-nav-target="about" class="nav-link px-4 py-3 text-gray-900 dark:text-white hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">About</a>
+                <a href="{{ url('/#contact') }}" data-nav-target="contact" class="nav-link px-4 py-3 text-gray-900 dark:text-white hover:text-amber-500 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">Contact</a>
                 <div class="pt-3 mt-3 border-t border-gray-200 dark:border-white/10 space-y-1">
                  @auth   
                         @if(auth()->user()->hasRole('admin') || (auth()->user()->is_admin ?? false) || auth()->user()->can('inventory.view') || auth()->user()->can('sales.view') || auth()->user()->can('deliveries.manage') || auth()->user()->can('reviews.moderate'))
@@ -141,7 +141,7 @@
                             </form>
                     @else
                         @if(!($authPage ?? false))
-                            <a href="{{ route('login') }}" class="block px-4 py-3 text-amber-500 font-medium hover:bg-amber-500/10 rounded-lg transition-colors">Log In</a>
+                            <a href="{{ route('login') }}" class="block px-4 py-3 text-center text-base font-semibold text-amber-500 border border-amber-400 dark:border-amber-300 rounded-lg hover:text-amber-400 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Log In</a>
                             <a href="{{ route('register.form') }}" class="block px-4 py-3 bg-amber-300 text-black font-bold rounded-lg text-center">Sign Up</a>
                         @endif
                     @endauth
@@ -188,6 +188,71 @@
 </div>
 
 <script>
+    function setActiveNavLink(target) {
+        const links = document.querySelectorAll('[data-nav-target]');
+
+        links.forEach((link) => {
+            const isActive = link.dataset.navTarget === target;
+            link.classList.toggle('!text-amber-500', isActive);
+            link.classList.toggle('!dark:text-amber-300', isActive);
+            link.classList.toggle('font-bold', isActive);
+
+            const inMobileMenu = !!link.closest('#mobileMenu');
+            if (inMobileMenu) {
+                link.classList.toggle('bg-amber-500/10', isActive);
+            }
+
+            if (isActive) {
+                link.setAttribute('aria-current', 'page');
+            } else {
+                link.removeAttribute('aria-current');
+            }
+        });
+    }
+
+    function updateActiveNav() {
+        const path = window.location.pathname.replace(/\/+$/, '') || '/';
+        const hash = window.location.hash.replace('#', '');
+        const isHomePage = path === '/' || path === '/home';
+
+        if (path.startsWith('/products') || path.startsWith('/collection')) {
+            setActiveNavLink('collections');
+            return;
+        }
+
+        if (!isHomePage) {
+            setActiveNavLink('');
+            return;
+        }
+
+        if (hash === 'about' || hash === 'contact') {
+            setActiveNavLink(hash);
+            return;
+        }
+
+        const about = document.getElementById('about');
+        const contact = document.getElementById('contact');
+        const triggerLine = window.innerHeight * 0.35;
+
+        if (contact) {
+            const contactTop = contact.getBoundingClientRect().top;
+            if (contactTop <= triggerLine) {
+                setActiveNavLink('contact');
+                return;
+            }
+        }
+
+        if (about) {
+            const aboutTop = about.getBoundingClientRect().top;
+            if (aboutTop <= triggerLine) {
+                setActiveNavLink('about');
+                return;
+            }
+        }
+
+        setActiveNavLink('home');
+    }
+
     function toggleMobileMenu() {
         const menu = document.getElementById('mobileMenu');
         if (menu) menu.classList.toggle('hidden');
@@ -222,5 +287,9 @@
             if (menu) menu.classList.add('hidden');
         }
     });
+
+    window.addEventListener('hashchange', updateActiveNav);
+    window.addEventListener('scroll', updateActiveNav, { passive: true });
+    document.addEventListener('DOMContentLoaded', updateActiveNav);
 
 </script>

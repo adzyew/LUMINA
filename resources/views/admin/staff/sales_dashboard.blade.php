@@ -4,13 +4,10 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto">
-
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
-        <div>
-            <h1 class="text-3xl font-playfair font-bold text-gray-900 dark:text-white mb-2">Sales & Orders</h1>
-            <p class="text-gray-600 dark:text-gray-400">Manage incoming orders and track store revenue.</p>
-        </div>
-    </div>
+    @include('admin.staff.partials.topbar', [
+        'title' => 'Sales & Orders',
+        'subtitle' => 'Manage incoming orders and track store revenue.',
+    ])
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         <div class="bg-white dark:bg-gray-900/60 rounded-3xl p-6 border border-gray-200 dark:border-white/5 shadow-lg relative overflow-hidden">

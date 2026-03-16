@@ -3,12 +3,10 @@
 @section('title', 'Inventory Dashboard | Lumina')
 
 @section('content')
-<header class="flex justify-between items-center mb-10">
-    <div>
-        <h1 class="text-3xl font-playfair font-bold text-gray-900 dark:text-white">Inventory Dashboard</h1>
-        <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Welcome back, {{ auth()->user()->name }}.</p>
-    </div>
-</header>
+@include('admin.staff.partials.topbar', [
+    'title' => 'Inventory Dashboard',
+    'subtitle' => 'Welcome back, ' . auth()->user()->name . '.',
+])
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6 shadow-sm dark:shadow-none">

@@ -23,7 +23,7 @@
     <table class="w-full text-left border-collapse">
         <thead>
             <tr class="bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-white border-b border-gray-200 dark:border-white/10 text-sm">
-                <th class="p-4">ID</th>
+                <th class="p-4">Order ID</th>
                 <th class="p-4">Customer</th>
                 <th class="p-4">Total</th>
                 <th class="p-4">Status</th>
@@ -39,7 +39,16 @@
                 <td class="p-4 text-amber-300 font-bold">₱{{ number_format($order->total_price, 2) }}</td>
                 <td class="p-4"><span class="px-2 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300">{{ ucfirst($order->status) }}</span></td>
                 <td class="p-4 text-gray-500 dark:text-gray-400">{{ $order->created_at->format('M d, Y') }}</td>
-                <td class="p-4"><a href="{{ route('admin.orders.show', $order) }}" class="inline-flex px-4 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 text-sm">View</a></td>
+                <td class="p-4">
+                    <div class="flex items-center justify-center gap-2">
+                        <a href="{{ route('admin.orders.show', $order) }}" class="inline-flex px-4 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 text-sm">View</a>
+                        <form method="POST" action="{{ route('admin.orders.destroy', $order) }}" onsubmit="return confirm('Delete this order? This cannot be undone.');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="inline-flex px-3 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 text-sm">Delete</button>
+                        </form>
+                    </div>
+                </td>
             </tr>
             @empty
             <tr><td colspan="6" class="p-12 text-center text-gray-500">No orders found.</td></tr>

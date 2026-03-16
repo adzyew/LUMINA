@@ -4,19 +4,10 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto">
-
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-        <div>
-            <h1 class="text-3xl sm:text-4xl font-playfair font-bold text-gray-900 dark:text-white mb-2">
-                Welcome back, {{ auth()->user()->name }}
-            </h1>
-            <p class="text-gray-600 dark:text-gray-400">Here is your daily overview for Lumina Jewelry.</p>
-        </div>
-        <div class="px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-300 text-sm font-bold uppercase tracking-widest flex items-center gap-2 shadow-lg">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-            Staff Portal
-        </div>
-    </div>
+    @include('admin.staff.partials.topbar', [
+        'title' => 'Overview',
+        'subtitle' => 'Welcome back, ' . auth()->user()->name . '!',
+    ])
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
 
