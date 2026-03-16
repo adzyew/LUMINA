@@ -43,80 +43,127 @@
     </div>
 @endif
 
-<div class="bg-white dark:bg-gray-900 rounded-xl overflow-hidden border border-gray-200 dark:border-white/5">
-    <table class="w-full text-left border-collapse">
-        <thead>
-            <tr class="bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-white border-b border-gray-200 dark:border-white/10 text-sm">
-                <th class="p-4">Name</th>
-                <th class="p-4">Email Address</th>
-                <th class="p-4">Role</th>
-                <th class="p-4">Verified</th>
-                <th class="p-4 text-center">Actions</th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200 dark:divide-white/10">
-            @foreach($users as $user)
-            <tr class="hover:bg-amber-300/10 transition duration-300">
-                <td class="p-4 font-medium text-gray-900 dark:text-white">{{ $user->name }}</td>
-                <td class="p-4 text-gray-600 dark:text-gray-300">{{ $user->email }}</td>
-                <td class="p-4">
-                    @forelse($user->roles as $role)
-                        @if($role->name === 'admin')
-                            <span class="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-amber-500/30 text-amber-300">Admin</span>
-                        @elseif($role->name === 'staff')
-                            <span class="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300">Staff</span>
-                        @elseif($role->name === 'customer')
-                            <span class="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-gray-500/20 text-gray-400">Customer</span>
-                        @else
-                            <span class="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300 capitalize">{{ $role->name }}</span>
-                        @endif
+@if($filter === 'all')
+
+    {{-- Staff & Admin Section --}}
+    <div class="mb-6">
+        <div class="flex items-center gap-2 mb-3">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Staff & Admin</h2>
+            <span class="text-xs bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full font-medium">{{ $staffUsers->count() }}</span>
+        </div>
+        <div class="bg-white dark:bg-gray-900 rounded-xl overflow-hidden border border-gray-200 dark:border-white/5">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-white border-b border-gray-200 dark:border-white/10 text-sm">
+                        <th class="p-4">Name</th>
+                        <th class="p-4">Email Address</th>
+                        <th class="p-4">Role</th>
+                        <th class="p-4">Verified</th>
+                        <th class="p-4 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+                    @forelse($staffUsers as $user)
+                        @include('admin.users._row')
                     @empty
-                        <span class="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-gray-500/20 text-gray-400">Customer</span>
+                        <tr><td colspan="5" class="p-8 text-center text-gray-500 dark:text-gray-400">No staff users found.</td></tr>
                     @endforelse
-                </td>
-                <td class="p-4">
-                    @if($user->is_verified ?? $user->email_verified_at)
-                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400">Verified</span>
-                    @else
-                        <span class="px-2 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-400">Pending</span>
-                    @endif
-                </td>
-                <td class="p-4">
-                    <div class="flex justify-center gap-3">
-                        <a href="{{ route('admin.users.show', $user) }}" class="inline-flex items-center px-4 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 hover:text-white transition-colors text-sm">View</a>
-                        @if(!$user->hasRole('admin'))
-                            @if($user->archived_at)
-                                <form action="{{ route('admin.users.unarchive', $user) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-500 text-white font-bold rounded-lg hover:bg-gray-400 transition-colors text-sm">Unarchive</button>
-                                </form>
-                                <form id="delete-user-form-{{ $user->id }}" action="{{ route('admin.users.destroy', $user) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" onclick="showDeleteModal('{{ $user->id }}', '{{ $user->name }}')" class="inline-flex items-center px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors text-sm">Delete</button>
-                                </form>
-                            @else
-                                <form action="{{ route('admin.users.archive', $user) }}" method="POST" onsubmit="return confirm('Archive this user? They will be prevented from logging in.');">
-                                    @csrf
-                                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-500 text-white font-bold rounded-lg hover:bg-gray-300 hover:text-black transition-colors text-sm">Archive</button>
-                                </form>
-                            @endif
-                        @endif
-                    </div>
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    @if($users->isEmpty())
-        <div class="p-12 text-center text-gray-500">No users found.</div>
+    {{-- Customers Section --}}
+    <div>
+        <div class="flex items-center gap-2 mb-3">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Customers</h2>
+            <span class="text-xs bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full font-medium">{{ $customerUsers->count() }}</span>
+        </div>
+        <div class="bg-white dark:bg-gray-900 rounded-xl overflow-hidden border border-gray-200 dark:border-white/5">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-white border-b border-gray-200 dark:border-white/10 text-sm">
+                        <th class="p-4">Name</th>
+                        <th class="p-4">Email Address</th>
+                        <th class="p-4">Role</th>
+                        <th class="p-4">Verified</th>
+                        <th class="p-4 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+                    @forelse($customerUsers as $user)
+                        @include('admin.users._row')
+                    @empty
+                        <tr><td colspan="5" class="p-8 text-center text-gray-500 dark:text-gray-400">No customers found.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+@else
+
+    <div class="bg-white dark:bg-gray-900 rounded-xl overflow-hidden border border-gray-200 dark:border-white/5">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-white border-b border-gray-200 dark:border-white/10 text-sm">
+                    <th class="p-4">Name</th>
+                    <th class="p-4">Email Address</th>
+                    <th class="p-4">Role</th>
+                    <th class="p-4">Verified</th>
+                    <th class="p-4 text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+                @foreach($users as $user)
+                    @include('admin.users._row')
+                @endforeach
+            </tbody>
+        </table>
+
+        @if($users->isEmpty())
+            <div class="p-12 text-center text-gray-500">No users found.</div>
+        @endif
+    </div>
+
+    @if($users->hasPages())
+        <div class="mt-6">{{ $users->links() }}</div>
     @endif
-</div>
 
-@if($users->hasPages())
-    <div class="mt-6">{{ $users->links() }}</div>
 @endif
+
+<div id="verifyUserModal" class="fixed inset-0 z-100 hidden" aria-labelledby="verify-user-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="hideVerifyModal()"></div>
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-xl bg-white dark:bg-gray-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm border border-gray-200 dark:border-white/10">
+                <div class="px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-500/20 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.745 3.745 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.745 3.745 0 0 1 3.296-1.043A3.745 3.745 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.745 3.745 0 0 1 3.296 1.043 3.745 3.745 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg font-semibold leading-6 text-gray-900 dark:text-white" id="verify-user-title">Confirm Verification</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">You are about to verify <span id="verifyUserName" class="font-semibold text-gray-900 dark:text-white"></span>. This will grant them access as a verified staff member.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-800/50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button type="button" onclick="confirmVerifyUser()" class="inline-flex w-full justify-center rounded-lg bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto transition-colors">
+                        Verify
+                    </button>
+                    <button type="button" onclick="hideVerifyModal()" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 sm:mt-0 sm:w-auto transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div id="deleteUserModal" class="fixed inset-0 z-100 hidden" aria-labelledby="delete-user-title" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="hideDeleteModal()"></div>
@@ -154,6 +201,24 @@
 </div>
 
 <script>
+    let selectedVerifyFormId = null;
+
+    function showVerifyModal(userId, userName) {
+        selectedVerifyFormId = 'verify-user-form-' + userId;
+        document.getElementById('verifyUserName').textContent = userName;
+        document.getElementById('verifyUserModal').classList.remove('hidden');
+    }
+
+    function hideVerifyModal() {
+        document.getElementById('verifyUserModal').classList.add('hidden');
+        selectedVerifyFormId = null;
+    }
+
+    function confirmVerifyUser() {
+        const form = document.getElementById(selectedVerifyFormId);
+        if (form) form.submit();
+    }
+
     let deleteTimer = null;
     let selectedDeleteFormId = null;
 

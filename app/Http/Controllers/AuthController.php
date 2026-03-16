@@ -183,6 +183,18 @@ class AuthController extends Controller
         return view('user.orders', compact('orders'));
     }
 
+    public function showOrder(Order $order)
+    {
+        $user = Auth::user();
+        if ($order->user_id !== $user->id) {
+            abort(403);
+        }
+
+        $order->load('items.product');
+
+        return view('user.order_detail', compact('order'));
+    }
+
     public function showProfile()
     {
         return view('user.profile_show', ['user' => Auth::user()]);

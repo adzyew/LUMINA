@@ -7,7 +7,7 @@
     <title>@yield('title', 'Lumina Admin')</title>
     @vite('resources/css/app.css')
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 <body class="bg-[#F8F8F8] text-gray-900 dark:bg-gray-900 dark:text-gray-100 font-sans antialiased flex h-screen overflow-hidden transition-colors">
 
@@ -118,29 +118,6 @@
                 </a>
             @endrole
         </nav>
-
-        <div class="p-4 border-t border-gray-200 dark:border-white/10 flex flex-col gap-2">
-            <div class="flex items-center gap-2 px-4 py-2">
-                <span class="text-sm text-gray-500 dark:text-gray-400">Theme</span>
-                @include('partials.theme_toggle')
-            </div>
-            @if($isAdmin)
-            <div class="relative mt-2" id="adminAccountDropdownWrapper">
-                <button type="button" onclick="toggleAdminAccountDropdown()" class="w-full flex items-center justify-between gap-2 px-4 py-2 bg-gray-100 dark:bg-white/5 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-white/10 rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
-                    <span class="font-semibold">Account</span>
-                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <div id="adminAccountDropdownMenu" class="absolute bottom-full mb-2 left-0 right-0 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-lg shadow-xl z-50 hidden overflow-hidden">
-                    <a href="{{ route('admin.profile.show') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
-                        My Profile
-                    </a>
-                    <button type="button" onclick="showLogoutModal(); closeAdminAccountDropdown();" class="w-full text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
-                        Logout
-                    </button>
-                </div>
-            </div>
-            @endif
-        </div>
     </aside>
 
     <main class="flex-1 min-w-0 overflow-y-auto bg-[#F4F4F4] dark:bg-gray-900 p-4 sm:p-8 md:p-10 transition-colors">
@@ -265,16 +242,6 @@
                 modal.classList.add('hidden');
             }
 
-            function toggleAdminAccountDropdown() {
-                const menu = document.getElementById('adminAccountDropdownMenu');
-                if (menu) menu.classList.toggle('hidden');
-            }
-
-            function closeAdminAccountDropdown() {
-                const menu = document.getElementById('adminAccountDropdownMenu');
-                if (menu) menu.classList.add('hidden');
-            }
-
             function toggleStaffProfileDropdown() {
                 const menu = document.getElementById('staffProfileDropdownMenu');
                 const chevron = document.getElementById('staffProfileChevron');
@@ -303,12 +270,6 @@
             }
 
             document.addEventListener('click', function (e) {
-                const wrapper = document.getElementById('adminAccountDropdownWrapper');
-                const menu = document.getElementById('adminAccountDropdownMenu');
-                if (wrapper && menu && !wrapper.contains(e.target)) {
-                    menu.classList.add('hidden');
-                }
-
                 const staffWrapper = document.getElementById('staffProfileDropdownWrapper');
                 if (staffWrapper && !staffWrapper.contains(e.target)) {
                     closeStaffProfileDropdown();

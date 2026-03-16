@@ -37,7 +37,7 @@
     <div class="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 p-5 mb-6">
         <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Satisfaction Trend (Last 6 Months)</h2>
         <div class="relative h-48">
-            <canvas id="feedbackTrendChart"></canvas>
+            <div id="feedbackTrendChart"></div>
         </div>
     </div>
 
@@ -209,58 +209,45 @@
     }
 
     (function () {
-        const ctx = document.getElementById('feedbackTrendChart');
-        if (!ctx || typeof Chart === 'undefined') return;
+        const el = document.getElementById('feedbackTrendChart');
+        if (!el || typeof ApexCharts === 'undefined') return;
 
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: @json($trendLabels),
-                datasets: [{
-                    label: 'Satisfaction Trend (Smoothed)',
-                    data: @json($trendAverageRatings),
-                    borderColor: '#f59e0b',
-                    backgroundColor: 'rgba(245, 158, 11, 0.15)',
-                    fill: false,
-                    spanGaps: false,
-                    tension: 0.2,
-                    pointRadius: 3,
-                }],
+        const isDark = document.documentElement.classList.contains('dark');
+        const reviewCounts = @json($trendReviewCounts);
+        const ratings = @json($trendAverageRatings);
+
+        new ApexCharts(el, {
+            chart: {
+                type: 'area',
+                height: 192,
+                toolbar: { show: false },
+                background: 'transparent',
+                animations: { enabled: false },
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                animation: false,
-                scales: {
-                    y: {
-                        min: 1,
-                        max: 5,
-                        ticks: {
-                            stepSize: 1,
-                        },
-                    },
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                const count = @json($trendReviewCounts)[context.dataIndex] ?? 0;
-                                const value = context.raw;
-
-                                if (value === null) {
-                                    return 'No approved reviews this month';
-                                }
-
-                                return `Smoothed rating: ${value} (${count} review${count === 1 ? '' : 's'})`;
-                            }
-                        }
-                    },
-                    legend: {
-                        display: false,
-                    },
+            theme: { mode: isDark ? 'dark' : 'light' },
+            series: [{ name: 'Satisfaction Trend', data: ratings }],
+            xaxis: { categories: @json($trendLabels) },
+            yaxis: { min: 1, max: 5, tickAmount: 4 },
+            colors: ['#f59e0b'],
+            fill: {
+                type: 'gradient',
+                gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05 },
+            },
+            stroke: { curve: 'smooth', width: 2 },
+            dataLabels: { enabled: false },
+            markers: { size: 4 },
+            legend: { show: false },
+            tooltip: {
+                custom: function ({ dataPointIndex }) {
+                    const count = reviewCounts[dataPointIndex] ?? 0;
+                    const value = ratings[dataPointIndex];
+                    if (value === null) {
+                        return '<div style="padding:8px 12px">No approved reviews this month</div>';
+                    }
+                    return `<div style="padding:8px 12px">Smoothed rating: ${value} (${count} review${count === 1 ? '' : 's'})</div>`;
                 },
             },
-        });
+        }).render();
     })();
 
     document.addEventListener('keydown', function (event) {

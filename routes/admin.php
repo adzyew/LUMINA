@@ -132,16 +132,19 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
 
         // USERS (Admin Only)
         Route::resource('users', UserManagementController::class)
-            ->only(['index', 'create', 'store', 'show'])
+            ->only(['index', 'create', 'store', 'show', 'edit', 'update'])
                 ->middleware('role:admin');
 
-        // archive/unarchive/delete users
+        // archive/unarchive/delete/verify users
         Route::post('users/{user}/archive', [UserManagementController::class, 'archive'])
             ->middleware('role:admin')
             ->name('users.archive');
         Route::post('users/{user}/unarchive', [UserManagementController::class, 'unarchive'])
             ->middleware('role:admin')
             ->name('users.unarchive');
+        Route::post('users/{user}/verify', [UserManagementController::class, 'verify'])
+            ->middleware('role:admin')
+            ->name('users.verify');
         Route::delete('users/{user}', [UserManagementController::class, 'destroy'])
             ->middleware('role:admin')
             ->name('users.destroy');
@@ -150,18 +153,27 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
         Route::get('roles', [UserManagementController::class, 'rolesIndex'])
             ->middleware('role:admin')
             ->name('roles.index');
-            Route::post('roles', [UserManagementController::class, 'storeRole'])
+        Route::post('roles', [UserManagementController::class, 'storeRole'])
             ->middleware('role:admin')
             ->name('roles.store');
-            Route::delete('roles/{role}', [UserManagementController::class, 'destroyRole'])
+        Route::delete('roles/{role}', [UserManagementController::class, 'destroyRole'])
             ->middleware('role:admin')
             ->name('roles.destroy');
+        Route::get('roles/{role}', [UserManagementController::class, 'showRole'])
+            ->middleware('role:admin')
+            ->name('roles.show');
         Route::get('roles/{role}/edit', [UserManagementController::class, 'editRole'])
             ->middleware('role:admin')
             ->name('roles.edit');
         Route::put('roles/{role}', [UserManagementController::class, 'updateRole'])
             ->middleware('role:admin')
             ->name('roles.update');
+        Route::post('roles/{role}/archive', [UserManagementController::class, 'archiveRole'])
+            ->middleware('role:admin')
+            ->name('roles.archive');
+        Route::post('roles/{role}/restore', [UserManagementController::class, 'restoreRole'])
+            ->middleware('role:admin')
+            ->name('roles.restore');
 
         // STAFF management (Admin Only)
         Route::get('staff', [StaffController::class, 'index'])

@@ -42,12 +42,20 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Revenue (Last 7 Days)</h3>
-        <canvas id="revenueChart" height="200"></canvas>
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white" id="revenueChartTitle">Revenue (Last 7 Days)</h3>
+            <div class="flex gap-1 text-xs">
+                <button onclick="setRevenuePeriod('day')" data-period="day" class="period-btn px-3 py-1 rounded-lg font-semibold transition-colors text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10">Day</button>
+                <button onclick="setRevenuePeriod('week')" data-period="week" class="period-btn px-3 py-1 rounded-lg font-semibold transition-colors bg-amber-300 text-black">Week</button>
+                <button onclick="setRevenuePeriod('month')" data-period="month" class="period-btn px-3 py-1 rounded-lg font-semibold transition-colors text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10">Month</button>
+                <button onclick="setRevenuePeriod('year')" data-period="year" class="period-btn px-3 py-1 rounded-lg font-semibold transition-colors text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10">Year</button>
+            </div>
+        </div>
+        <div id="revenueChart"></div>
     </div>
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
         <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Orders by Status</h3>
-        <canvas id="statusChart" height="200"></canvas>
+        <div id="statusChart"></div>
     </div>
 </div>
 
@@ -96,53 +104,67 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const revenueCtx = document.getElementById('revenueChart');
-    if (revenueCtx) {
-        new Chart(revenueCtx, {
-            type: 'bar',
-            data: {
-                labels: {!! json_encode(array_keys($ordersLast7Days)) !!},
-                datasets: [{
-                    label: 'Revenue (₱)',
-                    data: {!! json_encode(array_values($ordersLast7Days)) !!},
-                    backgroundColor: 'rgba(251, 191, 36, 0.5)',
-                    borderColor: 'rgb(251, 191, 36)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af' } },
-                    x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
-                }
-            }
+document.addEventListener('DOMContentLoaded', function () {
+    const isDark = document.documentElement.classList.contains('dark');
+    const pesoFmt = val => '₱' + parseFloat(val || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    const periodData = {
+        day:   { title: 'Revenue (Last 24 Hours)', labels: {!! json_encode(array_keys($ordersLast24Hours)) !!}, values: {!! json_encode(array_values($ordersLast24Hours)) !!} },
+        week:  { title: 'Revenue (Last 7 Days)',   labels: {!! json_encode(array_keys($ordersLast7Days)) !!},   values: {!! json_encode(array_values($ordersLast7Days)) !!} },
+        month: { title: 'Revenue (Last 30 Days)',  labels: {!! json_encode(array_keys($ordersLast30Days)) !!},  values: {!! json_encode(array_values($ordersLast30Days)) !!} },
+        year:  { title: 'Revenue (Last 12 Months)',labels: {!! json_encode(array_keys($ordersLast12Months)) !!},values: {!! json_encode(array_values($ordersLast12Months)) !!} },
+    };
+
+    const revenueEl = document.getElementById('revenueChart');
+    let revenueChart = null;
+
+    if (revenueEl) {
+        revenueChart = new ApexCharts(revenueEl, {
+            chart: { type: 'bar', height: 250, toolbar: { show: false }, background: 'transparent' },
+            theme: { mode: isDark ? 'dark' : 'light' },
+            series: [{ name: 'Revenue (₱)', data: periodData.week.values }],
+            xaxis: { categories: periodData.week.labels },
+            colors: ['#f59e0b'],
+            dataLabels: { enabled: false },
+            plotOptions: { bar: { borderRadius: 6, columnWidth: '50%' } },
+            grid: { borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#f3f4f6' },
+            yaxis: { labels: { formatter: pesoFmt } },
+            tooltip: { y: { formatter: pesoFmt } },
         });
+        revenueChart.render();
     }
-    const statusCtx = document.getElementById('statusChart');
-    if (statusCtx) {
+
+    window.setRevenuePeriod = function (period) {
+        if (!revenueChart) return;
+        const data = periodData[period];
+        revenueChart.updateOptions({
+            series: [{ name: 'Revenue (₱)', data: data.values }],
+            xaxis: { categories: data.labels },
+        });
+        document.getElementById('revenueChartTitle').textContent = data.title;
+        document.querySelectorAll('.period-btn').forEach(btn => {
+            const isActive = btn.dataset.period === period;
+            btn.className = 'period-btn px-3 py-1 rounded-lg font-semibold transition-colors ' +
+                (isActive ? 'bg-amber-300 text-black' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10');
+        });
+    };
+
+    const statusEl = document.getElementById('statusChart');
+    if (statusEl) {
         const statusData = {!! json_encode($ordersByStatus) !!};
         const labels = Object.keys(statusData).map(s => s.charAt(0).toUpperCase() + s.slice(1));
         const values = Object.values(statusData);
-        new Chart(statusCtx, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: values,
-                    backgroundColor: ['#f59e0b', '#3b82f6', '#8b5cf6', '#a855f7', '#22c55e', '#ef4444'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af' } } }
-            }
-        });
+        new ApexCharts(statusEl, {
+            chart: { type: 'donut', height: 250, background: 'transparent' },
+            theme: { mode: isDark ? 'dark' : 'light' },
+            series: values,
+            labels: labels,
+            colors: ['#f59e0b', '#3b82f6', '#8b5cf6', '#a855f7', '#22c55e', '#ef4444'],
+            dataLabels: { enabled: false },
+            legend: { position: 'bottom' },
+            stroke: { width: 0 },
+        }).render();
     }
 });
 </script>
