@@ -18,13 +18,15 @@ class ProductController extends Controller
         $search = trim((string) $request->get('search', ''));
         $category = $request->get('category');
 
-        // Admin should be able to see archived products, so remove the storefront global scope here
-        $products = Product::withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class);
+        // Admin should be able to see archived products, so include trashed and remove storefront archive scope
+        $products = Product::withTrashed()
+            ->withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class);
 
         if ($filter === 'archived') {
             $products->whereNotNull('archived_at');
         } elseif ($filter === 'active') {
             $products->whereNull('archived_at');
+            $products->whereNull('deleted_at');
         }
 
         if (!empty($category)) {
@@ -46,7 +48,8 @@ class ProductController extends Controller
             $products->where('stock_quantity', '>', 5);
         }
 
-        $categories = Product::withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class)
+        $categories = Product::withTrashed()
+            ->withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class)
             ->select('category')
             ->whereNotNull('category')
             ->where('category', '!=', '')

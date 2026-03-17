@@ -148,6 +148,9 @@
             </div>
         @endif
     </div>
+    <div class="mt-4">
+        {{ $products->links() }}
+    </div>
 
 <!-- Hidden form used by the confirmation modal to submit archive/unarchive -->
 <form id="archive-action-form" method="POST" style="display:none;">
