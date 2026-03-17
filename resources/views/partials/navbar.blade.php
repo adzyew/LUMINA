@@ -1,4 +1,4 @@
-<nav class="{{ ($authPage ?? false) ? 'fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 text-gray-900' : (($welcomeLayout ?? false) ? 'w-full bg-white/95 backdrop-blur-md border-b border-gray-200 text-gray-900' : 'fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 text-gray-900') }} transition-colors">
+<nav class="{{ ($authPage ?? false) ? 'fixed top-0 left-0 right-0 z-50 bg-amber-50  backdrop-blur-md border-b border-amber-300 text-gray-900' : (($welcomeLayout ?? false) ? 'w-full bg-amber-50 backdrop-blur-md border-b border-amber-300 text-gray-900' : 'fixed top-0 left-0 right-0 z-50 bg-amber-50 backdrop-blur-md border-b border-amber-300 text-gray-900') }} transition-colors">
         <div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
             <div class="flex items-center justify-between">
                 <!-- Logo -->
@@ -13,10 +13,10 @@
 
                 <!-- Navigation Links - Desktop -->
                 <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
-                <a href="{{ url('/') }}" data-nav-target="home" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 lg:text-lg font-sans font-semibold">Home</a>
-                <a href="{{ route('products.index') }}" data-nav-target="collections" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 lg:text-lg font-sans font-semibold">Collections</a>
-                <a href="{{ url('/#about') }}" data-nav-target="about" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 lg:text-lg font-sans font-semibold">About</a>
-                <a href="{{ url('/#contact') }}" data-nav-target="contact" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 lg:text-lg font-sans font-semibold">Contact</a>
+                <a href="{{ url('/') }}" data-nav-target="home" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 xl:text-xl font-sans font-semibold">Home</a>
+                <a href="{{ route('products.index') }}" data-nav-target="collections" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 xl:text-xl font-sans font-semibold">Collections</a>
+                <a href="{{ url('/#about') }}" data-nav-target="about" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 xl:text-xl font-sans font-semibold">About</a>
+                <a href="{{ url('/#contact') }}" data-nav-target="contact" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 xl:text-xl font-sans font-semibold">Contact</a>
                 </div>
 
             <!-- Icons & Actions - Desktop -->
@@ -33,9 +33,9 @@
                     </a>
                 @endauth
                 @if(!request()->routeIs('login')&& !request()->routeIs('register'))
-                <a href="{{ route('cart.index') }}" class="relative p-2 rounded-lg text-gray-500 hover:text-amber-500 hover:bg-gray-100 transition-colors group">
-                        <svg class="w-5 h-5 sm:w-6 sm:h-6 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                <a href="{{ route('cart.index') }}" class="relative p-2 rounded-lg text-amber-400 hover:text-amber-500 transition-colors group">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7 transform group-hover:scale-110 transition-transform">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                         </svg>
                         @if(session('cart') && count(session('cart')) > 0)
                         <span class="absolute -top-0.5 -right-0.5 sm:top-0 sm:right-0 bg-amber-300 text-black text-[10px] sm:text-xs rounded-full min-w-4.5 h-4.5 flex items-center justify-center font-bold">
@@ -78,6 +78,10 @@
                                 <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
                                 Orders
                             </a>
+                            <a href="{{ route('wishlist.index') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                Wishlist
+                            </a>
                             <a href="{{ route('profile.show') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                 <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                                 Settings
@@ -94,14 +98,16 @@
                     </div>
                 @else
                     @if(!($authPage ?? false))
-                        <a href="{{ route('login') }}" class="hidden md:inline-flex px-4 py-2 text-base font-semibold text-amber-500 hover:text-amber-400 hover:bg-gray-100 transition-colors border border-amber-400 rounded-lg">Log In</a>
-                        <a href="{{ route('register.form') }}" class="hidden md:inline-flex px-4 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors text-base">Sign Up</a>
+                        <a href="{{ route('login') }}" class="hidden md:inline-flex px-4 py-2 text-base font-semibold text-amber-500 hover:text-amber-600 hover:bg-amber-600/10transition-colors border border-amber-500 rounded-lg transform hover:scale-105">Log In</a>
+                        <a href="{{ route('register.form') }}" class="hidden md:inline-flex px-4 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-500 hover:text-white transition-colors text-base transform hover:scale-105">Sign Up</a>
                     @endif
                 @endauth
 
                 {{-- Mobile menu button --}}
-                <button type="button" onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg text-gray-500 hover:text-amber-500" aria-label="Menu">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                <button type="button" onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg text-amber-400 hover:text-amber-500" aria-label="Menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5" />
+                    </svg>
                 </button>
             </div>
         </div>
@@ -127,6 +133,7 @@
                         @endif
                         <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 rounded-lg transition-colors">View Profile</a>
                         <a href="{{ route('orders.index') }}" class="flex items-center gap-3 px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 rounded-lg transition-colors">Orders</a>
+                        <a href="{{ route('wishlist.index') }}" class="flex items-center gap-3 px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 rounded-lg transition-colors">Wishlist</a>
                         <a href="{{ route('profile.show') }}" class="flex items-center gap-3 px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 rounded-lg transition-colors">Settings</a>
                             <form method="POST" action="{{ route('logout') }}" onsubmit="return confirm('Are you sure you want to logout?');">
                                 @csrf

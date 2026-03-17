@@ -17,7 +17,7 @@
     <div class="fixed inset-0 -z-50 overflow-hidden">
         <img src="{{ asset('IMAGES/BG.png') }}" alt="Luxury background" class="w-full h-full object-cover"/>
         <div class="absolute inset-0 bg-stone-400/30 backdrop-blur-[2px]"></div>
-        <div class="absolute inset-0 bg-linear-to-b from-stone-200/70 via-stone-100/50 to-stone-200/80"></div>
+        <div class="absolute inset-0 bg-linear-to-b from-stone-500/70 via-stone-500/50 to-stone-200/80"></div>
     </div>
 
     @include('partials.navbar')
@@ -27,9 +27,9 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                 <div class="sm:flex-1 text-left">
                     <h1 class="text-4xl sm:text-5xl font-playfair font-bold mt-4">
-                        Explore <span class="text-gold">Our Collection</span>
+                        Explore <span class="text-amber-300">Our Collection</span>
                     </h1>
-                    <p class="mt-4 text-gray-600">Discover the finest handcrafted jewelry.</p>
+                    <p class="mt-4 text-white">Discover the finest handcrafted jewelry.</p>
                 </div>
 
                 <div class="mt-4 sm:mt-0 sm:ml-6 w-full sm:w-96">
