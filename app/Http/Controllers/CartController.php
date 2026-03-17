@@ -240,7 +240,7 @@ class CartController extends Controller
                 report($e);
             }
 
-            return redirect()->route('dashboard')->with('success', 'Order #' . $order->id . ' placed successfully! Check your email for confirmation.');
+            return redirect()->route('dashboard')->with('success', 'Order #' . $order->display_order_number . ' placed successfully! Check your email for confirmation.');
 
         } catch (\Exception $e) {
             // IF ANYTHING ABOVE FAILED, IT COMES HERE AND NOTHING IS SAVED!

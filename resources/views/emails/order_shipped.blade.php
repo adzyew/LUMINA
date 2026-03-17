@@ -21,7 +21,7 @@
     </div>
     <h1>Your order is on its way!</h1>
     <p>Hi {{ $order->user->name ?? 'Customer' }},</p>
-    <p>Good news! Your order <strong>#{{ $order->id }}</strong> has shipped and is on its way to you.</p>
+    <p>Good news! Your order <strong>#{{ $order->display_order_number }}</strong> has shipped and is on its way to you.</p>
 
     @if($order->tracking_number)
     <div class="tracking">

@@ -8,79 +8,79 @@
     @vite('resources/css/app.css')
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-gray-50 text-gray-900 dark:bg-black dark:text-white font-sans antialiased flex flex-col min-h-screen transition-colors">
+<body class="bg-stone-100 text-gray-900 font-sans antialiased flex flex-col min-h-screen">
 @include('partials.navbar')
 
 <div class="grow container mx-auto px-4 py-12 max-w-2xl">
-    <h1 class="text-3xl font-playfair font-bold text-amber-600 dark:text-amber-300 mb-4 mt-8">Checkout</h1>
+    <h1 class="text-3xl font-playfair font-bold text-amber-600 mb-4 mt-8">Checkout</h1>
 
     @if(session('error'))
-        <div class="mb-6 bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300 p-4 rounded-lg">{{ session('error') }}</div>
+        <div class="mb-6 bg-red-100 text-red-800 p-4 rounded-lg">{{ session('error') }}</div>
     @endif
 
-    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-2xl p-6 mb-6 shadow-sm dark:shadow-none">
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Order Summary</h3>
+    <div class="bg-white border border-gray-200 rounded-2xl p-6 mb-6 shadow-sm">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Order Summary</h3>
         @php $total = 0; @endphp
         @foreach(session('cart') as $id => $item)
             @php $total += $item['price'] * $item['quantity']; @endphp
-            <div class="flex justify-between py-2 border-b border-gray-100 dark:border-white/5">
-                <span class="text-gray-600 dark:text-gray-300">{{ $item['name'] }} × {{ $item['quantity'] }}</span>
-                <span class="text-amber-600 dark:text-amber-300">₱{{ number_format($item['price'] * $item['quantity'], 2) }}</span>
+            <div class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-gray-600">{{ $item['name'] }} × {{ $item['quantity'] }}</span>
+                <span class="text-amber-600">₱{{ number_format($item['price'] * $item['quantity'], 2) }}</span>
             </div>
         @endforeach
         <div class="flex justify-between mt-4 text-lg font-bold">
-            <span class="text-gray-900 dark:text-white">Total</span>
-            <span class="text-amber-600 dark:text-amber-300">₱{{ number_format($total, 2) }}</span>
+            <span class="text-gray-900">Total</span>
+            <span class="text-amber-600">₱{{ number_format($total, 2) }}</span>
         </div>
     </div>
 
     <form method="POST" action="{{ route('place.order') }}" class="space-y-4">
         @csrf
-        <div class="space-y-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-white/5">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Contact &amp; Shipping Details</h3>
+        <div class="space-y-4 p-4 rounded-xl bg-gray-50 border border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Contact &amp; Shipping Details</h3>
             <div>
-                <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Contact Number <span class="text-amber-500">*</span></label>
+                <label class="block text-sm font-medium text-gray-500 mb-2">Contact Number <span class="text-amber-500">*</span></label>
                 <input type="tel" name="contact_phone" value="{{ old('contact_phone', auth()->user()->phone ?? '') }}" required
-                    class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-amber-400 outline-none transition-colors"
+                    class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:border-amber-400 outline-none transition-colors"
                     placeholder="e.g. 09XX XXX XXXX">
-                @error('contact_phone')<p class="text-red-500 dark:text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
+                @error('contact_phone')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Street / Building / House No. <span class="text-amber-500">*</span></label>
+                <label class="block text-sm font-medium text-gray-500 mb-2">Street / Building / House No. <span class="text-amber-500">*</span></label>
                 <input type="text" name="shipping_street" value="{{ old('shipping_street', auth()->user()->shipping_street ?? '') }}" required
-                    class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-amber-400 outline-none transition-colors"
+                    class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:border-amber-400 outline-none transition-colors"
                     placeholder="Street, building name, house number">
-                @error('shipping_street')<p class="text-red-500 dark:text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
+                @error('shipping_street')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
             </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">City / Municipality <span class="text-amber-500">*</span></label>
+                        <label class="block text-sm font-medium text-gray-500 mb-2">City / Municipality <span class="text-amber-500">*</span></label>
                         <select id="city" name="shipping_city" required
-                            class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-amber-400 outline-none transition-colors">
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:border-amber-400 outline-none transition-colors">
                             <option value="">Loading cities...</option>
                         </select>
-                        @error('shipping_city')<p class="text-red-500 dark:text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
+                        @error('shipping_city')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
                     </div>          
                 <div>
-                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Barangay <span class="text-amber-500">*</span></label>
+                    <label class="block text-sm font-medium text-gray-500 mb-2">Barangay <span class="text-amber-500">*</span></label>
                     <select id="barangay" name="shipping_barangay" required
-                        class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-amber-400 outline-none transition-colors">
+                        class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:border-amber-400 outline-none transition-colors">
                         <option value="">Select Barangay</option>
                     </select>
-                    @error('shipping_barangay')<p class="text-red-500 dark:text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
+                    @error('shipping_barangay')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
                 </div>
             </div>
            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                        <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Postal / ZIP Code</label>
+                        <label class="block text-sm font-medium text-gray-500 mb-2">Postal / ZIP Code</label>
                     <input type="text" id="zip" name="shipping_postal_code" value="{{ old('shipping_postal_code', auth()->user()->shipping_postal_code ?? '') }}" readonly
-                        class="w-full bg-gray-100 dark:bg-gray-700/50 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-500 dark:text-gray-400 cursor-not-allowed outline-none"
+                        class="w-full bg-gray-100 border border-gray-200 rounded-lg p-3 text-gray-500 cursor-not-allowed outline-none"
                         placeholder="Auto-filled">
                 </div>  
                 <div>
-                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Country</label>
+                    <label class="block text-sm font-medium text-gray-500 mb-2">Country</label>
                     <input type="text" name="shipping_country" value="Philippines" readonly
-                        class="w-full bg-gray-100 dark:bg-gray-700/50 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-500 dark:text-gray-400 cursor-not-allowed outline-none">
+                        class="w-full bg-gray-100 border border-gray-200 rounded-lg p-3 text-gray-500 cursor-not-allowed outline-none">
                 </div>
             </div>
 
@@ -88,32 +88,32 @@
             <input type="hidden" name="shipping_province" value="Metro Manila">
 
             <div>
-                <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Additional Notes (optional)</label>
-                <textarea name="notes" rows="2" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-amber-400 outline-none transition-colors" placeholder="Delivery instructions, landmark, etc.">{{ old('notes') }}</textarea>
-                @error('notes')<p class="text-red-500 dark:text-red-400 text-sm mt-1">{{ $message }}</p>@enderror
+                <label class="block text-sm font-medium text-gray-500 mb-2">Additional Notes (optional)</label>
+                <textarea name="notes" rows="2" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:border-amber-400 outline-none transition-colors" placeholder="Delivery instructions, landmark, etc.">{{ old('notes') }}</textarea>
+                @error('notes')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
             </div>
         </div>
         @if(auth()->user()->points_balance > 0)
-        <div class="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-                <h4 class="font-bold text-amber-800 dark:text-amber-300 flex items-center gap-2">
+                <h4 class="font-bold text-amber-800 flex items-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
                     Lumina Rewards
                 </h4>
-                <p class="text-sm text-amber-700 dark:text-amber-400 mt-1">
+                <p class="text-sm text-amber-700 mt-1">
                     You have <strong>{{ auth()->user()->points_balance }} points</strong> (worth ₱{{ number_format(auth()->user()->points_balance, 2) }}).
                 </p>
             </div>
             <div class="flex items-center gap-2 shrink-0">
-                <input type="checkbox" name="use_points" value="1" id="use_points" class="w-5 h-5 text-amber-600 rounded focus:ring-amber-500 bg-white border-gray-300 dark:border-gray-600 dark:bg-gray-800">
-                <label for="use_points" class="text-sm font-bold text-gray-900 dark:text-white cursor-pointer">Apply Discount</label>
+                <input type="checkbox" name="use_points" value="1" id="use_points" class="w-5 h-5 text-amber-600 rounded focus:ring-amber-500 bg-white border-gray-300">
+                <label for="use_points" class="text-sm font-bold text-gray-900 cursor-pointer">Apply Discount</label>
             </div>
         </div>
         @endif
         <button type="submit" class="w-full py-4 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400">Place Order</button>
     </form>
 
-    <a href="{{ route('cart.index') }}" class="block text-center mt-4 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">← Back to Cart</a>
+    <a href="{{ route('cart.index') }}" class="block text-center mt-4 text-sm text-gray-500 hover:text-gray-900 transition-colors">← Back to Cart</a>
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {

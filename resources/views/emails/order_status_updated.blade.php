@@ -53,7 +53,7 @@
     <h1>{{ $heading }}</h1>
     <p>Dear {{ $order->user->name ?? 'Customer' }},</p>
     <p>{{ $message }}</p>
-    <p>Order reference: <strong>#{{ $order->id }}</strong></p>
+    <p>Order reference: <strong>#{{ $order->display_order_number }}</strong></p>
 
     <div class="status-box">
         <p class="status" style="margin: 0 0 8px 0;">

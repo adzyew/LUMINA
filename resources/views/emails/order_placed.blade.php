@@ -34,7 +34,7 @@
 
     <h1>Your Lumina Order Confirmation</h1>
     <p>Dear {{ $order->user->name ?? 'Customer' }},</p>
-    <p>Thank you for shopping with Lumina. We are pleased to confirm that we have successfully received your order <strong>#{{ $order->id }}</strong>.</p>
+    <p>Thank you for shopping with Lumina. We are pleased to confirm that we have successfully received your order <strong>#{{ $order->display_order_number }}</strong>.</p>
     <p>We are currently preparing your items and will notify you as soon as they ship.</p>
 
     <div class="order-box">

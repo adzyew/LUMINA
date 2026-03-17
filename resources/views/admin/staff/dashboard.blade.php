@@ -12,25 +12,25 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
 
         @can('inventory.view')
-        <a href="{{ route('admin.inventory.dashboard') }}" class="group bg-white dark:bg-gray-900/60 rounded-4xl p-8 border border-gray-200 dark:border-white/5 hover:border-amber-300/30 transition-all duration-300 hover:-translate-y-1 shadow-xl">
+        <a href="{{ route('admin.inventory.dashboard') }}" class="group bg-white rounded-4xl p-8 border border-gray-200 hover:border-amber-300/30 transition-all duration-300 hover:-translate-y-1 shadow-xl">
             <div class="w-14 h-14 bg-blue-500/10 rounded-full flex items-center justify-center mb-6 border border-blue-500/20 group-hover:scale-110 transition-transform">
                 <svg class="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Inventory</h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6">Monitor stock levels, manage products, and view the inventory movement logs.</p>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Inventory</h3>
+            <p class="text-gray-500 text-sm leading-relaxed mb-6">Monitor stock levels, manage products, and view the inventory movement logs.</p>
             @if($inventoryStats)
             <div class="grid grid-cols-3 gap-2 mb-6">
                 <div class="rounded-lg bg-blue-500/10 border border-blue-500/20 p-2 text-center">
-                    <p class="text-[10px] uppercase text-blue-600 dark:text-blue-400">Products</p>
-                    <p class="text-sm font-bold text-blue-700 dark:text-blue-300">{{ $inventoryStats['total'] }}</p>
+                    <p class="text-[10px] uppercase text-blue-600">Products</p>
+                    <p class="text-sm font-bold text-blue-700">{{ $inventoryStats['total'] }}</p>
                 </div>
                 <div class="rounded-lg bg-amber-500/10 border border-amber-500/20 p-2 text-center">
-                    <p class="text-[10px] uppercase text-amber-600 dark:text-amber-400">Low</p>
-                    <p class="text-sm font-bold text-amber-700 dark:text-amber-300">{{ $inventoryStats['low_stock'] }}</p>
+                    <p class="text-[10px] uppercase text-amber-600">Low</p>
+                    <p class="text-sm font-bold text-amber-700">{{ $inventoryStats['low_stock'] }}</p>
                 </div>
                 <div class="rounded-lg bg-red-500/10 border border-red-500/20 p-2 text-center">
-                    <p class="text-[10px] uppercase text-red-600 dark:text-red-400">Out</p>
-                    <p class="text-sm font-bold text-red-700 dark:text-red-300">{{ $inventoryStats['out_of_stock'] }}</p>
+                    <p class="text-[10px] uppercase text-red-600">Out</p>
+                    <p class="text-sm font-bold text-red-700">{{ $inventoryStats['out_of_stock'] }}</p>
                 </div>
             </div>
             @endif
@@ -41,25 +41,25 @@
         @endcan
 
         @can('sales.view')
-        <a href="{{ route('admin.sales.dashboard') }}" class="group bg-white dark:bg-gray-900/60 rounded-4xl p-8 border border-gray-200 dark:border-white/5 hover:border-amber-300/30 transition-all duration-300 hover:-translate-y-1 shadow-xl">
+        <a href="{{ route('admin.sales.dashboard') }}" class="group bg-white rounded-4xl p-8 border border-gray-200 hover:border-amber-300/30 transition-all duration-300 hover:-translate-y-1 shadow-xl">
             <div class="w-14 h-14 bg-green-500/10 rounded-full flex items-center justify-center mb-6 border border-green-500/20 group-hover:scale-110 transition-transform">
                 <svg class="w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Sales & Orders</h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6">Process incoming customer orders, review transactions, and verify payments.</p>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Sales & Orders</h3>
+            <p class="text-gray-500 text-sm leading-relaxed mb-6">Process incoming customer orders, review transactions, and verify payments.</p>
             @if($salesStats)
             <div class="grid grid-cols-3 gap-2 mb-6">
                 <div class="rounded-lg bg-amber-500/10 border border-amber-500/20 p-2 text-center">
-                    <p class="text-[10px] uppercase text-amber-600 dark:text-amber-400">Pending</p>
-                    <p class="text-sm font-bold text-amber-700 dark:text-amber-300">{{ $salesStats['pending'] }}</p>
+                    <p class="text-[10px] uppercase text-amber-600">Pending</p>
+                    <p class="text-sm font-bold text-amber-700">{{ $salesStats['pending'] }}</p>
                 </div>
                 <div class="rounded-lg bg-indigo-500/10 border border-indigo-500/20 p-2 text-center">
-                    <p class="text-[10px] uppercase text-indigo-600 dark:text-indigo-400">Processing</p>
-                    <p class="text-sm font-bold text-indigo-700 dark:text-indigo-300">{{ $salesStats['processing'] }}</p>
+                    <p class="text-[10px] uppercase text-indigo-600">Processing</p>
+                    <p class="text-sm font-bold text-indigo-700">{{ $salesStats['processing'] }}</p>
                 </div>
                 <div class="rounded-lg bg-green-500/10 border border-green-500/20 p-2 text-center">
-                    <p class="text-[10px] uppercase text-green-600 dark:text-green-400">Delivered</p>
-                    <p class="text-sm font-bold text-green-700 dark:text-green-300">{{ $salesStats['delivered'] }}</p>
+                    <p class="text-[10px] uppercase text-green-600">Delivered</p>
+                    <p class="text-sm font-bold text-green-700">{{ $salesStats['delivered'] }}</p>
                 </div>
             </div>
             @endif
@@ -70,25 +70,25 @@
         @endcan
 
         @can('deliveries.manage')
-        <a href="{{ route('admin.delivery.dashboard') }}" class="group bg-white dark:bg-gray-900/60 rounded-4xl p-8 border border-gray-200 dark:border-white/5 hover:border-amber-300/30 transition-all duration-300 hover:-translate-y-1 shadow-xl">
+        <a href="{{ route('admin.delivery.dashboard') }}" class="group bg-white rounded-4xl p-8 border border-gray-200 hover:border-amber-300/30 transition-all duration-300 hover:-translate-y-1 shadow-xl">
             <div class="w-14 h-14 bg-purple-500/10 rounded-full flex items-center justify-center mb-6 border border-purple-500/20 group-hover:scale-110 transition-transform">
                 <svg class="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Deliveries</h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6">Update shipping statuses, print dispatch labels, and track outgoing packages.</p>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Deliveries</h3>
+            <p class="text-gray-500 text-sm leading-relaxed mb-6">Update shipping statuses, print dispatch labels, and track outgoing packages.</p>
             @if($deliveryStats)
             <div class="grid grid-cols-3 gap-2 mb-6">
                 <div class="rounded-lg bg-amber-500/10 border border-amber-500/20 p-2 text-center">
-                    <p class="text-[10px] uppercase text-amber-600 dark:text-amber-400">To Ship</p>
-                    <p class="text-sm font-bold text-amber-700 dark:text-amber-300">{{ $deliveryStats['to_ship'] }}</p>
+                    <p class="text-[10px] uppercase text-amber-600">To Ship</p>
+                    <p class="text-sm font-bold text-amber-700">{{ $deliveryStats['to_ship'] }}</p>
                 </div>
                 <div class="rounded-lg bg-blue-500/10 border border-blue-500/20 p-2 text-center">
-                    <p class="text-[10px] uppercase text-blue-600 dark:text-blue-400">Transit</p>
-                    <p class="text-sm font-bold text-blue-700 dark:text-blue-300">{{ $deliveryStats['in_transit'] }}</p>
+                    <p class="text-[10px] uppercase text-blue-600">Transit</p>
+                    <p class="text-sm font-bold text-blue-700">{{ $deliveryStats['in_transit'] }}</p>
                 </div>
                 <div class="rounded-lg bg-green-500/10 border border-green-500/20 p-2 text-center">
-                    <p class="text-[10px] uppercase text-green-600 dark:text-green-400">Delivered</p>
-                    <p class="text-sm font-bold text-green-700 dark:text-green-300">{{ $deliveryStats['delivered'] }}</p>
+                    <p class="text-[10px] uppercase text-green-600">Delivered</p>
+                    <p class="text-sm font-bold text-green-700">{{ $deliveryStats['delivered'] }}</p>
                 </div>
             </div>
             @endif
@@ -99,25 +99,25 @@
         @endcan
 
         @can('reviews.moderate')
-        <a href="{{ route('admin.feedback.index') }}" class="group bg-white dark:bg-gray-900/60 rounded-4xl p-8 border border-gray-200 dark:border-white/5 hover:border-amber-300/30 transition-all duration-300 hover:-translate-y-1 shadow-xl">
+        <a href="{{ route('admin.feedback.index') }}" class="group bg-white rounded-4xl p-8 border border-gray-200 hover:border-amber-300/30 transition-all duration-300 hover:-translate-y-1 shadow-xl">
             <div class="w-14 h-14 bg-rose-500/10 rounded-full flex items-center justify-center mb-6 border border-rose-500/20 group-hover:scale-110 transition-transform">
                 <svg class="w-7 h-7 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16h6M7 4h10a2 2 0 012 2v12l-3-2-3 2-3-2-3 2V6a2 2 0 012-2z"></path></svg>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Feedback Moderation</h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6">Review customer comments, approve or reject submissions, and monitor satisfaction quality.</p>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Feedback Moderation</h3>
+            <p class="text-gray-500 text-sm leading-relaxed mb-6">Review customer comments, approve or reject submissions, and monitor satisfaction quality.</p>
             @if($feedbackStats)
             <div class="grid grid-cols-3 gap-2 mb-6">
                 <div class="rounded-lg bg-amber-500/10 border border-amber-500/20 p-2 text-center">
-                    <p class="text-[10px] uppercase text-amber-600 dark:text-amber-400">Pending</p>
-                    <p class="text-sm font-bold text-amber-700 dark:text-amber-300">{{ $feedbackStats['pending'] }}</p>
+                    <p class="text-[10px] uppercase text-amber-600">Pending</p>
+                    <p class="text-sm font-bold text-amber-700">{{ $feedbackStats['pending'] }}</p>
                 </div>
                 <div class="rounded-lg bg-rose-500/10 border border-rose-500/20 p-2 text-center">
-                    <p class="text-[10px] uppercase text-rose-600 dark:text-rose-400">Flagged</p>
-                    <p class="text-sm font-bold text-rose-700 dark:text-rose-300">{{ $feedbackStats['flagged'] }}</p>
+                    <p class="text-[10px] uppercase text-rose-600">Flagged</p>
+                    <p class="text-sm font-bold text-rose-700">{{ $feedbackStats['flagged'] }}</p>
                 </div>
                 <div class="rounded-lg bg-green-500/10 border border-green-500/20 p-2 text-center">
-                    <p class="text-[10px] uppercase text-green-600 dark:text-green-400">Approved</p>
-                    <p class="text-sm font-bold text-green-700 dark:text-green-300">{{ $feedbackStats['approved'] }}</p>
+                    <p class="text-[10px] uppercase text-green-600">Approved</p>
+                    <p class="text-sm font-bold text-green-700">{{ $feedbackStats['approved'] }}</p>
                 </div>
             </div>
             @endif
@@ -129,18 +129,18 @@
 
     </div>
 
-    <div class="bg-gray-50 dark:bg-black/40 rounded-4xl p-8 border border-gray-200 dark:border-white/5 shadow-xl">
-        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+    <div class="bg-gray-50 rounded-4xl p-8 border border-gray-200 shadow-xl">
+        <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
             <svg class="w-5 h-5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             System Notice
         </h3>
-        <div class="flex items-start gap-4 p-4 bg-white dark:bg-gray-900/50 rounded-xl border border-gray-200 dark:border-white/5">
+        <div class="flex items-start gap-4 p-4 bg-white rounded-xl border border-gray-200">
             <div class="p-2 bg-amber-500/10 rounded-lg text-amber-400 mt-1">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
             </div>
             <div>
-                <h4 class="text-gray-900 dark:text-white font-semibold mb-1">Remember to log out</h4>
-                <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">Please ensure you securely log out of the staff portal at the end of your shift to maintain data security. For technical support, contact the system administrator.</p>
+                <h4 class="text-gray-900 font-semibold mb-1">Remember to log out</h4>
+                <p class="text-gray-500 text-sm leading-relaxed">Please ensure you securely log out of the staff portal at the end of your shift to maintain data security. For technical support, contact the system administrator.</p>
             </div>
         </div>
     </div>

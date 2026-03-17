@@ -8,27 +8,27 @@
     @vite('resources/css/app.css')
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-gray-50 text-gray-900 dark:bg-black dark:text-white font-sans antialiased flex flex-col min-h-screen transition-colors">
+<body class="bg-gray-50 text-gray-900 font-sans antialiased flex flex-col min-h-screen transition-colors">
     <div class="fixed inset-0 -z-50 overflow-hidden">
         <img src="{{ asset('IMAGES/BG.png') }}" alt="" class="w-full h-full object-cover"/>
-        <div class="absolute inset-0 bg-linear-to-b from-amber-300/20 via-black/70 to-black/90"></div>
+        <div class="absolute inset-0 bg-linear-to-b from-amber-200/30 via-white/60 to-amber-50/80"></div>
     </div>
     @include('partials.navbar')
 
     <div class="grow flex items-center justify-center py-24 px-4">
-        <div class="w-full max-w-md bg-gray-900/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-amber-300/20 p-8 sm:p-10">
+        <div class="w-full max-w-md bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-amber-200/50 p-8 sm:p-10">
             <div class="text-center mb-8">
-                <div class="inline-flex justify-center w-16 h-16 rounded-full bg-amber-300/10 mb-4 text-amber-300">
+                <div class="inline-flex justify-center w-16 h-16 rounded-full bg-amber-100 mb-4 text-amber-500">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-9 mt-3">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                 </svg>
                 </div>
-                <h2 class="text-3xl font-playfair font-bold text-white mb-2">Set New Password</h2>
-                <p class="text-gray-400 text-sm">Enter your new password below.</p>
+                <h2 class="text-3xl font-playfair font-bold text-gray-900 mb-2">Set New Password</h2>
+                <p class="text-gray-600 text-sm">Enter your new password below.</p>
             </div>
 
             @if($errors->any())
-                <div class="mb-6 p-4 bg-red-500/20 border border-red-500/40 rounded-xl text-red-400 text-sm">
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
                     <ul class="list-disc list-inside space-y-1 text-sm">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
                 </div>
             @endif
@@ -36,13 +36,13 @@
             <form method="POST" action="{{ route('password.update') }}" class="space-y-6">
                 @csrf
                 <div>
-                    <label for="password" class="block text-gray-300 text-sm font-medium mb-2">New Password</label>
+                    <label for="password" class="block text-gray-700 text-sm font-medium mb-2">New Password</label>
                     <div class="relative">
                         <input type="password" name="password" id="password" required minlength="8"
-                            class="w-full px-4 py-3 pr-11 bg-black border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-amber-300 focus:ring-1 focus:ring-amber-300"
+                            class="w-full px-4 py-3 pr-11 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                             placeholder="Use uppercase, lowercase, number"
                             autocomplete="new-password">
-                        <button type="button" onclick="togglePasswordField('password', 'reset-eye-open', 'reset-eye-closed')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300" aria-label="Toggle password visibility">
+                        <button type="button" onclick="togglePasswordField('password', 'reset-eye-open', 'reset-eye-closed')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="Toggle password visibility">
                             <svg id="reset-eye-open" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -56,13 +56,13 @@
                     <p id="reset-password-rules" class="hidden text-xs mt-1 text-gray-500">Use at least 8 characters with uppercase, lowercase, and a number.</p>
                 </div>
                 <div>
-                    <label for="password_confirmation" class="block text-gray-300 text-sm font-medium mb-2">Confirm Password</label>
+                    <label for="password_confirmation" class="block text-gray-700 text-sm font-medium mb-2">Confirm Password</label>
                     <div class="relative">
                         <input type="password" name="password_confirmation" id="password_confirmation" required minlength="8"
-                            class="w-full px-4 py-3 pr-11 bg-black border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-amber-300 focus:ring-1 focus:ring-amber-300"
+                            class="w-full px-4 py-3 pr-11 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                             placeholder="Confirm your password"
                             autocomplete="new-password">
-                        <button type="button" onclick="togglePasswordField('password_confirmation', 'reset-confirm-eye-open', 'reset-confirm-eye-closed')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300" aria-label="Toggle password visibility">
+                        <button type="button" onclick="togglePasswordField('password_confirmation', 'reset-confirm-eye-open', 'reset-confirm-eye-closed')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="Toggle password visibility">
                             <svg id="reset-confirm-eye-open" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -79,7 +79,7 @@
                 </button>
             </form>
 
-            <a href="{{ route('login') }}" class="block mt-6 text-center text-sm text-gray-500 hover:text-amber-300 transition-colors">← Back to Login</a>
+            <a href="{{ route('login') }}" class="block mt-6 text-center text-sm text-gray-500 hover:text-amber-600 transition-colors">← Back to Login</a>
         </div>
     </div>
     @include('partials.footer')
