@@ -15,6 +15,9 @@ class Order extends Model
             if (empty($order->tracking_number)) {
                 $order->tracking_number = static::generateTrackingNumber();
             }
+            if (empty($order->order_number)) {
+                $order->order_number = static::generateOrderNumber();
+            }
         });
     }
 
@@ -27,7 +30,17 @@ class Order extends Model
         return $trackingNumber;
     }
 
+    protected static function generateOrderNumber(): string
+    {
+        do {
+            $orderNumber = now()->format('ymd') . Str::upper(Str::random(8));
+        } while (static::where('order_number', $orderNumber)->exists());
+
+        return $orderNumber;
+    }
+
     protected $fillable = [
+        'order_number',
         'user_id',
         'total_price',
         'points_used',
@@ -71,6 +84,11 @@ class Order extends Model
         'shipped_at' => 'datetime',
         'delivered_at' => 'datetime',
     ];
+
+    public function getDisplayOrderNumberAttribute(): string
+    {
+        return $this->order_number ?: (string) $this->id;
+    }
 
     public function user(): BelongsTo
     {

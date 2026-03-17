@@ -128,12 +128,12 @@ class AnalyticsController extends Controller
 
         return response()->stream(function () use ($orders) {
             $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['ID', 'Date', 'Customer', 'Email', 'Status', 'Total (₱)', 'Items']);
+            fputcsv($handle, ['Order ID', 'Date', 'Customer', 'Email', 'Status', 'Total (₱)', 'Items']);
 
             foreach ($orders as $order) {
                 $items = $order->items->map(fn ($i) => $i->product->name . ' x' . $i->quantity)->implode('; ');
                 fputcsv($handle, [
-                    $order->id,
+                    $order->display_order_number,
                     $order->created_at->format('Y-m-d H:i'),
                     $order->user->name ?? 'Guest',
                     $order->user->email ?? '',

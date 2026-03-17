@@ -96,7 +96,7 @@ class OrderController extends Controller
                         'quantity_change' => $item->quantity,
                         'previous_stock'  => $previousStock,
                         'new_stock'       => $previousStock + $item->quantity,
-                        'reason'          => 'Stock restored — Order #' . $order->id . ' cancelled.',
+                        'reason'          => 'Stock restored — Order #' . $order->display_order_number . ' cancelled.',
                         'reference_id'    => $order->id,
                     ]);
                 }
@@ -124,7 +124,7 @@ class OrderController extends Controller
 
     public function destroy(Order $order)
     {
-        $orderId = $order->id;
+        $orderId = $order->display_order_number;
         $order->delete();
 
         return redirect()->route('admin.orders.index')

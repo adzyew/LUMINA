@@ -22,17 +22,18 @@ class OrderStatusUpdatedMail extends Mailable implements ShouldQueue
     public function build()
     {
         $status = strtolower((string) $this->order->status);
+        $orderNumber = $this->order->display_order_number;
 
         $subjects = [
-            'pending' => 'We Received Your Lumina Order - #' . $this->order->id,
-            'confirmed' => 'Your Lumina Order Is Confirmed - #' . $this->order->id,
-            'processing' => 'Update: We Are Preparing Your Lumina Order - #' . $this->order->id,
-            'shipped' => 'Update: Your Lumina Order Is On Its Way! - #' . $this->order->id,
-            'delivered' => 'Delivered: Your Lumina Order Has Arrived - #' . $this->order->id,
-            'cancelled' => 'Update: Your Lumina Order Was Cancelled - #' . $this->order->id,
+            'pending' => 'We Received Your Lumina Order - #' . $orderNumber,
+            'confirmed' => 'Your Lumina Order Is Confirmed - #' . $orderNumber,
+            'processing' => 'Update: We Are Preparing Your Lumina Order - #' . $orderNumber,
+            'shipped' => 'Update: Your Lumina Order Is On Its Way! - #' . $orderNumber,
+            'delivered' => 'Delivered: Your Lumina Order Has Arrived - #' . $orderNumber,
+            'cancelled' => 'Update: Your Lumina Order Was Cancelled - #' . $orderNumber,
         ];
 
-        $subject = $subjects[$status] ?? ('Order #' . $this->order->id . ' Status Update from Lumina');
+        $subject = $subjects[$status] ?? ('Order #' . $orderNumber . ' Status Update from Lumina');
 
         return $this->subject($subject)
             ->view('emails.order_status_updated')

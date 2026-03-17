@@ -19,7 +19,7 @@ class OrderShippedMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Your Order #' . $this->order->id . ' Has Shipped – Lumina Jewelry')
+        return $this->subject('Your Order #' . $this->order->display_order_number . ' Has Shipped – Lumina Jewelry')
             ->view('emails.order_shipped');
     }
 }

@@ -8,23 +8,24 @@
     @vite('resources/css/app.css')
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
-<body class="bg-gray-50 text-gray-900 dark:bg-black dark:text-white font-sans antialiased min-h-screen flex flex-col transition-colors">
+<body class="bg-stone-100 text-gray-900 font-sans antialiased min-h-screen flex flex-col">
 
     <div class="fixed inset-0 -z-50 overflow-hidden">
         <img src="{{ asset('IMAGES/BG.png') }}" alt="" class="w-full h-full object-cover"/>
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-md"></div>
+        <div class="absolute inset-0 bg-stone-400/30 backdrop-blur-[2px]"></div>
+        <div class="absolute inset-0 bg-linear-to-b from-stone-200/70 via-stone-100/50 to-stone-200/80"></div>
     </div>
 
     @include('partials.navbar')
 
     <main class="grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12 w-full">
-        <a href="{{ url()->previous() ?? route('products.index') }}" class="inline-flex items-center gap-2 text-gray-400 hover:text-amber-300 text-sm font-medium mb-10 transition-colors group">
+        <a href="{{ url()->previous() ?? route('products.index') }}" class="inline-flex items-center gap-2 text-gray-600 hover:text-amber-600 text-sm font-medium mb-10 transition-colors group">
             <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             Back to Collection
         </a>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-            
+
             {{-- LEFT COL: Product Images (Gallery) --}}
             @php
                 $gallery = collect($product->images ?? [])->pluck('image_url')->filter()->values();
@@ -33,9 +34,9 @@
                 }
                 $mainImg = $gallery->first();
             @endphp
-            
+
             <div class="lg:sticky lg:top-24 h-max">
-                <div class="relative bg-gray-900/60 rounded-[2rem] border border-white/5 shadow-2xl overflow-hidden flex items-center justify-center p-4 aspect-[4/5] sm:aspect-square group">
+                <div class="relative bg-white rounded-[2rem] border border-amber-200/50 shadow-xl overflow-hidden flex items-center justify-center p-4 aspect-[4/5] sm:aspect-square group">
                     @if($mainImg)
                         <img id="mainProductImage" src="{{ $mainImg }}" alt="{{ $product->name }}" class="w-full h-full object-contain mx-auto transition-transform duration-700 group-hover:scale-105">
                     @else
@@ -43,7 +44,7 @@
                             <svg class="w-32 h-32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                         </div>
                     @endif
-                    
+
                     @if($product->is_featured ?? false)
                         <span class="absolute top-5 left-5 px-4 py-1.5 bg-amber-300 text-black text-xs font-bold rounded-full uppercase tracking-wider shadow-lg">Featured</span>
                     @endif
@@ -64,7 +65,7 @@
                 @if($gallery->count() > 1)
                     <div class="mt-4 grid grid-cols-5 gap-3 overflow-x-auto pb-2">
                         @foreach($gallery as $img)
-                            <button type="button" onclick="setMainProductImage('{{ $img }}')" class="bg-gray-800/50 rounded-2xl border border-white/5 hover:border-amber-300/50 overflow-hidden aspect-square transition-colors">
+                            <button type="button" onclick="setMainProductImage('{{ $img }}')" class="bg-white/80 rounded-2xl border border-gray-200 hover:border-amber-400/50 overflow-hidden aspect-square transition-colors">
                                 <img src="{{ $img }}" alt="" class="w-full h-full object-cover">
                             </button>
                         @endforeach
@@ -74,9 +75,9 @@
 
             {{-- RIGHT COL: Product Details --}}
             <div class="flex flex-col pt-2">
-                
+
                 <div class="flex flex-wrap gap-2 mb-4">
-                    <span class="px-4 py-1.5 rounded-full border border-white/10 text-xs font-semibold text-amber-300 uppercase tracking-widest">
+                    <span class="px-4 py-1.5 rounded-full border border-amber-200/50 text-xs font-semibold text-amber-600 uppercase tracking-widest">
                         {{ $product->category ?? 'Jewelry' }}
                     </span>
                     @php $inStock = ($product->stock_quantity ?? 0) > 0; @endphp
@@ -85,16 +86,16 @@
                     </span>
                 </div>
 
-                <h1 class="text-4xl sm:text-5xl font-playfair font-bold text-white mb-6 leading-tight">{{ $product->name }}</h1>
+                <h1 class="text-4xl sm:text-5xl font-playfair font-bold text-gray-900 mb-6 leading-tight">{{ $product->name }}</h1>
                 <p class="text-4xl font-black text-amber-300 mb-8">₱{{ number_format($product->price ?? 0, 2) }}</p>
 
                 @if($product->description ?? null)
                     <div class="mb-10">
-                        <p class="text-gray-400 leading-relaxed text-lg">{{ $product->description }}</p>
+                        <p class="text-gray-600 leading-relaxed text-lg">{{ $product->description }}</p>
                     </div>
                 @endif
 
-                <hr class="border-white/10 mb-8">
+                <hr class="border-gray-200 mb-8">
 
                 <div class="flex flex-col gap-4 mb-8">
                     @if($inStock)
@@ -103,12 +104,12 @@
                             Add to Cart
                         </a>
                     @else
-                        <span class="w-full h-14 bg-gray-800 text-gray-500 font-bold text-lg rounded-full flex items-center justify-center cursor-not-allowed">
+                        <span class="w-full h-14 bg-gray-200 text-gray-500 font-bold text-lg rounded-full flex items-center justify-center cursor-not-allowed">
                             Currently Unavailable
                         </span>
                     @endif
-                    
-                    <a href="{{ route('products.index') }}" class="w-full h-14 bg-white/5 text-white font-semibold rounded-full hover:bg-white/10 border border-white/10 transition-colors flex items-center justify-center">
+
+                    <a href="{{ route('products.index') }}" class="w-full h-14 bg-white/70 text-gray-700 font-semibold rounded-full hover:bg-white border border-gray-200 transition-colors flex items-center justify-center">
                         Continue Shopping
                     </a>
                 </div>
@@ -118,13 +119,13 @@
                         {{ session('success') }}
                     </div>
                 @endif
-                
-                <div class="mt-auto bg-gray-900/40 rounded-3xl p-6 border border-white/5 space-y-4">
-                    <div class="flex items-center gap-4 text-gray-300">
+
+                <div class="mt-auto bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
+                    <div class="flex items-center gap-4 text-gray-600">
                         <svg class="w-6 h-6 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"></path></svg>
                         <span class="text-sm">Authentic Lumina Quality</span>
                     </div>
-                    <div class="flex items-center gap-4 text-gray-300">
+                    <div class="flex items-center gap-4 text-gray-600">
                         <svg class="w-6 h-6 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"></path></svg>
                         <span class="text-sm">Secure & Insured Shipping</span>
                     </div>
@@ -134,30 +135,30 @@
         </div>
 
         {{-- Reviews Section (Refined) --}}
-        <div class="mt-20 bg-gray-900/60 rounded-[2rem] p-8 sm:p-10 border border-white/5 shadow-xl">
+        <div class="mt-20 bg-white rounded-[2rem] p-8 sm:p-10 border border-gray-100 shadow-md">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
                 <div>
-                    <h2 class="text-3xl font-playfair font-bold text-white mb-3">Customer Reviews</h2>
+                    <h2 class="text-3xl font-playfair font-bold text-gray-900 mb-3">Customer Reviews</h2>
                     @if($averageRating ?? null)
                         <div class="flex items-center gap-3">
                             <div class="flex gap-1">
                                 @for($i = 1; $i <= 5; $i++)
-                                    <svg class="w-6 h-6 {{ $i <= round($averageRating) ? 'text-amber-400 fill-amber-400' : 'text-gray-700' }}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                    <svg class="w-6 h-6 {{ $i <= round($averageRating) ? 'text-amber-400 fill-amber-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
                                 @endfor
                             </div>
-                            <span class="text-gray-300 font-medium">{{ number_format($averageRating, 1) }} out of 5</span>
+                            <span class="text-gray-600 font-medium">{{ number_format($averageRating, 1) }} out of 5</span>
                             <span class="text-gray-500">({{ $reviews->total() }} reviews)</span>
                         </div>
                     @else
-                        <p class="text-gray-400">No reviews yet. Be the first to review!</p>
+                        <p class="text-gray-500">No reviews yet. Be the first to review!</p>
                     @endif
                 </div>
                 @auth
-                    <button onclick="document.getElementById('reviewForm').classList.toggle('hidden')" class="w-full sm:w-auto px-8 py-3.5 bg-white/5 text-white font-bold rounded-full hover:bg-white/10 border border-white/10 transition-colors text-center">
+                    <button onclick="document.getElementById('reviewForm').classList.toggle('hidden')" class="w-full sm:w-auto px-8 py-3.5 bg-amber-50 text-amber-700 font-bold rounded-full hover:bg-amber-100 border border-amber-200 transition-colors text-center">
                         Write a Review
                     </button>
                 @else
-                    <a href="{{ route('login') }}" class="w-full sm:w-auto px-8 py-3.5 bg-white/5 text-white font-bold rounded-full hover:bg-white/10 border border-white/10 transition-colors text-center">
+                    <a href="{{ route('login') }}" class="w-full sm:w-auto px-8 py-3.5 bg-amber-50 text-amber-700 font-bold rounded-full hover:bg-amber-100 border border-amber-200 transition-colors text-center">
                         Login to Review
                     </a>
                 @endauth
@@ -165,11 +166,11 @@
 
             {{-- Review Form --}}
             @auth
-            <form id="reviewForm" action="{{ route('reviews.store', $product) }}" method="POST" class="hidden mb-12 p-8 bg-black/40 rounded-[1.5rem] border border-white/5">
+            <form id="reviewForm" action="{{ route('reviews.store', $product) }}" method="POST" class="hidden mb-12 p-8 bg-white rounded-[1.5rem] border border-gray-100 shadow-sm">
                 @csrf
-                <h3 class="text-xl font-bold text-white mb-6">Write Your Review</h3>
+                <h3 class="text-xl font-bold text-gray-900 mb-6">Write Your Review</h3>
                 <div class="mb-6">
-                    <label class="block text-gray-400 text-sm font-medium mb-3">Rating</label>
+                    <label class="block text-gray-600 text-sm font-medium mb-3">Rating</label>
                     <div class="flex gap-2" id="ratingStars">
                         @for($i = 1; $i <= 5; $i++)
                             <button type="button" onclick="setRating({{ $i }})" class="star-rating w-10 h-10 text-gray-600 hover:text-amber-400 hover:scale-110 transition-all" data-rating="{{ $i }}">
@@ -180,12 +181,12 @@
                     <input type="hidden" name="rating" id="ratingInput" value="5" required>
                 </div>
                 <div class="mb-6">
-                    <label for="comment" class="block text-gray-400 text-sm font-medium mb-3">Your Review</label>
-                    <textarea name="comment" id="comment" rows="4" class="w-full px-5 py-4 bg-gray-900/80 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:border-amber-300 transition-colors" placeholder="Share your thoughts about this product..."></textarea>
+                    <label for="comment" class="block text-gray-600 text-sm font-medium mb-3">Your Review</label>
+                    <textarea name="comment" id="comment" rows="4" class="w-full px-5 py-4 bg-white border border-gray-300 rounded-2xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-amber-300 transition-colors" placeholder="Share your thoughts about this product..."></textarea>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
                     <button type="submit" class="w-full sm:w-auto px-8 py-3.5 bg-amber-300 text-black font-bold rounded-full hover:bg-amber-400 transition-colors">Submit Review</button>
-                    <button type="button" onclick="document.getElementById('reviewForm').classList.add('hidden')" class="w-full sm:w-auto px-8 py-3.5 bg-transparent text-gray-400 font-semibold rounded-full hover:text-white transition-colors">Cancel</button>
+                    <button type="button" onclick="document.getElementById('reviewForm').classList.add('hidden')" class="w-full sm:w-auto px-8 py-3.5 bg-transparent text-gray-500 font-semibold rounded-full hover:text-gray-700 transition-colors">Cancel</button>
                 </div>
             </form>
             @endauth
@@ -193,33 +194,33 @@
             {{-- Reviews List --}}
             <div class="space-y-8">
                 @forelse($reviews ?? [] as $review)
-                    <div class="pb-8 border-b border-white/5 last:border-0 last:pb-0">
+                    <div class="pb-8 border-b border-gray-100 last:border-0 last:pb-0">
                         <div class="flex items-start justify-between mb-4">
                             <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center text-amber-300 font-bold text-lg border border-white/5">
+                                <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 font-bold text-lg border border-amber-200">
                                     {{ strtoupper(substr($review->user->name ?? 'U', 0, 1)) }}
                                 </div>
                                 <div>
-                                    <p class="font-bold text-white text-lg">{{ $review->user->name ?? 'Anonymous' }}</p>
+                                    <p class="font-bold text-gray-900 text-lg">{{ $review->user->name ?? 'Anonymous' }}</p>
                                     <p class="text-sm text-gray-500">{{ $review->created_at->diffForHumans() }}</p>
                                 </div>
                             </div>
-                            <div class="flex gap-1 bg-black/30 px-3 py-1.5 rounded-full border border-white/5">
+                            <div class="flex gap-1 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200">
                                 @for($i = 1; $i <= 5; $i++)
-                                    <svg class="w-4 h-4 {{ $i <= $review->rating ? 'text-amber-400 fill-amber-400' : 'text-gray-700' }}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                    <svg class="w-4 h-4 {{ $i <= $review->rating ? 'text-amber-400 fill-amber-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
                                 @endfor
                             </div>
                         </div>
                         @if($review->comment)
-                            <p class="text-gray-400 leading-relaxed pl-0 sm:pl-16">{{ $review->comment }}</p>
+                            <p class="text-gray-600 leading-relaxed pl-0 sm:pl-16">{{ $review->comment }}</p>
                         @endif
                     </div>
                 @empty
                     <div class="text-center py-12">
-                        <div class="w-20 h-20 bg-gray-800/50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-600">
+                        <div class="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-600">
                             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                         </div>
-                        <p class="text-gray-400 text-lg">No reviews yet.</p>
+                        <p class="text-gray-500 text-lg">No reviews yet.</p>
                     </div>
                 @endforelse
             </div>

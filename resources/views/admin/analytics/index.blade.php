@@ -5,13 +5,13 @@
 @section('content')
 <header class="flex justify-between items-center mb-8">
     <div>
-        <h1 class="text-3xl font-playfair font-bold text-gray-900 dark:text-white">Analytics & CRM</h1>
-        <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Sales analytics, top products, and customer insights.</p>
+        <h1 class="text-3xl font-playfair font-bold text-gray-900">Analytics & CRM</h1>
+        <p class="text-gray-600 text-sm mt-1">Sales analytics, top products, and customer insights.</p>
     </div>
     <form action="{{ route('admin.analytics.export') }}" method="GET" class="flex gap-2 items-center">
-        <input type="date" name="from" class="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white" placeholder="From">
-        <input type="date" name="to" class="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white" placeholder="To">
-        <select name="status" class="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white">
+        <input type="date" name="from" class="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900" placeholder="From">
+        <input type="date" name="to" class="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900" placeholder="To">
+        <select name="status" class="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900">
             <option value="">All Statuses</option>
             <option value="pending">Pending</option>
             <option value="confirmed">Confirmed</option>
@@ -22,57 +22,57 @@
 </header>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
-        <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Total Revenue</h3>
+    <div class="bg-white border border-gray-200 rounded-2xl p-6">
+        <h3 class="text-gray-500 text-sm font-medium mb-1">Total Revenue</h3>
         <p class="text-3xl font-bold text-amber-300">₱{{ number_format($totalRevenue, 2) }}</p>
     </div>
-    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
-        <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">This Month</h3>
-        <p class="text-3xl font-bold text-gray-900 dark:text-white">₱{{ number_format($thisMonthRevenue, 2) }}</p>
+    <div class="bg-white border border-gray-200 rounded-2xl p-6">
+        <h3 class="text-gray-500 text-sm font-medium mb-1">This Month</h3>
+        <p class="text-3xl font-bold text-gray-900">₱{{ number_format($thisMonthRevenue, 2) }}</p>
     </div>
-    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
-        <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Last Month</h3>
-        <p class="text-3xl font-bold text-gray-900 dark:text-white">₱{{ number_format($lastMonthRevenue, 2) }}</p>
+    <div class="bg-white border border-gray-200 rounded-2xl p-6">
+        <h3 class="text-gray-500 text-sm font-medium mb-1">Last Month</h3>
+        <p class="text-3xl font-bold text-gray-900">₱{{ number_format($lastMonthRevenue, 2) }}</p>
     </div>
-    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
-        <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">Revenue Change</h3>
+    <div class="bg-white border border-gray-200 rounded-2xl p-6">
+        <h3 class="text-gray-500 text-sm font-medium mb-1">Revenue Change</h3>
         <p class="text-3xl font-bold {{ $revenueChange >= 0 ? 'text-green-400' : 'text-red-400' }}">{{ $revenueChange >= 0 ? '+' : '' }}{{ $revenueChange }}%</p>
     </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
+    <div class="bg-white border border-gray-200 rounded-2xl p-6">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white" id="revenueChartTitle">Revenue (Last 7 Days)</h3>
+            <h3 class="text-lg font-bold text-gray-900" id="revenueChartTitle">Revenue (Last 7 Days)</h3>
             <div class="flex gap-1 text-xs">
-                <button onclick="setRevenuePeriod('day')" data-period="day" class="period-btn px-3 py-1 rounded-lg font-semibold transition-colors text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10">Day</button>
+                <button onclick="setRevenuePeriod('day')" data-period="day" class="period-btn px-3 py-1 rounded-lg font-semibold transition-colors text-gray-500 hover:bg-gray-100">Day</button>
                 <button onclick="setRevenuePeriod('week')" data-period="week" class="period-btn px-3 py-1 rounded-lg font-semibold transition-colors bg-amber-300 text-black">Week</button>
-                <button onclick="setRevenuePeriod('month')" data-period="month" class="period-btn px-3 py-1 rounded-lg font-semibold transition-colors text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10">Month</button>
-                <button onclick="setRevenuePeriod('year')" data-period="year" class="period-btn px-3 py-1 rounded-lg font-semibold transition-colors text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10">Year</button>
+                <button onclick="setRevenuePeriod('month')" data-period="month" class="period-btn px-3 py-1 rounded-lg font-semibold transition-colors text-gray-500 hover:bg-gray-100">Month</button>
+                <button onclick="setRevenuePeriod('year')" data-period="year" class="period-btn px-3 py-1 rounded-lg font-semibold transition-colors text-gray-500 hover:bg-gray-100">Year</button>
             </div>
         </div>
         <div id="revenueChart"></div>
     </div>
-    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Orders by Status</h3>
+    <div class="bg-white border border-gray-200 rounded-2xl p-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Orders by Status</h3>
         <div id="statusChart"></div>
     </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Top Products</h3>
+    <div class="bg-white border border-gray-200 rounded-2xl p-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Top Products</h3>
         <table class="w-full text-sm">
             <thead>
-                <tr class="text-gray-500 border-b border-gray-200 dark:border-white/10">
+                <tr class="text-gray-500 border-b border-gray-200">
                     <th class="pb-3 text-left">Product</th>
                     <th class="pb-3 text-right">Units Sold</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($topProducts as $item)
-                <tr class="border-b border-gray-100 dark:border-white/5">
-                    <td class="py-3 text-gray-900 dark:text-white">{{ $item->product->name ?? 'Product #'.$item->product_id }}</td>
+                <tr class="border-b border-gray-100">
+                    <td class="py-3 text-gray-900">{{ $item->product->name ?? 'Product #'.$item->product_id }}</td>
                     <td class="py-3 text-right text-amber-300 font-bold">{{ $item->total_sold }}</td>
                 </tr>
                 @empty
@@ -81,19 +81,19 @@
             </tbody>
         </table>
     </div>
-    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Top Customers</h3>
+    <div class="bg-white border border-gray-200 rounded-2xl p-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Top Customers</h3>
         <table class="w-full text-sm">
             <thead>
-                <tr class="text-gray-500 border-b border-gray-200 dark:border-white/10">
+                <tr class="text-gray-500 border-b border-gray-200">
                     <th class="pb-3 text-left">Customer</th>
                     <th class="pb-3 text-right">Total Spent</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($topCustomers as $customer)
-                <tr class="border-b border-gray-100 dark:border-white/5">
-                    <td class="py-3 text-gray-900 dark:text-white">{{ $customer->name }}</td>
+                <tr class="border-b border-gray-100">
+                    <td class="py-3 text-gray-900">{{ $customer->name }}</td>
                     <td class="py-3 text-right text-amber-300 font-bold">₱{{ number_format($customer->total_spent ?? 0, 2) }}</td>
                 </tr>
                 @empty
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.period-btn').forEach(btn => {
             const isActive = btn.dataset.period === period;
             btn.className = 'period-btn px-3 py-1 rounded-lg font-semibold transition-colors ' +
-                (isActive ? 'bg-amber-300 text-black' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10');
+                (isActive ? 'bg-amber-300 text-black' : 'text-gray-500 hover:bg-gray-100');
         });
     };
 

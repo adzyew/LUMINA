@@ -5,10 +5,10 @@
 @section('content')
 <header class="flex justify-between items-center mb-8">
     <div>
-        <h1 class="text-3xl font-playfair font-bold text-gray-900 dark:text-white">Users</h1>
-        <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Manage accounts and create staff users.</p>
+        <h1 class="text-3xl font-playfair font-bold text-gray-900">Users</h1>
+        <p class="text-gray-600 text-sm mt-1">Manage accounts and create staff users.</p>
     </div>
-    <a href="{{ route('admin.users.create') }}" class="px-5 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors">
+    <a href="{{ route('admin.users.create') }}" class="px-5 py-2.5 bg-amber-400 hover:bg-amber-500 text-black font-bold rounded-lg transition-colors shadow-lg">
         + Add Staff
     </a>
 </header>
@@ -16,23 +16,23 @@
 {{-- Filter tabs: All | Customers | Staff | Admin --}}
 <div class="flex flex-wrap gap-2 mb-6">
     <a href="{{ route('admin.users.index', ['filter' => 'all']) }}"
-       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? 'all') === 'all' ? 'bg-amber-300 text-black' : 'bg-gray-100 dark:bg-white/5 text-gray-600 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10' }}">
+       class="px-5 py-2 rounded-xl font-semibold text-sm transition-colors {{ ($filter ?? 'all') === 'all' ? 'bg-amber-400 text-black shadow' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-gray-200' }}">
         All Users
     </a>
     <a href="{{ route('admin.users.index', ['filter' => 'customer']) }}"
-       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'customer' ? 'bg-amber-300 text-black' : 'bg-gray-100 dark:bg-white/5 text-gray-600 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10' }}">
+       class="px-5 py-2 rounded-xl font-semibold text-sm transition-colors {{ ($filter ?? '') === 'customer' ? 'bg-amber-400 text-black shadow' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-gray-200' }}">
         Customers
     </a>
     <a href="{{ route('admin.users.index', ['filter' => 'staff']) }}"
-       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'staff' ? 'bg-amber-300 text-black' : 'bg-gray-100 dark:bg-white/5 text-gray-600 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10' }}">
+       class="px-5 py-2 rounded-xl font-semibold text-sm transition-colors {{ ($filter ?? '') === 'staff' ? 'bg-amber-400 text-black shadow' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-gray-200' }}">
         Staff
     </a>
     <a href="{{ route('admin.users.index', ['filter' => 'admin']) }}"
-       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'admin' ? 'bg-amber-300 text-black' : 'bg-gray-100 dark:bg-white/5 text-gray-600 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10' }}">
+       class="px-5 py-2 rounded-xl font-semibold text-sm transition-colors {{ ($filter ?? '') === 'admin' ? 'bg-amber-400 text-black shadow' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-gray-200' }}">
         Admin
     </a>
     <a href="{{ route('admin.users.index', ['filter' => 'archived']) }}"
-       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'archived' ? 'bg-amber-300 text-black' : 'bg-gray-100 dark:bg-white/5 text-gray-600 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-300 dark:border-white/10' }}">
+       class="px-5 py-2 rounded-xl font-semibold text-sm transition-colors {{ ($filter ?? '') === 'archived' ? 'bg-amber-400 text-black shadow' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-gray-200' }}">
         Archived
     </a>
 </div>
@@ -48,13 +48,13 @@
     {{-- Staff & Admin Section --}}
     <div class="mb-6">
         <div class="flex items-center gap-2 mb-3">
-            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Staff & Admin</h2>
-            <span class="text-xs bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full font-medium">{{ $staffUsers->count() }}</span>
+            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-500">Staff & Admin</h2>
+            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">{{ $staffUsers->count() }}</span>
         </div>
-        <div class="bg-white dark:bg-gray-900 rounded-xl overflow-hidden border border-gray-200 dark:border-white/5">
+        <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-white border-b border-gray-200 dark:border-white/10 text-sm">
+                    <tr class="bg-gray-50 text-gray-700 border-b border-gray-200 text-sm">
                         <th class="p-4">Name</th>
                         <th class="p-4">Email Address</th>
                         <th class="p-4">Role</th>
@@ -62,11 +62,11 @@
                         <th class="p-4 text-center">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+                <tbody class="divide-y divide-gray-200">
                     @forelse($staffUsers as $user)
                         @include('admin.users._row')
                     @empty
-                        <tr><td colspan="5" class="p-8 text-center text-gray-500 dark:text-gray-400">No staff users found.</td></tr>
+                        <tr><td colspan="5" class="p-8 text-center text-gray-500">No staff users found.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -76,13 +76,13 @@
     {{-- Customers Section --}}
     <div>
         <div class="flex items-center gap-2 mb-3">
-            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Customers</h2>
-            <span class="text-xs bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full font-medium">{{ $customerUsers->count() }}</span>
+            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-500">Customers</h2>
+            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">{{ $customerUsers->count() }}</span>
         </div>
-        <div class="bg-white dark:bg-gray-900 rounded-xl overflow-hidden border border-gray-200 dark:border-white/5">
+        <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-white border-b border-gray-200 dark:border-white/10 text-sm">
+                    <tr class="bg-gray-50 text-gray-700 border-b border-gray-200 text-sm">
                         <th class="p-4">Name</th>
                         <th class="p-4">Email Address</th>
                         <th class="p-4">Role</th>
@@ -90,11 +90,11 @@
                         <th class="p-4 text-center">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+                <tbody class="divide-y divide-gray-200">
                     @forelse($customerUsers as $user)
                         @include('admin.users._row')
                     @empty
-                        <tr><td colspan="5" class="p-8 text-center text-gray-500 dark:text-gray-400">No customers found.</td></tr>
+                        <tr><td colspan="5" class="p-8 text-center text-gray-500">No customers found.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -103,10 +103,10 @@
 
 @else
 
-    <div class="bg-white dark:bg-gray-900 rounded-xl overflow-hidden border border-gray-200 dark:border-white/5">
+    <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-white border-b border-gray-200 dark:border-white/10 text-sm">
+                <tr class="bg-gray-50 text-gray-700 border-b border-gray-200 text-sm">
                     <th class="p-4">Name</th>
                     <th class="p-4">Email Address</th>
                     <th class="p-4">Role</th>
@@ -114,7 +114,7 @@
                     <th class="p-4 text-center">Actions</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+            <tbody class="divide-y divide-gray-200">
                 @foreach($users as $user)
                     @include('admin.users._row')
                 @endforeach
@@ -132,69 +132,58 @@
 
 @endif
 
-<div id="verifyUserModal" class="fixed inset-0 z-100 hidden" aria-labelledby="verify-user-title" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="hideVerifyModal()"></div>
-    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-            <div class="relative transform overflow-hidden rounded-xl bg-white dark:bg-gray-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm border border-gray-200 dark:border-white/10">
-                <div class="px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-500/20 sm:mx-0 sm:h-10 sm:w-10">
-                            <svg class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.745 3.745 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.745 3.745 0 0 1 3.296-1.043A3.745 3.745 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.745 3.745 0 0 1 3.296 1.043 3.745 3.745 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-                            </svg>
-                        </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                            <h3 class="text-lg font-semibold leading-6 text-gray-900 dark:text-white" id="verify-user-title">Confirm Verification</h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-500 dark:text-gray-400">You are about to verify <span id="verifyUserName" class="font-semibold text-gray-900 dark:text-white"></span>. This will grant them access as a verified staff member.</p>
-                            </div>
-                        </div>
-                    </div>
+<div id="verifyUserModal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-black/75" onclick="hideVerifyModal()"></div>
+        <div class="relative z-10 bg-white border border-gray-200 rounded-2xl shadow-2xl p-8 max-w-md w-full">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.745 3.745 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.745 3.745 0 0 1 3.296-1.043A3.745 3.745 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.745 3.745 0 0 1 3.296 1.043 3.745 3.745 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                    </svg>
                 </div>
-                <div class="bg-gray-50 dark:bg-gray-800/50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <button type="button" onclick="confirmVerifyUser()" class="inline-flex w-full justify-center rounded-lg bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto transition-colors">
-                        Verify
-                    </button>
-                    <button type="button" onclick="hideVerifyModal()" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 sm:mt-0 sm:w-auto transition-colors">
-                        Cancel
-                    </button>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">Confirm Verification</h3>
+                    <p class="text-gray-500 text-sm">This will grant staff access.</p>
                 </div>
+            </div>
+            <p class="text-gray-600 mb-6">You are about to verify <span id="verifyUserName" class="font-bold text-gray-900"></span>. They will be granted access as a verified staff member.</p>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="hideVerifyModal()" class="px-5 py-2.5 bg-gray-100 border border-gray-300 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors font-medium">
+                    Cancel
+                </button>
+                <button type="button" onclick="confirmVerifyUser()" class="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl transition-colors">
+                    Verify User
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<div id="deleteUserModal" class="fixed inset-0 z-100 hidden" aria-labelledby="delete-user-title" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="hideDeleteModal()"></div>
-
-    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-            <div class="relative transform overflow-hidden rounded-xl bg-white dark:bg-gray-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm border border-gray-200 dark:border-white/10">
-                <div class="px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-500/20 sm:mx-0 sm:h-10 sm:w-10">
-                            <svg class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                        </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                            <h3 class="text-lg font-semibold leading-6 text-gray-900 dark:text-white" id="delete-user-title">Confirm Permanent Delete</h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-500 dark:text-gray-400">You are about to permanently delete <span id="deleteUserName" class="font-semibold"></span>. This cannot be undone.</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Please wait <span id="deleteCountdown" class="font-semibold text-red-500">10</span> seconds to confirm.</p>
-                            </div>
-                        </div>
-                    </div>
+<div id="deleteUserModal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-black/75" onclick="hideDeleteModal()"></div>
+        <div class="relative z-10 bg-white border border-gray-200 rounded-2xl shadow-2xl p-8 max-w-md w-full">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                    </svg>
                 </div>
-                <div class="bg-gray-50 dark:bg-gray-800/50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <button id="deleteConfirmBtn" type="button" onclick="confirmDeleteUser()" disabled class="inline-flex w-full justify-center rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white opacity-50 cursor-not-allowed sm:ml-3 sm:w-auto transition-colors">
-                        Delete
-                    </button>
-                    <button type="button" onclick="hideDeleteModal()" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 sm:mt-0 sm:w-auto transition-colors">
-                        Cancel
-                    </button>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">Delete User</h3>
+                    <p class="text-gray-500 text-sm">This action cannot be undone.</p>
                 </div>
+            </div>
+            <p class="text-gray-600 mb-2">You are about to permanently delete <span id="deleteUserName" class="font-bold text-gray-900"></span>.</p>
+            <p class="text-sm text-gray-500 mb-6">Please wait <span id="deleteCountdown" class="font-semibold text-red-500">10</span> seconds to confirm.</p>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="hideDeleteModal()" class="px-5 py-2.5 bg-gray-100 border border-gray-300 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors font-medium">
+                    Cancel
+                </button>
+                <button id="deleteConfirmBtn" type="button" onclick="confirmDeleteUser()" disabled class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-colors opacity-50 cursor-not-allowed">
+                    Delete Permanently
+                </button>
             </div>
         </div>
     </div>
