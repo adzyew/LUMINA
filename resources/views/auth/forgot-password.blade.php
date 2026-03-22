@@ -11,11 +11,11 @@
 <body class="bg-gray-50 text-gray-900 font-sans antialiased flex flex-col min-h-screen transition-colors">
     <div class="fixed inset-0 -z-50 overflow-hidden">
         <img src="{{ asset('IMAGES/BG.png') }}" alt="" class="w-full h-full object-cover"/>
-        <div class="absolute inset-0 bg-linear-to-b from-amber-200/30 via-white/60 to-amber-50/80"></div>
+        <div class="absolute inset-0 bg-linear-to-b backdrop-blur-sm "></div>
     </div>
     @include('partials.navbar')
 
-    <div class="grow flex items-center justify-center py-24 px-4">
+    <div class="grow flex items-center justify-center py-24 px-4 mt-10">
         <div class="w-full max-w-md bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-amber-200/50 p-8 sm:p-10">
             <div class="text-center mb-8">
                 <div class="inline-flex justify-center w-16 h-16 rounded-full bg-amber-100 mb-4 text-amber-500">
@@ -55,6 +55,5 @@
             <a href="{{ route('login') }}" class="block mt-6 text-center text-sm text-gray-500 hover:text-amber-600 transition-colors">← Back to Login</a>
         </div>
     </div>
-    @include('partials.footer')
 </body>
 </html>

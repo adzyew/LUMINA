@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.3/build/css/intlTelInput.css">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .font-serif { font-family: 'Cormorant Garamond', serif; }
+        .auth-serif { font-family: 'Cormorant Garamond', serif; }
         .font-sans { font-family: 'Inter', sans-serif; }
 
         .auth-form-wrapper {
@@ -74,7 +74,7 @@
 
                         <!-- LOGIN PANEL -->
                         <div class="slide-panel" id="panel-login">
-                            <h2 class="text-3xl font-serif font-semibold text-gray-900 mb-2">Welcome Back!</h2>
+                            <h2 class="text-3xl auth-serif font-semibold text-gray-900 mb-2">Welcome Back!</h2>
                             <p class="text-gray-500 mb-8">Please enter your details to access your collection.</p>
 
                             <form method="POST" action="{{ route('login.post') }}" class="space-y-5">
@@ -182,7 +182,7 @@
 
                         <!-- REGISTER PANEL -->
                         <div class="slide-panel" id="panel-register">
-                            <h2 class="text-3xl font-serif font-semibold text-gray-900 mb-2 p-1">Join our Circle</h2>
+                            <h2 class="text-3xl auth-serif font-semibold text-gray-900 mb-2 p-1">Join our Circle</h2>
                             <p class="text-gray-500 mb-6">Create an account to curate your wishlist.</p>
 
                             <form method="POST" action="{{ route('register.post') }}" class="space-y-4">
