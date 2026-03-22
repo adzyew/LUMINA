@@ -11,33 +11,59 @@
 <body class="bg-stone-100 text-gray-900 font-sans antialiased flex flex-col min-h-screen">
 @include('partials.navbar')
 
-<div class="grow container mx-auto px-4 py-12 max-w-2xl">
+<div class="grow container mx-auto px-4 py-12 max-w-6xl">
     <h1 class="text-3xl font-playfair font-bold text-amber-600 mb-4 mt-8">Checkout</h1>
 
     @if(session('error'))
         <div class="mb-6 bg-red-100 text-red-800 p-4 rounded-lg">{{ session('error') }}</div>
     @endif
 
-    <div class="bg-white border border-gray-200 rounded-2xl p-6 mb-6 shadow-sm">
-        <h3 class="text-lg font-bold text-gray-900 mb-4">Order Summary</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1.65fr)_minmax(320px,1fr)] gap-6 items-start">
+    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm lg:order-2 lg:sticky lg:top-28">
         @php $total = 0; @endphp
         @foreach(session('cart') as $id => $item)
             @php $total += $item['price'] * $item['quantity']; @endphp
-            <div class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-gray-600">{{ $item['name'] }} × {{ $item['quantity'] }}</span>
-                <span class="text-amber-600">₱{{ number_format($item['price'] * $item['quantity'], 2) }}</span>
+            <div class="py-3 border-b border-gray-100">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0 flex items-start gap-3">
+                        <div class="w-14 h-14 rounded-md overflow-hidden border border-gray-200 bg-gray-100 shrink-0">
+                            @if(!empty($item['image']))
+                                <img src="{{ asset($item['image']) }}" alt="{{ $item['name'] }}" class="w-full h-full object-cover">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                </div>
+                            @endif
+                        </div>
+                        <span class="text-black text-md block truncate mt-4">{{ $item['name'] }} × {{ $item['quantity'] }}</span>
+                    </div>
+                    <span class="text-amber-600 shrink-0 mt-4">₱{{ number_format($item['price'] * $item['quantity'], 2) }}</span>
+                </div>
             </div>
         @endforeach
-        <div class="flex justify-between mt-4 text-lg font-bold">
-            <span class="text-gray-900">Total</span>
-            <span class="text-amber-600">₱{{ number_format($total, 2) }}</span>
+        <div class="mt-4 space-y-2 border-t border-gray-100 pt-4">
+            <div class="flex justify-between text-base text-gray-700">
+                <span>Subtotal</span>
+                <span>₱{{ number_format($total, 2) }}</span>
+            </div>
+            <div class="flex justify-between text-base text-gray-700">
+                <span>Shipping</span>
+                <span class="text-amber-600 font-medium">Free</span>
+            </div>
+        </div>
+        <div class="flex items-end justify-between mt-4">
+            <span class="text-2xl font-bold text-gray-900">Total</span>
+            <div class="text-right">
+                <span class="text-base text-gray-500 mr-1">PHP</span>
+                <span class="text-2xl font-bold text-amber-600">₱{{ number_format($total, 2) }}</span>
+            </div>
         </div>
     </div>
 
-    <form method="POST" action="{{ route('place.order') }}" class="space-y-4">
+    <form method="POST" action="{{ route('place.order') }}" class="space-y-4 lg:order-1">
         @csrf
         <div class="space-y-4 p-4 rounded-xl bg-gray-50 border border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-900">Contact &amp; Shipping Details</h3>
+            <h3 class="text-xl font-bold text-gray-900">Contact Information</h3>
             <div>
                 <label class="block text-sm font-medium text-gray-500 mb-2">Contact Number <span class="text-amber-500">*</span></label>
                 <input type="tel" name="contact_phone" value="{{ old('contact_phone', auth()->user()->phone ?? '') }}" required
@@ -46,6 +72,16 @@
                 @error('contact_phone')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
+                <label class="block text-sm font-medium text-gray-500 mb-2">Email Address <span class="text-amber-500">*</span></label>
+                <input type="email" name="contact_email" value="{{ old('contact_email', auth()->user()->email ?? '') }}" required
+                    class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:border-amber-400 outline-none transition-colors"
+                    placeholder="e.g. john.doe@example.com">
+                @error('contact_email')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900 mb-4">Delivery Information</h1>
+                </div>
                 <label class="block text-sm font-medium text-gray-500 mb-2">Street / Building / House No. <span class="text-amber-500">*</span></label>
                 <input type="text" name="shipping_street" value="{{ old('shipping_street', auth()->user()->shipping_street ?? '') }}" required
                     class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:border-amber-400 outline-none transition-colors"
@@ -92,7 +128,37 @@
                 <textarea name="notes" rows="2" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:border-amber-400 outline-none transition-colors" placeholder="Delivery instructions, landmark, etc.">{{ old('notes') }}</textarea>
                 @error('notes')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
             </div>
+
+            <div class="space-y-3">
+                <h3 class="text-lg font-semibold text-gray-900">Payment Method</h3>
+
+                <label for="payment_cod" class="flex items-start gap-3 p-4 border border-gray-200 rounded-lg bg-white cursor-pointer has-checked:border-amber-400 has-checked:ring-2 has-checked:ring-amber-100 transition">
+                    <input id="payment_cod" type="radio" name="payment_method" value="cod" {{ old('payment_method', 'cod') === 'cod' ? 'checked' : '' }} class="mt-1 h-4 w-4 text-amber-500 border-gray-300 focus:ring-amber-400">
+                    <span>
+                        <span class="block text-sm font-semibold text-gray-900">Cash on Delivery (COD)</span>
+                        <span class="block text-xs text-gray-500">Pay with cash when your order arrives.</span>
+                    </span>
+                </label>
+
+                <label for="payment_paymongo" class="flex items-start gap-3 p-4 border border-gray-200 rounded-lg bg-white cursor-pointer has-checked:border-amber-400 has-checked:ring-2 has-checked:ring-amber-100 transition">
+                    <input
+                        id="payment_paymongo"
+                        type="radio"
+                        name="payment_method"
+                        value="paymongo"
+                        {{ old('payment_method') === 'paymongo' ? 'checked' : '' }}
+                        class="mt-1 h-4 w-4 text-amber-500 border-gray-300 focus:ring-amber-400"
+                    >
+                    <span>
+                        <span class="block text-sm font-semibold text-gray-900">Secure Payments via PayMongo</span>
+                        <span class="block text-xs text-gray-500">Card, e-wallet, and online payment options via PayMongo checkout.</span>
+                    </span>
+                </label>
+                @error('payment_method')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
+            </div>
         </div>
+
+        
         @if(auth()->user()->points_balance > 0)
         <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
@@ -112,6 +178,7 @@
         @endif
         <button type="submit" class="w-full py-4 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400">Place Order</button>
     </form>
+    </div>
 
     <a href="{{ route('cart.index') }}" class="block text-center mt-4 text-sm text-gray-500 hover:text-gray-900 transition-colors">← Back to Cart</a>
 </div>

@@ -125,7 +125,10 @@ class CartController extends Controller
         if (empty($cart)) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
-        return view('cart.checkout');
+
+        return view('cart.checkout', [
+            'shippingRates' => $this->shippingRates(),
+        ]);
     }
 
     public function placeOrder(Request $request)
@@ -137,6 +140,8 @@ class CartController extends Controller
 
         $request->validate([
             'contact_phone' => 'required|string|max:20',
+            'contact_email' => 'required|email|max:255',
+            'payment_method' => 'required|in:cod,paymongo',
             'shipping_street' => 'required|string|max:255',
             'shipping_city' => 'required|string|max:100',
             'shipping_province' => 'required|string|max:100',
@@ -149,13 +154,13 @@ class CartController extends Controller
             // ✨ START TRANSACTION ✨
             // We pass the $request and $cart into the transaction using "use"
             $order = DB::transaction(function () use ($request, $cart) {
-                
-                $total = 0;
-                foreach ($cart as $id => $item) {
-                    $total += $item['price'] * $item['quantity'];
-                }
 
-                $user = auth()->user();
+                $subtotal = $this->calculateSubtotal($cart);
+                $shippingFee = $this->shippingFeeForCity($request->shipping_city);
+                $total = $subtotal + $shippingFee;
+
+                /** @var \App\Models\User $user */
+                $user = Auth::user();
                 $pointsUsed = 0;
                 $discountAmount = 0;
 
@@ -183,8 +188,10 @@ class CartController extends Controller
                     'points_used' => $pointsUsed,
                     'discount_amount' => $discountAmount,
                     'status' => 'pending',
+                    'payment_method' => $request->payment_method,
                     'shipping_address' => $fullAddress,
                     'contact_phone' => $request->contact_phone,
+                    'contact_email' => $request->contact_email,
                     'shipping_street' => $request->shipping_street,
                     'shipping_city' => $request->shipping_city,
                     'shipping_province' => $request->shipping_province,
@@ -247,5 +254,50 @@ class CartController extends Controller
             Log::error('Checkout Failed: ' . $e->getMessage());
             return redirect()->route('cart.index')->with('error', 'There was an issue processing your order. Please try again.');
         }
+    }
+
+    private function calculateSubtotal(array $cart): float
+    {
+        $subtotal = 0;
+        foreach ($cart as $item) {
+            $subtotal += $item['price'] * $item['quantity'];
+        }
+
+        return (float) $subtotal;
+    }
+
+    private function shippingFeeForCity(?string $city): float
+    {
+        $rates = $this->shippingRates();
+
+        if (!$city) {
+            return (float) ($rates['default'] ?? 0);
+        }
+
+        return (float) ($rates[$city] ?? $rates['default'] ?? 0);
+    }
+
+    private function shippingRates(): array
+    {
+        return [
+            'City of Manila' => 0,
+            'Quezon City' => 0,
+            'City of Caloocan' => 0,
+            'City of Makati' => 0,
+            'City of Taguig' => 0,
+            'City of Pasig' => 0,
+            'City of Parañaque' => 0,
+            'City of Las Piñas' => 0,
+            'City of Mandaluyong' => 0,
+            'City of Marikina' => 0,
+            'City of Navotas' => 0,
+            'City of Malabon' => 0,
+            'City of Valenzuela' => 0,
+            'City of San Juan' => 0,
+            'City of Muntinlupa' => 0,
+            'Pasay City' => 0,
+            'Pateros' => 0,
+            'default' => 0,
+        ];
     }
 }

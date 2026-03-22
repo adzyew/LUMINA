@@ -99,20 +99,24 @@
     {{-- Services Footer Section (4 cards) --}}
     <section id="features" class="py-16 bg-white border-t border-gray-100 scroll-fade-in scroll-smooth">
         <div class="container mx-auto px-2 sm:px-6">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-12">
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-700 ease-in-out">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-10 ">
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-700 ease-in-out transform hover:scale-103">
                     <div class="shrink-0 w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
-                        <svg class="w-8 h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" class="size-10" viewBox="0 0 50 50">
+                            <path d="M 0 8 L 0 10 L 28.09375 10 C 28.492188 10 29 10.507813 29 10.90625 L 29 38 L 18.90625 38 C 18.429688 35.164063 15.964844 33 13 33 C 10.035156 33 7.570313 35.164063 7.09375 38 L 3 38 C 2.445313 38 2 37.554688 2 37 L 2 28 L 0 28 L 0 37 C 0 38.644531 1.355469 40 3 40 L 7.09375 40 C 7.570313 42.835938 10.035156 45 13 45 C 15.964844 45 18.429688 42.835938 18.90625 40 L 34.09375 40 C 34.570313 42.835938 37.035156 45 40 45 C 42.964844 45 45.429688 42.835938 45.90625 40 L 47 40 C 47.832031 40 48.5625 39.625 49.09375 39.09375 C 49.625 38.5625 50 37.832031 50 37 L 50 27.40625 C 50 26.28125 49.570313 25.25 49.1875 24.46875 C 48.804688 23.6875 48.40625 23.125 48.40625 23.125 L 48.40625 23.09375 L 44.3125 17.59375 L 44.28125 17.59375 L 44.28125 17.5625 C 43.394531 16.453125 41.972656 15 40 15 L 32 15 C 31.640625 15 31.3125 15.066406 31 15.1875 L 31 10.90625 C 31 9.304688 29.695313 8 28.09375 8 Z M 0 12 L 0 14 L 18 14 L 18 12 Z M 0 16 L 0 18 L 15 18 L 15 16 Z M 32 17 L 36 17 L 36 26 C 36 26.832031 36.375 27.5625 36.90625 28.09375 C 37.4375 28.625 38.167969 29 39 29 L 48 29 L 48 37 C 48 37.167969 47.875 37.4375 47.65625 37.65625 C 47.4375 37.875 47.167969 38 47 38 L 45.90625 38 C 45.429688 35.164063 42.964844 33 40 33 C 37.035156 33 34.570313 35.164063 34.09375 38 L 31 38 L 31 18 C 31 17.832031 31.125 17.5625 31.34375 17.34375 C 31.5625 17.125 31.832031 17 32 17 Z M 38 17 L 40 17 C 40.824219 17 41.972656 17.925781 42.6875 18.8125 L 46.78125 24.28125 L 46.8125 24.3125 C 46.832031 24.339844 47.101563 24.722656 47.40625 25.34375 C 47.660156 25.859375 47.792969 26.472656 47.875 27 L 39 27 C 38.832031 27 38.5625 26.875 38.34375 26.65625 C 38.125 26.4375 38 26.167969 38 26 Z M 0 20 L 0 22 L 12 22 L 12 20 Z M 0 24 L 0 26 L 9 26 L 9 24 Z M 13 35 C 15.222656 35 17 36.777344 17 39 C 17 41.222656 15.222656 43 13 43 C 10.777344 43 9 41.222656 9 39 C 9 36.777344 10.777344 35 13 35 Z M 40 35 C 42.222656 35 44 36.777344 44 39 C 44 41.222656 42.222656 43 40 43 C 37.777344 43 36 41.222656 36 39 C 36 36.777344 37.777344 35 40 35 Z"></path>
+                        </svg>
                     </div>
                     <div>
-                        <h3 class="font-playfair font-bold text-gray-900 mb-1">Nationwide Shipping</h3>
+                        <h3 class="font-playfair font-bold text-gray-900 mb-1">Metro Manila Shipping</h3>
                         <p class="text-gray-500 text-sm">Free shipping on all orders</p>
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-700 ease-in-out">
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-700 ease-in-out transform hover:scale-103">
                     <div class="shrink-0 w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
-                        <svg class="w-8 h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" class="size-8" viewBox="0 0 24 24">
+                            <path d="M21,6h-3.008c-0.952-1.78-2.884-3-5.117-3c-0.203,0-7.25,0-7.25,0v3H3v1.75h2.625v1.5H3V11h2.625v10H8v-7 c0,0,4.609,0,4.875,0c2.233,0,4.165-1.22,5.117-3H21V9.25h-2.435c0.035-0.246,0.06-0.495,0.06-0.75s-0.024-0.504-0.06-0.75H21V6z M8,5h4.75c0.952,0,1.813,0.383,2.444,1H8V5z M12.75,12H8v-1h7.194C14.563,11.617,13.702,12,12.75,12z M16.165,9.25H8v-1.5h8.165 c0.053,0.242,0.085,0.492,0.085,0.75S16.218,9.008,16.165,9.25z"></path>
+                        </svg>
                     </div>
                     <div>
                         <h3 class="font-playfair font-bold text-gray-900 mb-1">Money Back Guarantee</h3>
@@ -120,9 +124,11 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-2 text-center sm:text-left scroll-scale p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-700 ease-in-out">
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-2 text-center sm:text-left scroll-scale p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-700 ease-in-out transform hover:scale-103">
                     <div class="shrink-0 w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
-                        <svg class="w-8 h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" class="size-8" viewBox="0 0 50 50">
+                            <path d="M 25 1 A 1.0001 1.0001 0 0 0 24.068359 1.6386719 L 17.902344 17.535156 L 0.94921875 18.400391 A 1.0001 1.0001 0 0 0 0.3671875 20.173828 L 13.568359 30.966797 L 9.2324219 47.34375 A 1.0001 1.0001 0 0 0 10.740234 48.441406 L 25 39.289062 L 39.259766 48.441406 A 1.0001 1.0001 0 0 0 40.767578 47.34375 L 36.431641 30.966797 L 49.632812 20.173828 A 1.0001 1.0001 0 0 0 49.050781 18.400391 L 32.097656 17.535156 L 25.931641 1.6386719 A 1.0001 1.0001 0 0 0 25 1 z M 25 4.7636719 L 30.466797 18.861328 A 1.0001 1.0001 0 0 0 31.349609 19.498047 L 46.359375 20.265625 L 34.667969 29.826172 A 1.0001 1.0001 0 0 0 34.333984 30.855469 L 38.175781 45.369141 L 25.541016 37.257812 A 1.0001 1.0001 0 0 0 24.458984 37.257812 L 11.824219 45.369141 L 15.666016 30.855469 A 1.0001 1.0001 0 0 0 15.332031 29.826172 L 3.640625 20.265625 L 18.650391 19.498047 A 1.0001 1.0001 0 0 0 19.533203 18.861328 L 25 4.7636719 z"></path>
+                        </svg>
                     </div>
                     <div>
                         <h3 class="font-playfair font-bold text-gray-900 mb-1">Offers And Discounts</h3>
@@ -130,9 +136,11 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-700 ease-in-out">
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left scroll-scale p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-700 ease-in-out transform hover:scale-103">
                     <div class="shrink-0 w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center">
-                        <svg class="w-8 h-8 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" class="size-9" viewBox="0 0 48 48">
+                            <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M27.5,42.5c1.1,0,2-0.9,2-2v-2c0-1.1,0.9-2,2-2l0,0c2.8,0,5-2.2,5-5V28c0,0,4-1.1,4-2c0-1.3-4-9-4.5-10.5	c-2-6-6.7-10-13.5-10c-6.3,0-11.2,2.7-13.5,7.2"></path><path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M7.6,21.2c0.8,7.3,5.4,7.1,5.9,19.4c0,1.1,0.9,1.9,2,1.9h6"></path><circle cx="21.5" cy="21.5" r="3" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></circle><path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21.5,24.5V25c0,2.5,2,4.5,4.5,4.5h4"></path><circle cx="30.5" cy="29.5" r="2.5"></circle><line x1="21.5" x2="21.5" y1="6" y2="18.5" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></line>
+                        </svg>
                     </div>
                     <div>
                         <h3 class="font-playfair font-bold text-gray-900 mb-1">24/7 Support Services</h3>
@@ -223,43 +231,43 @@
     <section class="py-20 bg-white scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
             <h2 class="text-3xl font-playfair font-bold text-gray-900 text-center mb-12 scroll-scale">Why Choose Lumina</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors transform hover:scale-103">
                     <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
                     </div>
                     <h3 class="font-playfair font-bold text-gray-900 mb-2">Premium Materials</h3>
                     <p class="text-gray-600 text-sm">We use only the finest metals and gemstones, sourced ethically from trusted suppliers worldwide.</p>
                 </div>
-                <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors transform hover:scale-103">
                     <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
                     </div>
                     <h3 class="font-playfair font-bold text-gray-900 mb-2">Expert Craftsmanship</h3>
                     <p class="text-gray-600 text-sm">Each piece is meticulously handcrafted by skilled artisans with decades of experience in jewelry making.</p>
                 </div>
-                <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors transform hover:scale-103">
                     <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                     </div>
                     <h3 class="font-playfair font-bold text-gray-900 mb-2">Lifetime Warranty</h3>
                     <p class="text-gray-600 text-sm">Every purchase comes with our lifetime craftsmanship guarantee, ensuring your jewelry lasts for generations.</p>
                 </div>
-                <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors transform hover:scale-103">
                     <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
                     <h3 class="font-playfair font-bold text-gray-900 mb-2">Fast & Secure Shipping</h3>
                     <p class="text-gray-600 text-sm">Free worldwide shipping with secure packaging and insurance on every order. Track your package in real-time.</p>
                 </div>
-                <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors transform hover:scale-103">
                     <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     </div>
                     <h3 class="font-playfair font-bold text-gray-900 mb-2">Personalized Service</h3>
                     <p class="text-gray-600 text-sm">Our dedicated team is here to help you find the perfect piece. Custom orders and consultations available.</p>
                 </div>
-                <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors transform hover:scale-103">
                     <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                     </div>
