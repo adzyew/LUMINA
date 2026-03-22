@@ -7,6 +7,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Socialite\ProviderController;
 use App\Http\Controllers\Socialite\ProviderCallbackController;
@@ -15,6 +16,7 @@ use App\Models\Product;
 
 Route::get('/auth/{provider}', ProviderController::class)->name('auth.redirect');
 Route::get('/auth/{provider}/callback', ProviderCallbackController::class)->name('auth.callback');
+Route::post('/webhooks/paymongo', [PaymentController::class, 'paymongoWebhook'])->name('webhooks.paymongo');
 
 // OTP verification routes (session-based, no auth required)
 Route::middleware('throttle:10,1')->group(function () {
@@ -63,7 +65,9 @@ Route::middleware('customer')->group(function () {
     Route::middleware('auth')->group(function () {
         Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
         Route::post('/place-order', [CartController::class, 'placeOrder'])->name('place.order');
-
+        Route::get('/payments/paymongo/success', [PaymentController::class, 'paymongoSuccess'])->name('payments.paymongo.success');
+        Route::get('/payments/paymongo/cancel', [PaymentController::class, 'paymongoCancel'])->name('payments.paymongo.cancel');
+        
         Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
 
         Route::post('/products/{product}/review', [ReviewController::class, 'store'])->name('reviews.store');

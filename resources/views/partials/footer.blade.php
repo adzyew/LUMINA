@@ -3,13 +3,8 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
 
             <div class="space-y-4">
-                <div class="flex items-center space-x-2">
-                    <div class="flex space-x-1">
-                        <div class="w-2 h-6 bg-amber-300 rounded-full transform -rotate-12"></div>
-                        <div class="w-2 h-6 bg-amber-300 rounded-full"></div>
-                        <div class="w-2 h-6 bg-amber-300 rounded-full transform rotate-12"></div>
-                    </div>
-                    <span class="font-playfair font-black text-2xl text-amber-900 tracking-wide">Lumina</span>
+                <div class="flex items-center">
+                    <img src="{{ asset('IMAGES/Lumina (1).svg') }}" alt="Lumina" class="h-10 w-auto">
                 </div>
                 <p class="text-amber-900/80 text-sm leading-relaxed max-w-xs">
                     Crafting dreams into reality, one jewel at a time. Experience the difference of true luxury with our handcrafted collections.

@@ -1,18 +1,14 @@
-<nav class="{{ ($authPage ?? false) ? 'fixed top-0 left-0 right-0 z-50 bg-amber-50  backdrop-blur-md border-b border-amber-300 text-gray-900' : (($welcomeLayout ?? false) ? 'w-full bg-amber-50 backdrop-blur-md border-b border-amber-300 text-gray-900' : 'fixed top-0 left-0 right-0 z-50 bg-amber-50 backdrop-blur-md border-b border-amber-300 text-gray-900') }} transition-colors">
-        <div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
-            <div class="flex items-center justify-between">
+<nav id="mainNavbar" class="{{ ($authPage ?? false) ? 'fixed top-0 left-0 right-0 z-50 bg-amber-50  backdrop-blur-md border-b border-amber-300 text-gray-900' : (($welcomeLayout ?? false) ? 'w-full bg-amber-50 backdrop-blur-md border-b border-amber-300 text-gray-900' : 'fixed top-0 left-0 right-0 z-50 bg-amber-50 backdrop-blur-md border-b border-amber-300 text-gray-900') }} navbar-compact transition-colors duration-300">
+        <div class="navbar-shell container mx-auto px-4 sm:px-6 py-3 sm:py-4 transition-all duration-300">
+            <div class="flex items-center {{ ($authPage ?? false) ? 'justify-center' : 'justify-between' }}">
                 <!-- Logo -->
-            <a href="{{ url('/') }}" class="flex items-center space-x-2 group">
-                    <div class="flex space-x-1">
-                        <div class="w-2 h-6 sm:w-3 sm:h-8 bg-amber-300 rounded-full transform -rotate-12"></div>
-                        <div class="w-2 h-6 sm:w-3 sm:h-8 bg-amber-300 rounded-full"></div>
-                        <div class="w-2 h-6 sm:w-3 sm:h-8 bg-amber-300 rounded-full transform rotate-12"></div>
-                    </div>
-                <span class="font-serif font-black text-2xl sm:text-3xl text-inherit">Lumina</span>
+            <a href="{{ url('/') }}" class="flex items-center group">
+                <img src="{{ asset('IMAGES/Lumina (1).svg') }}" alt="Lumina" class="navbar-logo h-10 sm:h-11 w-auto origin-left scale-[1.85] transition-transform duration-300">
             </a>
 
+                @if(!($authPage ?? false))
                 <!-- Navigation Links - Desktop -->
-                <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
+                <div class="hidden md:flex items-center space-x-6 lg:space-x-8 navbar-links">
                 <a href="{{ url('/') }}" data-nav-target="home" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 xl:text-xl font-sans font-semibold">Home</a>
                 <a href="{{ route('products.index') }}" data-nav-target="collections" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 xl:text-xl font-sans font-semibold">Collections</a>
                 <a href="{{ url('/#about') }}" data-nav-target="about" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 xl:text-xl font-sans font-semibold">About</a>
@@ -20,13 +16,19 @@
                 </div>
 
             <!-- Icons & Actions - Desktop -->
-            <div class="flex items-center gap-2 sm:gap-4">
+            <div class="flex items-center gap-2 sm:gap-4 navbar-actions">
 
                 {{-- User dropdown (auth) or Login/Sign Up (guest) --}}
 
 
                 @auth
-                    <a href="{{ route('wishlist.index') }}" class="relative p-2 rounded-lg text-gray-500 hover:text-amber-500 hover:bg-gray-100 transition-colors group">
+                    <a href="{{ route('wishlist.index') }}" class="relative p-2 rounded-lg text-gray-500 hover:text-amber-500 hover:bg-gray-100 transition-colors group" aria-label="Wishlist">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="relative p-2 rounded-lg text-gray-500 hover:text-amber-500 hover:bg-gray-100 transition-colors group" aria-label="Wishlist">
                         <svg class="w-5 h-5 sm:w-6 sm:h-6 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                         </svg>
@@ -110,8 +112,10 @@
                     </svg>
                 </button>
             </div>
+            @endif
         </div>
 
+        @if(!($authPage ?? false))
         {{-- Mobile Menu --}}
         <div id="mobileMenu" class="hidden md:hidden mt-4 pt-4 border-t border-gray-200">
             <div class="flex flex-col space-y-1">
@@ -151,8 +155,79 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
 </nav>
+<style>
+    #mainNavbar.navbar-compact {
+        background: transparent;
+        border-color: transparent;
+    }
+
+    #mainNavbar.navbar-compact .navbar-shell {
+        width: min(80%, 1160px);
+        min-width: 760px;
+        margin-top: 3px;
+        border-radius: 0;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 10px 22px;
+        border-radius: 9999px;
+        background: #fffbeb;
+        border: 2px solid #fcd34d;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+    }
+
+    #mainNavbar.navbar-compact .navbar-links .nav-link {
+        color: #111827;
+    }
+
+    #mainNavbar.navbar-compact .navbar-links .nav-link:hover {
+        color: #fbbf24;
+    }
+
+    #mainNavbar.navbar-compact .navbar-actions > a,
+    #mainNavbar.navbar-compact .navbar-actions > button,
+    #mainNavbar.navbar-compact .navbar-actions #userMenuButton {
+        color: #6b7280;
+    }
+
+    #mainNavbar.navbar-compact .navbar-actions #userMenuButton:hover,
+    #mainNavbar.navbar-compact .navbar-actions > a:hover {
+        color: #fbbf24;
+    }
+
+    #mainNavbar.navbar-compact .navbar-logo {
+        transform: scale(1.35);
+    }
+
+    @media (max-width: 1200px) {
+        #mainNavbar.navbar-compact .navbar-shell {
+            width: 88%;
+            min-width: 0;
+        }
+    }
+
+    @media (max-width: 767px) {
+        #mainNavbar.navbar-compact .navbar-shell {
+            width: auto;
+            border-radius: 0;
+            margin-top: 0;
+            border: 0;
+            background: transparent;
+            box-shadow: none;
+            max-width: 100%;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        #mainNavbar.navbar-compact {
+            background: transparent;
+            border-color: transparent;
+        }
+
+    }
+</style>
 <div id="logoutModal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="hideLogoutModal()"></div>
 
@@ -255,6 +330,18 @@
         setActiveNavLink('home');
     }
 
+    function updateNavbarCompactState() {
+        const navbar = document.getElementById('mainNavbar');
+        if (!navbar) return;
+
+        if (window.innerWidth < 768) {
+            navbar.classList.remove('navbar-compact');
+            return;
+        }
+
+        navbar.classList.add('navbar-compact');
+    }
+
     function toggleMobileMenu() {
         const menu = document.getElementById('mobileMenu');
         if (menu) menu.classList.toggle('hidden');
@@ -288,10 +375,16 @@
             const menu = document.getElementById('mobileMenu');
             if (menu) menu.classList.add('hidden');
         }
+
+        updateNavbarCompactState();
     });
 
     window.addEventListener('hashchange', updateActiveNav);
     window.addEventListener('scroll', updateActiveNav, { passive: true });
-    document.addEventListener('DOMContentLoaded', updateActiveNav);
+
+    document.addEventListener('DOMContentLoaded', function () {
+        updateActiveNav();
+        updateNavbarCompactState();
+    });
 
 </script>
