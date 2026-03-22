@@ -25,12 +25,7 @@
     <aside id="customerSidebar" class="fixed inset-y-0 left-0 z-40 w-72 -translate-x-full lg:translate-x-0 lg:static bg-white border-r border-amber-100 flex flex-col transition-transform duration-200 ease-out shadow-sm">
         <div class="px-6 py-6 border-b border-amber-100">
             <div class="flex items-center gap-2">
-                <div class="flex space-x-0.5">
-                    <div class="w-1.5 h-5 bg-amber-400 rounded-full transform -rotate-12"></div>
-                    <div class="w-1.5 h-5 bg-amber-400 rounded-full"></div>
-                    <div class="w-1.5 h-5 bg-amber-400 rounded-full transform rotate-12"></div>
-                </div>
-                <span class="text-xl font-black text-amber-500 tracking-wide">Lumina</span>
+                <img src="{{ asset('IMAGES/Lumina (1).svg') }}" alt="Lumina" class="h-9 w-auto">
                 <span class="text-xs text-gray-400 mt-1 ml-1">Customer</span>
             </div>
         </div>
@@ -91,7 +86,7 @@
             <button type="button" onclick="openCustomerSidebar()" class="inline-flex items-center justify-center rounded-lg border border-gray-200 p-2 text-gray-600" aria-label="Open menu">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
-            <span class="text-lg font-black text-amber-500">Lumina</span>
+            <img src="{{ asset('IMAGES/Lumina (1).svg') }}" alt="Lumina" class="h-8 w-auto">
             <a href="{{ $settingsLink }}" class="text-xs text-gray-500 hover:text-amber-600">Settings</a>
         </div>
 

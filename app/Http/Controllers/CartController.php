@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\InventoryLog;
 use App\Models\Product;
+use App\Services\PaymongoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -131,7 +132,7 @@ class CartController extends Controller
         ]);
     }
 
-    public function placeOrder(Request $request)
+    public function placeOrder(Request $request, PaymongoService $paymongoService)
     {
         $cart = session()->get('cart', []);
         if (empty($cart)) {
@@ -189,6 +190,7 @@ class CartController extends Controller
                     'discount_amount' => $discountAmount,
                     'status' => 'pending',
                     'payment_method' => $request->payment_method,
+                    'payment_status' => 'pending',
                     'shipping_address' => $fullAddress,
                     'contact_phone' => $request->contact_phone,
                     'contact_email' => $request->contact_email,
@@ -230,13 +232,31 @@ class CartController extends Controller
                     }
                 }
 
-                // 3. Clear Cart
-                session()->forget('cart');
-
                 // Return the order out of the transaction so the email can use it
                 return $order; 
             }); 
             // ✨ END TRANSACTION ✨
+
+            if ($order->payment_method === 'paymongo') {
+                $order->loadMissing(['user', 'items.product']);
+
+                $checkoutSession = $paymongoService->createCheckoutSession(
+                    $order,
+                    route('payments.paymongo.success', ['order' => $order->id]),
+                    route('payments.paymongo.cancel', ['order' => $order->id])
+                );
+
+                $order->update([
+                    'paymongo_checkout_session_id' => data_get($checkoutSession, 'id'),
+                    'paymongo_reference' => data_get($checkoutSession, 'attributes.reference_number'),
+                ]);
+
+                session()->forget('cart');
+
+                return redirect()->away(data_get($checkoutSession, 'attributes.checkout_url'));
+            }
+
+            session()->forget('cart');
 
             // Send Email (We do this outside the transaction so if the email fails, 
             // the order isn't deleted!)

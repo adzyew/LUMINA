@@ -34,9 +34,9 @@
                         @foreach($order->items as $item)
                             <div class="flex items-center gap-4 px-5 py-4">
                                 @if($item->product && $item->product->image_url)
-                                    <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" class="w-16 h-16 rounded-xl object-cover flex-shrink-0">
+                                    <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" class="w-16 h-16 rounded-xl object-cover shrink-0">
                                 @else
-                                    <div class="w-16 h-16 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
+                                    <div class="w-16 h-16 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
                                         <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3 3h18M3 21h18" />
                                         </svg>
@@ -44,45 +44,14 @@
                                 @endif
                                 <div class="flex-1 min-w-0">
                                     <p class="text-gray-900 font-semibold truncate">{{ $item->product->name ?? 'Product Unavailable' }}</p>
-                                    <p class="text-gray-600 text-sm">Qty: {{ $item->quantity }}</p>
+                                    <p class="text-gray-600 text-sm">Quantity: {{ $item->quantity }}</p>
                                 </div>
-                                <div class="text-right flex-shrink-0">
+                                <div class="text-right shrink-0">
                                     <p class="text-amber-600 font-bold">Php {{ number_format($item->unit_price * $item->quantity, 2) }}</p>
                                     <p class="text-gray-500 text-xs">Php {{ number_format($item->unit_price, 2) }} each</p>
                                 </div>
                             </div>
                         @endforeach
-                    </div>
-                </div>
-            </div>
-
-            {{-- Order Summary & Shipping --}}
-            <div class="space-y-4">
-
-                {{-- Price Summary --}}
-                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
-                    <h2 class="text-gray-900 font-bold mb-4">Order Summary</h2>
-                    <div class="space-y-2 text-sm">
-                        <div class="flex justify-between text-gray-600">
-                            <span>Subtotal</span>
-                            <span>Php {{ number_format($order->total_price + $order->discount_amount, 2) }}</span>
-                        </div>
-                        @if($order->discount_amount > 0)
-                            <div class="flex justify-between text-green-600">
-                                <span>Discount</span>
-                                <span>- Php {{ number_format($order->discount_amount, 2) }}</span>
-                            </div>
-                        @endif
-                        @if($order->points_used > 0)
-                            <div class="flex justify-between text-amber-600">
-                                <span>Points Used</span>
-                                <span>{{ $order->points_used }} pts</span>
-                            </div>
-                        @endif
-                        <div class="border-t border-gray-100 pt-2 flex justify-between text-gray-900 font-bold">
-                            <span>Total</span>
-                            <span class="text-amber-600">Php {{ number_format($order->total_price, 2) }}</span>
-                        </div>
                     </div>
                 </div>
 
@@ -91,17 +60,17 @@
                     <h2 class="text-gray-900 font-bold mb-4">Shipping Details</h2>
                     <div class="space-y-3 text-sm">
                         <div>
-                            <p class="text-gray-500">Delivery Address</p>
+                            <p class="text-gray-500 font-bold">Delivery Address</p>
                             <p class="text-gray-700 mt-0.5">{{ $order->formatted_shipping_address ?: 'Not provided' }}</p>
                         </div>
                         @if($order->contact_phone)
                             <div>
-                                <p class="text-gray-500">Contact Number</p>
+                                <p class="text-gray-500 font-bold">Contact Number</p>
                                 <p class="text-gray-700 mt-0.5">{{ $order->contact_phone }}</p>
                             </div>
                         @endif
                         <div>
-                            <p class="text-gray-500">Tracking Number</p>
+                            <p class="text-gray-500 font-bold">Tracking Number</p>
                             <p class="text-gray-700 font-mono mt-0.5">{{ $order->tracking_number ?? 'Pending assignment' }}</p>
                         </div>
                         @if($order->courier_name)
@@ -131,6 +100,39 @@
                                 <p class="text-gray-700 mt-0.5">{{ $order->delivered_at->format('M d, Y h:i A') }}</p>
                             </div>
                         @endif
+                    </div>
+                </div>
+            </div>
+
+            {{-- Order Summary & Shipping --}}
+            <div class="space-y-4">
+
+                {{-- Price Summary --}}
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+                    <h2 class="text-gray-900 font-bold mb-4">Order Summary</h2>
+                    <div class="divide-y divide-gray-100"></div>
+                    <div class="space-y-2 text-sm">
+                    
+                        <div class="flex justify-between text-gray-600">
+                            <span>Subtotal</span>
+                            <span>Php {{ number_format($order->total_price + $order->discount_amount, 2) }}</span>
+                        </div>
+                        @if($order->discount_amount > 0)
+                            <div class="flex justify-between text-green-600">
+                                <span>Discount</span>
+                                <span>- Php {{ number_format($order->discount_amount, 2) }}</span>
+                            </div>
+                        @endif
+                        @if($order->points_used > 0)
+                            <div class="flex justify-between text-amber-600">
+                                <span>Points Used</span>
+                                <span>{{ $order->points_used }} pts</span>
+                            </div>
+                        @endif
+                        <div class="border-t border-gray-100 pt-2 flex justify-between text-gray-900 font-bold">
+                            <span>Total</span>
+                            <span class="text-amber-600">Php {{ number_format($order->total_price, 2) }}</span>
+                        </div>
                     </div>
                 </div>
 
