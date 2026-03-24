@@ -4,6 +4,7 @@
 
 @section('content')
 <header class="flex justify-between items-center mb-8">
+    @include('partials.favicon')
     <div>
         <h1 class="text-3xl font-playfair font-bold text-gray-900">Roles & Permissions</h1>
         <p class="text-gray-600 text-sm mt-1">Manage role permissions for your team.</p>

@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     @include('partials.theme_init')
     <title>@yield('title', 'Lumina')</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('IMAGES/FinalIcon.png') }}" />
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('IMAGES/FinalIcon.png') }}" />
+    <link rel="shortcut icon" href="{{ asset('IMAGES/FinalIcon.png') }}" />
+    <link rel="apple-touch-icon" href="{{ asset('IMAGES/FinalIcon.png') }}" />
     @vite('resources/css/app.css')
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.3/build/css/intlTelInput.css">

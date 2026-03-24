@@ -4,6 +4,7 @@
 
 @section('content')
 <header class="mb-8">
+    @include('partials.favicon')
     <h1 class="text-3xl font-playfair font-bold text-gray-900">Sales</h1>
     <p class="text-gray-600 text-sm mt-1">View revenue and sales reports.</p>
 </header>

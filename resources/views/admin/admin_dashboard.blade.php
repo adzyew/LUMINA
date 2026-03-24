@@ -8,6 +8,7 @@
     <div class="flex items-center justify-between mb-10 bg-white border border-gray-200 rounded-2xl px-6 py-3 shadow-sm">
         {{-- Search --}}
         <header class="flex items-center gap-3">
+    @include('partials.favicon')
         <h1 class="text-3xl font-playfair font-bold text-gray-900">Overview</h1>
         <p class="text-gray-600 text-sm mt-3">Welcome back, Admin!</p>
     </header>

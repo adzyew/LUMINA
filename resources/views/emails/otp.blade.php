@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    @include('partials.favicon')
     <meta charset="utf-8">
     <title>OTP Verification</title>
 </head>

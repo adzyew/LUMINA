@@ -5,6 +5,7 @@
 @section('content')
 <div class="max-w-2xl w-full">
     <header class="mb-8">
+    @include('partials.favicon')
         <div class="flex justify-between items-center">
             <div>
                 <h1 class="text-3xl font-playfair font-bold text-gray-900">Add Staff User</h1>

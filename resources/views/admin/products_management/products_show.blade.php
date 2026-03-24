@@ -5,6 +5,7 @@
 @section('content')
 <div class="max-w-4xl w-full">
     <header class="mb-8 flex justify-between items-center">
+    @include('partials.favicon')
         <div>
             <h1 class="text-3xl font-playfair font-bold text-black">Product Details</h1>
             <p class="text-gray-600 text-sm mt-1">{{ $product->name }}</p>

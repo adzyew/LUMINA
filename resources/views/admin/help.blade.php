@@ -6,6 +6,7 @@
 @php $isAdmin = auth()->user()->hasRole('admin') || (auth()->user()->is_admin ?? false); @endphp
 
 <header class="mb-8">
+    @include('partials.favicon')
     <h1 class="text-3xl font-playfair font-bold text-gray-900">Help & Guide</h1>
     <p class="text-gray-500 mt-1 text-sm">A walkthrough of every section in the Lumina admin panel.</p>
 </header>

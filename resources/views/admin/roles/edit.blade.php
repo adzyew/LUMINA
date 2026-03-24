@@ -5,6 +5,7 @@
 @section('content')
 <div class="max-w-4xl w-full">
     <header class="mb-8">
+    @include('partials.favicon')
         <h1 class="text-3xl font-playfair font-bold text-gray-900">Edit Permissions</h1>
         <p class="text-gray-600 text-sm mt-1">Manage permissions for {{ Str::headline($role->name) }} role.</p>
     </header>
