@@ -38,7 +38,8 @@ class PaymentController extends Controller
 
                     if ($paymentStatus === '' || in_array($paymentStatus, ['paid', 'succeeded', 'captured'], true)) {
                         $paymentId = (string) (data_get($firstPayment, 'id') ?? '');
-                        $this->finalizePaidOrder($order, $paymentId);
+                        $paymentChannel = $this->resolvePaymentChannel(is_array($firstPayment) ? $firstPayment : []);
+                        $this->finalizePaidOrder($order, $paymentId, $paymentChannel);
                         $order->refresh();
                     }
                 }
@@ -115,7 +116,11 @@ class PaymentController extends Controller
 
         if (str_contains($eventType, 'paid')) {
             try {
-                $this->finalizePaidOrder($order, (string) data_get($event, 'data.attributes.data.attributes.payments.0.id'));
+                $firstPayment = data_get($event, 'data.attributes.data.attributes.payments.0', []);
+                $paymentId = (string) data_get($firstPayment, 'id', '');
+                $paymentChannel = $this->resolvePaymentChannel(is_array($firstPayment) ? $firstPayment : []);
+
+                $this->finalizePaidOrder($order, $paymentId, $paymentChannel);
             } catch (\Throwable $e) {
                 Log::error('Failed to finalize paid PayMongo order', [
                     'order_id' => $order->id,
@@ -143,9 +148,9 @@ class PaymentController extends Controller
         return response()->json(['message' => 'Webhook received'], 200);
     }
 
-    private function finalizePaidOrder(Order $order, string $paymentIntentId): void
+    private function finalizePaidOrder(Order $order, string $paymentIntentId, string $paymentChannel = 'online'): void
     {
-        DB::transaction(function () use ($order, $paymentIntentId): void {
+        DB::transaction(function () use ($order, $paymentIntentId, $paymentChannel): void {
             $order->loadMissing('items.product');
 
             if ($order->status === 'awaiting_payment') {
@@ -177,11 +182,40 @@ class PaymentController extends Controller
 
             $order->update([
                 'payment_status' => 'paid',
+                'payment_channel' => $order->payment_method === 'paymongo'
+                    ? ($paymentChannel !== '' ? $paymentChannel : ($order->payment_channel ?: 'online'))
+                    : 'cod',
                 'status' => $order->status === 'awaiting_payment' || $order->status === 'pending'
                     ? 'processing'
                     : $order->status,
                 'paymongo_payment_intent_id' => $paymentIntentId !== '' ? $paymentIntentId : $order->paymongo_payment_intent_id,
             ]);
         });
+    }
+
+    /**
+     * @param array<string, mixed> $paymentPayload
+     */
+    private function resolvePaymentChannel(array $paymentPayload): string
+    {
+        $rawChannel = (string) (
+            data_get($paymentPayload, 'attributes.source.type')
+            ?? data_get($paymentPayload, 'source.type')
+            ?? data_get($paymentPayload, 'attributes.payment_method_used')
+            ?? data_get($paymentPayload, 'attributes.payment_method')
+            ?? data_get($paymentPayload, 'attributes.channel')
+            ?? data_get($paymentPayload, 'attributes.payment_method_type')
+            ?? ''
+        );
+
+        if ($rawChannel === '') {
+            return 'online';
+        }
+
+        $normalized = strtolower(trim($rawChannel));
+        $normalized = preg_replace('/[^a-z0-9]+/', '_', $normalized) ?? 'online';
+        $normalized = trim($normalized, '_');
+
+        return $normalized !== '' ? $normalized : 'online';
     }
 }

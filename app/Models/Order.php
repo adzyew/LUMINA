@@ -50,6 +50,7 @@ class Order extends Model
         'courier_name',
         'tracking_url',
         'payment_method',
+        'payment_channel',
         'payment_status',
         'paymongo_checkout_session_id',
         'paymongo_payment_intent_id',
@@ -94,6 +95,49 @@ class Order extends Model
     public function getDisplayOrderNumberAttribute(): string
     {
         return $this->order_number ?: (string) $this->id;
+    }
+
+    public function getPaymentChannelLabelAttribute(): string
+    {
+        if ($this->payment_method === 'cod') {
+            return 'COD';
+        }
+
+        $channel = (string) ($this->payment_channel ?? '');
+        if ($channel === '' || $channel === 'online') {
+            return 'Online';
+        }
+
+        return self::formatPaymentChannel($channel);
+    }
+
+    public function getPaymentDisplayAttribute(): string
+    {
+        if ($this->payment_method === 'cod') {
+            return 'Cash on Delivery';
+        }
+
+        $channel = (string) ($this->payment_channel ?? '');
+        if ($channel === '' || $channel === 'online') {
+            return 'Online Payment';
+        }
+
+        return 'Online (' . self::formatPaymentChannel($channel) . ')';
+    }
+
+    private static function formatPaymentChannel(string $channel): string
+    {
+        $normalized = strtolower(trim($channel));
+
+        return match ($normalized) {
+            'cod' => 'COD',
+            'gcash' => 'GCash',
+            'paymaya', 'maya' => 'Maya',
+            'grab_pay', 'grabpay' => 'GrabPay',
+            'card' => 'Card',
+            'dob' => 'Online Banking',
+            default => ucfirst(str_replace('_', ' ', $normalized)),
+        };
     }
 
     public function user(): BelongsTo

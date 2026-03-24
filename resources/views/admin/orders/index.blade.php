@@ -26,6 +26,7 @@
             <tr class="bg-gray-50 text-gray-700 border-b border-gray-200 text-sm">
                 <th class="p-4">Order ID</th>
                 <th class="p-4">Customer</th>
+                <th class="p-4">Payment</th>
                 <th class="p-4">Total</th>
                 <th class="p-4">Status</th>
                 <th class="p-4">Date</th>
@@ -37,6 +38,7 @@
             <tr class="hover:bg-amber-300/10 transition duration-300">
                 <td class="p-4 text-gray-500">#{{ $order->display_order_number }}</td>
                 <td class="p-4 font-medium text-gray-900">{{ $order->user->name ?? 'Guest' }}</td>
+                <td class="p-4 text-gray-500">{{ $order->payment_channel_label }}</td>
                 <td class="p-4 text-amber-300 font-bold">₱{{ number_format($order->total_price, 2) }}</td>
                 <td class="p-4"><span class="px-2 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300">{{ ucfirst($order->status) }}</span></td>
                 <td class="p-4 text-gray-500">{{ $order->created_at->format('M d, Y') }}</td>
@@ -52,7 +54,7 @@
                 </td>
             </tr>
             @empty
-            <tr><td colspan="6" class="p-12 text-center text-gray-500">No orders found.</td></tr>
+            <tr><td colspan="7" class="p-12 text-center text-gray-500">No orders found.</td></tr>
             @endforelse
         </tbody>
     </table>

@@ -190,6 +190,7 @@ class CartController extends Controller
                     'discount_amount' => $discountAmount,
                     'status' => $request->payment_method === 'paymongo' ? 'awaiting_payment' : 'pending',
                     'payment_method' => $request->payment_method,
+                    'payment_channel' => $request->payment_method === 'paymongo' ? 'online' : 'cod',
                     'payment_status' => 'pending',
                     'shipping_address' => $fullAddress,
                     'contact_phone' => $request->contact_phone,
