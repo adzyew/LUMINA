@@ -54,6 +54,10 @@ return [
         'secret_key' => env('PAYMONGO_SECRET_KEY'),
         'public_key' => env('PAYMONGO_PUBLIC_KEY'),
         'webhook_secret' => env('PAYMONGO_WEBHOOK_SECRET'),
+        'payment_method_types' => array_values(array_filter(array_map(
+            static fn (string $value): string => trim($value),
+            explode(',', (string) env('PAYMONGO_PAYMENT_METHOD_TYPES', 'card,gcash'))
+        ))),
     ],
     
 

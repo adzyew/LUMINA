@@ -32,11 +32,16 @@ class PaymongoService
             throw new RuntimeException('Cannot create PayMongo checkout session with no line items.');
         }
 
+        $paymentMethodTypes = config('services.paymongo.payment_method_types', ['card', 'gcash']);
+        if (!is_array($paymentMethodTypes) || $paymentMethodTypes === []) {
+            $paymentMethodTypes = ['card', 'gcash'];
+        }
+
         $payload = [
             'data' => [
                 'attributes' => [
                     'line_items' => $lineItems,
-                    'payment_method_types' => ['card', 'gcash', 'paymaya'],
+                    'payment_method_types' => array_values($paymentMethodTypes),
                     'success_url' => $successUrl,
                     'cancel_url' => $cancelUrl,
                     'description' => 'Order #' . $order->display_order_number,

@@ -4,6 +4,7 @@
 
 @section('content')
 <header class="flex items-center justify-between mb-8">
+    @include('partials.favicon')
     <div>
         <h1 class="text-3xl font-playfair font-bold text-gray-900">Edit Staff User</h1>
         <p class="text-gray-600 text-sm mt-1">Update {{ $user->name }}'s details and role assignment.</p>

@@ -5,6 +5,7 @@
 @section('content')
 <div class="max-w-4xl w-full align-middle mx-auto py-12">
     <header class="mb-8">
+    @include('partials.favicon')
         <div class="flex justify-between items-center">
             <div>
                 <h1 class="text-3xl font-playfair font-bold text-gray-900">Add New Product</h1>

@@ -1,6 +1,7 @@
 <div class="mb-10 bg-white border border-gray-200 rounded-2xl px-6 py-3 shadow-sm">
     <div class="flex items-center justify-between gap-4">
         <header class="flex items-center gap-3 min-w-0">
+    @include('partials.favicon')
             <h1 class="text-3xl font-playfair font-bold text-gray-900">{{ $title ?? 'Overview' }}</h1>
             @if(!empty($subtitle))
                 <p class="text-gray-600 text-sm mt-3 truncate">{{ $subtitle }}</p>

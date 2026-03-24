@@ -5,6 +5,7 @@
 
 @section('content')
 <header class="mb-6">
+    @include('partials.favicon')
     <h1 class="text-2xl font-bold">Edit Staff Member</h1>
     <p class="text-gray-600 text-sm">Update staff details and department assignment.</p>
 </header>

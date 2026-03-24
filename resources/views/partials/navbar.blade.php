@@ -3,7 +3,7 @@
             <div class="flex items-center {{ ($authPage ?? false) ? 'justify-center' : 'justify-between' }}">
                 <!-- Logo -->
             <a href="{{ url('/') }}" class="flex items-center group">
-                <img src="{{ asset('IMAGES/Lumina (1).svg') }}" alt="Lumina" class="navbar-logo h-10 sm:h-11 w-auto origin-left scale-[1.85] transition-transform duration-300">
+                <img src="{{ asset('IMAGES/Lumina (1).svg') }}" alt="Lumina" class="navbar-logo h-10 sm:h-11 w-auto origin-left scale-[2.30] transition-transform duration-300">
             </a>
 
                 @if(!($authPage ?? false))

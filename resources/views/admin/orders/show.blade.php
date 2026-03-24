@@ -5,6 +5,7 @@
 @section('content')
 <div class="max-w-4xl w-full">
     <header class="mb-8 flex justify-between items-center">
+    @include('partials.favicon')
         <div>
             <h1 class="text-3xl font-playfair font-bold text-gray-900">Order #{{ $order->display_order_number }}</h1>
             <p class="text-gray-600 text-sm mt-1">{{ $order->created_at->format('F d, Y \a\t g:i A') }}</p>
