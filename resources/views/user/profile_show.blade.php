@@ -42,7 +42,7 @@
                     <p class="mt-1 font-semibold text-gray-900">{{ $user->phone ?: 'Not set' }}</p>
                 </div>
                 <div class="bg-gray-50 rounded-xl border border-gray-200 px-4 py-3 sm:col-span-2">
-                    <p class="text-xs text-gray-500 uppercase tracking-wide">Email (Read-only)</p>
+                    <p class="text-xs text-gray-500 uppercase tracking-wide">Email Address</p>
                     <p class="mt-1 font-semibold text-gray-700">{{ $user->email }}</p>
                 </div>
                 <div class="bg-gray-50 rounded-xl border border-gray-200 px-4 py-3 sm:col-span-2">

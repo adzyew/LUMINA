@@ -11,12 +11,19 @@ class PaymongoService
 {
     private const BASE_URL = 'https://api.paymongo.com/v1';
 
-    public function createCheckoutSession(Order $order, string $successUrl, string $cancelUrl): array
+    private function getSecretKey(): string
     {
         $secretKey = (string) config('services.paymongo.secret_key');
         if ($secretKey === '') {
             throw new RuntimeException('PayMongo secret key is not configured.');
         }
+
+        return $secretKey;
+    }
+
+    public function createCheckoutSession(Order $order, string $successUrl, string $cancelUrl): array
+    {
+        $secretKey = $this->getSecretKey();
 
         $lineItems = [];
         foreach ($order->items as $item) {
@@ -71,6 +78,28 @@ class PaymongoService
         /** @var array<string,mixed> $data */
         $data = $response->json('data') ?? [];
 
+        return $data;
+    }
+
+    public function getCheckoutSession(string $checkoutSessionId): array
+    {
+        if ($checkoutSessionId === '') {
+            throw new RuntimeException('PayMongo checkout session id is required.');
+        }
+
+        $secretKey = $this->getSecretKey();
+
+        /** @var Response $response */
+        $response = Http::withBasicAuth($secretKey, '')
+            ->acceptJson()
+            ->get(self::BASE_URL . '/checkout_sessions/' . $checkoutSessionId);
+
+        if ($response->failed()) {
+            throw new RuntimeException('PayMongo get checkout session failed: ' . $response->body());
+        }
+
+        /** @var array<string,mixed> $data */
+        $data = $response->json('data') ?? [];
         return $data;
     }
 

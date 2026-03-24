@@ -188,7 +188,7 @@ class CartController extends Controller
                     'total_price' => $total,
                     'points_used' => $pointsUsed,
                     'discount_amount' => $discountAmount,
-                    'status' => 'pending',
+                    'status' => $request->payment_method === 'paymongo' ? 'awaiting_payment' : 'pending',
                     'payment_method' => $request->payment_method,
                     'payment_status' => 'pending',
                     'shipping_address' => $fullAddress,
@@ -211,8 +211,6 @@ class CartController extends Controller
                         $oldStock = $product->stock_quantity;
                         $quantityBought = $item['quantity'];
 
-                        $product->decrement('stock_quantity', $quantityBought);
-
                         OrderItem::create([
                             'order_id' => $order->id,
                             'product_id' => $productId,
@@ -220,15 +218,20 @@ class CartController extends Controller
                             'unit_price' => $item['price'],
                         ]);
 
-                        InventoryLog::create([
-                            'product_id' => $productId,
-                            'user_id' => Auth::id(),
-                            'quantity_change' => -$quantityBought,
-                            'previous_stock' => $oldStock,
-                            'new_stock' => $oldStock - $quantityBought,
-                            'reason' => 'Order placed',
-                            'reference_id' => $order->id,
-                        ]);
+                        // For PayMongo, finalize stock changes only after successful payment webhook.
+                        if ($request->payment_method !== 'paymongo') {
+                            $product->decrement('stock_quantity', $quantityBought);
+
+                            InventoryLog::create([
+                                'product_id' => $productId,
+                                'user_id' => Auth::id(),
+                                'quantity_change' => -$quantityBought,
+                                'previous_stock' => $oldStock,
+                                'new_stock' => $oldStock - $quantityBought,
+                                'reason' => 'Order placed',
+                                'reference_id' => $order->id,
+                            ]);
+                        }
                     }
                 }
 
@@ -250,8 +253,6 @@ class CartController extends Controller
                     'paymongo_checkout_session_id' => data_get($checkoutSession, 'id'),
                     'paymongo_reference' => data_get($checkoutSession, 'attributes.reference_number'),
                 ]);
-
-                session()->forget('cart');
 
                 return redirect()->away(data_get($checkoutSession, 'attributes.checkout_url'));
             }
