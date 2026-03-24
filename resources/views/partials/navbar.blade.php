@@ -1,4 +1,4 @@
-<nav id="mainNavbar" class="{{ ($authPage ?? false) ? 'fixed top-0 left-0 right-0 z-50 bg-amber-50  backdrop-blur-md border-b border-amber-300 text-gray-900' : (($welcomeLayout ?? false) ? 'w-full bg-amber-50 backdrop-blur-md border-b border-amber-300 text-gray-900' : 'fixed top-0 left-0 right-0 z-50 bg-amber-50 backdrop-blur-md border-b border-amber-300 text-gray-900') }} navbar-compact transition-colors duration-300">
+<nav id="mainNavbar" class="{{ ($authPage ?? false) ? 'fixed top-0 left-0 right-0 z-50 bg-amber-50  backdrop-blur-md border-b border-amber-300 text-gray-900' : (($welcomeLayout ?? false) ? 'w-full bg-amber-50 backdrop-blur-md border-b border-amber-300 text-gray-900' : 'fixed top-0 left-0 right-0 z-50 bg-amber-50 backdrop-blur-md border-b border-amber-300 text-gray-900') }} transition-colors duration-300">
         <div class="navbar-shell container mx-auto px-4 sm:px-6 py-3 sm:py-4 transition-all duration-300">
             <div class="flex items-center {{ ($authPage ?? false) ? 'justify-center' : 'justify-between' }}">
                 <!-- Logo -->
@@ -158,75 +158,6 @@
         @endif
     </div>
 </nav>
-<style>
-    #mainNavbar.navbar-compact {
-        background: transparent;
-        border-color: transparent;
-    }
-
-    #mainNavbar.navbar-compact .navbar-shell {
-        width: min(80%, 1160px);
-        min-width: 760px;
-        border-radius: 0;
-        margin-left: auto;
-        margin-right: auto;
-        padding: 10px 22px;
-        border-radius: 9999px;
-        background: #fffbeb;
-        border: 2px solid #fcd34d;
-        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
-    }
-
-    #mainNavbar.navbar-compact .navbar-links .nav-link {
-        color: #111827;
-    }
-
-    #mainNavbar.navbar-compact .navbar-links .nav-link:hover {
-        color: #fbbf24;
-    }
-
-    #mainNavbar.navbar-compact .navbar-actions > a,
-    #mainNavbar.navbar-compact .navbar-actions > button,
-    #mainNavbar.navbar-compact .navbar-actions #userMenuButton {
-        color: #6b7280;
-    }
-
-    #mainNavbar.navbar-compact .navbar-actions #userMenuButton:hover,
-    #mainNavbar.navbar-compact .navbar-actions > a:hover {
-        color: #fbbf24;
-    }
-
-    #mainNavbar.navbar-compact .navbar-logo {
-        transform: scale(1.35);
-    }
-
-    @media (max-width: 1200px) {
-        #mainNavbar.navbar-compact .navbar-shell {
-            width: 88%;
-            min-width: 0;
-        }
-    }
-
-    @media (max-width: 767px) {
-        #mainNavbar.navbar-compact .navbar-shell {
-            width: auto;
-            border-radius: 0;
-            margin-top: 0;
-            border: 0;
-            background: transparent;
-            box-shadow: none;
-            max-width: 100%;
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
-
-        #mainNavbar.navbar-compact {
-            background: transparent;
-            border-color: transparent;
-        }
-
-    }
-</style>
 <div id="logoutModal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="hideLogoutModal()"></div>
 
@@ -329,18 +260,6 @@
         setActiveNavLink('home');
     }
 
-    function updateNavbarCompactState() {
-        const navbar = document.getElementById('mainNavbar');
-        if (!navbar) return;
-
-        if (window.innerWidth < 768) {
-            navbar.classList.remove('navbar-compact');
-            return;
-        }
-
-        navbar.classList.add('navbar-compact');
-    }
-
     function toggleMobileMenu() {
         const menu = document.getElementById('mobileMenu');
         if (menu) menu.classList.toggle('hidden');
@@ -374,8 +293,6 @@
             const menu = document.getElementById('mobileMenu');
             if (menu) menu.classList.add('hidden');
         }
-
-        updateNavbarCompactState();
     });
 
     window.addEventListener('hashchange', updateActiveNav);
@@ -383,7 +300,6 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         updateActiveNav();
-        updateNavbarCompactState();
     });
 
 </script>
