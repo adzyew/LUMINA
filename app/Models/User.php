@@ -93,4 +93,15 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(\App\Models\Review::class);
     }
+
+    public function isPrivilegedStaff(): bool
+    {
+        return (bool) ($this->is_admin ?? false)
+            || $this->hasRole('admin')
+            || $this->hasRole('staff')
+            || $this->can('inventory.view')
+            || $this->can('sales.view')
+            || $this->can('deliveries.manage')
+            || $this->can('reviews.moderate');
+    }
 }

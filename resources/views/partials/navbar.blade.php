@@ -167,7 +167,6 @@
     #mainNavbar.navbar-compact .navbar-shell {
         width: min(80%, 1160px);
         min-width: 760px;
-        margin-top: 3px;
         border-radius: 0;
         margin-left: auto;
         margin-right: auto;

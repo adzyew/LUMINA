@@ -53,6 +53,47 @@ class AuthController extends Controller
         return $remainingSeconds;
     }
 
+    private function activeSessionCacheKey(User $user): string
+    {
+        return 'active_privileged_session_' . $user->id;
+    }
+
+    private function hasDifferentActiveSession(User $user, string $currentSessionId): bool
+    {
+        if (!$user->isPrivilegedStaff()) {
+            return false;
+        }
+
+        $existingSessionId = Cache::get($this->activeSessionCacheKey($user));
+        return is_string($existingSessionId) && $existingSessionId !== '' && $existingSessionId !== $currentSessionId;
+    }
+
+    private function rememberActiveSession(User $user, string $sessionId): void
+    {
+        if (!$user->isPrivilegedStaff()) {
+            return;
+        }
+
+        $ttl = now()->addMinutes((int) config('session.lifetime', 120));
+        Cache::put($this->activeSessionCacheKey($user), $sessionId, $ttl);
+    }
+
+    private function clearActiveSession(User $user, ?string $sessionId = null): void
+    {
+        if (!$user->isPrivilegedStaff()) {
+            return;
+        }
+
+        $key = $this->activeSessionCacheKey($user);
+        $existingSessionId = Cache::get($key);
+
+        if ($sessionId !== null && is_string($existingSessionId) && $existingSessionId !== $sessionId) {
+            return;
+        }
+
+        Cache::forget($key);
+    }
+
     public function showLogin()
     {
         return view('auth.login');
@@ -292,6 +333,9 @@ class AuthController extends Controller
         if (!$user instanceof User) {
             abort(403);
         }
+
+        $this->clearActiveSession($user, $request->session()->getId());
+
         $user->archived_at = Carbon::now();
         $user->save();
 
@@ -343,8 +387,21 @@ class AuthController extends Controller
         }
 
         // ✅ Verified user → normal login
+        $currentSessionId = $request->session()->getId();
+        if ($user && $this->hasDifferentActiveSession($user, $currentSessionId)) {
+            return back()->withErrors([
+                'email' => 'This account is already logged in on another browser or device.',
+            ]);
+        }
+
         if (Auth::attempt($request->only("email", "password"))) {
             $request->session()->regenerate();
+
+            $authenticatedUser = Auth::user();
+            if ($authenticatedUser instanceof User) {
+                $this->rememberActiveSession($authenticatedUser, $request->session()->getId());
+            }
+
             return redirect()->intended(route('dashboard'))
                 ->with("success", "Logged in Successfully!");
         }
@@ -358,6 +415,11 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        $user = Auth::user();
+        if ($user instanceof User) {
+            $this->clearActiveSession($user, $request->session()->getId());
+        }
+
         Auth::logout();
 
         $request->session()->invalidate();
@@ -392,8 +454,16 @@ class AuthController extends Controller
     // 4. CHECK VERIFICATION STATUS
     // If the user is ALREADY verified, skip OTP and log them in directly.
     if ($user->is_verified) {
+        $currentSessionId = $request->session()->getId();
+        if ($this->hasDifferentActiveSession($user, $currentSessionId)) {
+            return back()->withErrors([
+                'email' => 'This account is already logged in on another browser or device.'
+            ]);
+        }
+
         Auth::login($user);
         $request->session()->regenerate();
+        $this->rememberActiveSession($user, $request->session()->getId());
 
         // Mark session as verified for your custom middleware
         session(['otp_verified' => true]); 
@@ -530,6 +600,13 @@ class AuthController extends Controller
     }
 
     if ($user) {
+        $currentSessionId = $request->session()->getId();
+        if ($this->hasDifferentActiveSession($user, $currentSessionId)) {
+            return back()->withErrors([
+                'otp' => 'This account is already logged in on another browser or device.',
+            ]);
+        }
+
         // ✅ A. Mark User as Verified
         $user->is_verified      = true;
         $user->email_verified_at = now();
@@ -537,6 +614,7 @@ class AuthController extends Controller
 
         // ✅ B. Log the User In
         Auth::login($user);
+        $this->rememberActiveSession($user, $request->session()->getId());
 
         // ✅ C. Clean Up
         Cache::forget('otp_' . $email);
