@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\InventoryLog;
 use App\Models\Order;
+use App\Models\Product;
 use App\Services\PaymongoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
 
 class PaymentController extends Controller
 {
-    public function paymongoSuccess(Request $request)
+    public function paymongoSuccess(Request $request, PaymongoService $paymongoService)
     {
         $orderId = (int) $request->query('order');
         $order = Order::where('id', $orderId)
@@ -21,9 +25,43 @@ class PaymentController extends Controller
             return redirect()->route('dashboard')->with('error', 'Order not found.');
         }
 
+        // Webhooks can be delayed/missed in some deployments.
+        // As a fallback, verify checkout session directly when user lands on success URL.
+        if ($order->payment_status !== 'paid' && $order->paymongo_checkout_session_id) {
+            try {
+                $checkoutSession = $paymongoService->getCheckoutSession((string) $order->paymongo_checkout_session_id);
+                $payments = data_get($checkoutSession, 'attributes.payments', []);
+
+                if (is_array($payments) && isset($payments[0])) {
+                    $firstPayment = $payments[0];
+                    $paymentStatus = (string) (data_get($firstPayment, 'attributes.status') ?? data_get($firstPayment, 'status', ''));
+
+                    if ($paymentStatus === '' || in_array($paymentStatus, ['paid', 'succeeded', 'captured'], true)) {
+                        $paymentId = (string) (data_get($firstPayment, 'id') ?? '');
+                        $this->finalizePaidOrder($order, $paymentId);
+                        $order->refresh();
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('PayMongo success fallback sync failed', [
+                    'order_id' => $order->id,
+                    'message' => $e->getMessage(),
+                ]);
+            }
+        }
+
         $message = $order->payment_status === 'paid'
             ? 'Payment received for Order #' . $order->display_order_number . '.'
             : 'Payment is being processed for Order #' . $order->display_order_number . '. We will update your order shortly.';
+
+        if ($order->payment_status === 'paid') {
+            $request->session()->forget('cart');
+        }
+
+        if ($order->status === 'awaiting_payment') {
+            return redirect()->route('orders.index')
+                ->with('info', 'Waiting for payment confirmation. The order will appear once payment is completed.');
+        }
 
         return redirect()->route('orders.show', $order)->with('success', $message);
     }
@@ -39,8 +77,16 @@ class PaymentController extends Controller
             return redirect()->route('dashboard')->with('error', 'Order not found.');
         }
 
+        if ($order->status === 'awaiting_payment' && $order->payment_status === 'pending') {
+            $order->items()->delete();
+            $order->delete();
+
+            return redirect()->route('checkout')
+                ->with('error', 'Payment was canceled. Your order was not placed.');
+        }
+
         return redirect()->route('orders.show', $order)
-            ->with('error', 'Payment was canceled. You can retry payment from your order page.');
+            ->with('error', 'Payment was canceled.');
     }
 
     public function paymongoWebhook(Request $request, PaymongoService $paymongoService)
@@ -68,17 +114,74 @@ class PaymentController extends Controller
         }
 
         if (str_contains($eventType, 'paid')) {
-            $order->update([
-                'payment_status' => 'paid',
-                'status' => $order->status === 'pending' ? 'processing' : $order->status,
-                'paymongo_payment_intent_id' => data_get($event, 'data.attributes.data.attributes.payments.0.id'),
-            ]);
+            try {
+                $this->finalizePaidOrder($order, (string) data_get($event, 'data.attributes.data.attributes.payments.0.id'));
+            } catch (\Throwable $e) {
+                Log::error('Failed to finalize paid PayMongo order', [
+                    'order_id' => $order->id,
+                    'message' => $e->getMessage(),
+                ]);
+
+                return response()->json(['message' => 'Finalize failed'], 202);
+            }
         } elseif (str_contains($eventType, 'failed')) {
-            $order->update(['payment_status' => 'failed']);
+            if ($order->status === 'awaiting_payment') {
+                $order->items()->delete();
+                $order->delete();
+            } else {
+                $order->update(['payment_status' => 'failed']);
+            }
         } elseif (str_contains($eventType, 'canceled') || str_contains($eventType, 'expired')) {
-            $order->update(['payment_status' => 'canceled']);
+            if ($order->status === 'awaiting_payment') {
+                $order->items()->delete();
+                $order->delete();
+            } else {
+                $order->update(['payment_status' => 'canceled']);
+            }
         }
 
         return response()->json(['message' => 'Webhook received'], 200);
+    }
+
+    private function finalizePaidOrder(Order $order, string $paymentIntentId): void
+    {
+        DB::transaction(function () use ($order, $paymentIntentId): void {
+            $order->loadMissing('items.product');
+
+            if ($order->status === 'awaiting_payment') {
+                foreach ($order->items as $item) {
+                    $product = Product::find($item->product_id);
+                    if (!$product) {
+                        throw new RuntimeException('Product not found for order item ' . $item->id);
+                    }
+
+                    $qty = (int) $item->quantity;
+                    if ((int) $product->stock_quantity < $qty) {
+                        throw new RuntimeException('Insufficient stock for product ' . $product->id);
+                    }
+
+                    $previousStock = (int) $product->stock_quantity;
+                    $product->decrement('stock_quantity', $qty);
+
+                    InventoryLog::create([
+                        'product_id' => $product->id,
+                        'user_id' => $order->user_id,
+                        'quantity_change' => -$qty,
+                        'previous_stock' => $previousStock,
+                        'new_stock' => $previousStock - $qty,
+                        'reason' => 'Order paid',
+                        'reference_id' => $order->id,
+                    ]);
+                }
+            }
+
+            $order->update([
+                'payment_status' => 'paid',
+                'status' => $order->status === 'awaiting_payment' || $order->status === 'pending'
+                    ? 'processing'
+                    : $order->status,
+                'paymongo_payment_intent_id' => $paymentIntentId !== '' ? $paymentIntentId : $order->paymongo_payment_intent_id,
+            ]);
+        });
     }
 }

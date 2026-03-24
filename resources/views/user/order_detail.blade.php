@@ -1,6 +1,8 @@
 @extends('layouts.customer')
 
-@section('title', 'Order #{{ $order->display_order_number }} | Lumina')
+@section('title')
+    Order #{{ $order->display_order_number }} | Lumina
+@endsection
 
 @section('content')
     <div class="container mx-auto px-4 sm:px-6 lg:px-10 py-12 max-w-4xl">

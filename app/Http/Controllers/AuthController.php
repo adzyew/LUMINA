@@ -204,7 +204,11 @@ class AuthController extends Controller
         if (!$user instanceof User) {
             abort(403);
         }
-        $orders = $user->orders()->with('items.product')->latest()->get();
+        $orders = $user->orders()
+            ->where('status', '!=', 'awaiting_payment')
+            ->with('items.product')
+            ->latest()
+            ->get();
         return view("user.user_dashboard", compact('user', 'orders'));
     }
 
@@ -216,6 +220,7 @@ class AuthController extends Controller
         }
 
         $orders = $user->orders()
+            ->where('status', '!=', 'awaiting_payment')
             ->with('items.product')
             ->latest()
             ->paginate(10)
@@ -229,6 +234,10 @@ class AuthController extends Controller
         $user = Auth::user();
         if ($order->user_id !== $user->id) {
             abort(403);
+        }
+
+        if ($order->status === 'awaiting_payment') {
+            return redirect()->route('orders.index')->with('info', 'This order is awaiting payment confirmation.');
         }
 
         $order->load('items.product');
