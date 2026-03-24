@@ -31,6 +31,7 @@
                         <span class="px-2 py-1 rounded-full text-xs font-medium {{ $statusColors[$order->status] ?? 'bg-gray-500/20' }}">{{ ucfirst($order->status) }}</span>
                     </dd>
                 </div>
+                <div class="flex justify-between"><dt class="text-gray-500">Payment</dt><dd class="text-gray-900">{{ $order->payment_display }}</dd></div>
                 <div class="flex justify-between"><dt class="text-gray-500">Tracking</dt><dd class="text-gray-900">{{ $order->tracking_number ?? '—' }}</dd></div>
                 <div class="flex justify-between"><dt class="text-gray-500">Courier</dt><dd class="text-gray-900">{{ $order->courier_name ?? '—' }}</dd></div>
                 <div class="flex justify-between"><dt class="text-gray-500">Tracking URL</dt><dd class="text-gray-900 break-all">{{ $order->tracking_url ?? '—' }}</dd></div>

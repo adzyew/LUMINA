@@ -29,7 +29,7 @@
                         ">{{ $order->status }}</span>
                     </div>
 
-                    <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                    <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-4 gap-3 text-sm">
                         <div>
                             <p class="text-gray-500">Items</p>
                             <p class="text-gray-700 font-medium">{{ $order->items->count() }} item(s)</p>
@@ -37,6 +37,10 @@
                         <div>
                             <p class="text-gray-500">Total</p>
                             <p class="text-amber-600 font-bold">Php {{ number_format($order->total_price, 2) }}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Payment</p>
+                            <p class="text-gray-700 font-medium">{{ $order->payment_display }}</p>
                         </div>
                         <div>
                             <p class="text-gray-500">Tracking Number</p>

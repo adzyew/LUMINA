@@ -74,6 +74,7 @@
                     <p class="text-gray-600 text-sm mt-1">
                         {{ $order->items->count() }} item(s) • ₱{{ number_format($order->total_price, 2) }}
                     </p>
+                    <p class="text-gray-600 text-sm mt-1">Payment: {{ $order->payment_display }}</p>
                 </div>
 
                 <div class="flex flex-col sm:items-end gap-2">

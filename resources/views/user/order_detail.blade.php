@@ -131,6 +131,10 @@
                                 <span>{{ $order->points_used }} pts</span>
                             </div>
                         @endif
+                        <div class="flex justify-between text-gray-600">
+                            <span>Payment</span>
+                            <span>{{ $order->payment_display }}</span>
+                        </div>
                         <div class="border-t border-gray-100 pt-2 flex justify-between text-gray-900 font-bold">
                             <span>Total</span>
                             <span class="text-amber-600">Php {{ number_format($order->total_price, 2) }}</span>

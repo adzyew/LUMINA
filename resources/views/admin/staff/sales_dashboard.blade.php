@@ -100,6 +100,7 @@
                         <th class="py-4 px-4 font-medium">Order ID</th>
                         <th class="py-4 px-4 font-medium">Customer</th>
                         <th class="py-4 px-4 font-medium">Date</th>
+                        <th class="py-4 px-4 font-medium">Payment</th>
                         <th class="py-4 px-4 font-medium">Status</th>
                         <th class="py-4 px-4 font-medium text-right">Total</th>
                         <th class="py-4 px-4 font-medium text-center">Action</th>
@@ -114,6 +115,7 @@
                                 <div class="text-xs text-gray-500">{{ $order->contact_phone ?? 'No phone' }}</div>
                             </td>
                             <td class="py-4 px-4 text-sm">{{ $order->created_at->format('M d, Y h:ia') }}</td>
+                            <td class="py-4 px-4 text-sm text-gray-600">{{ $order->payment_channel_label }}</td>
                             <td class="py-4 px-4">
                                 <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
                                     {{ $order->status === 'pending' ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' : '' }}
@@ -133,7 +135,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-12 text-center text-gray-500">
+                            <td colspan="7" class="py-12 text-center text-gray-500">
                                 <svg class="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                                 No recent orders found.
                             </td>
