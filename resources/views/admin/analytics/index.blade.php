@@ -1,12 +1,12 @@
 @extends('admin.admin_layout')
 
-@section('title', 'Analytics & CRM | Lumina Admin')
+@section('title', 'Analytics | Lumina Admin')
 
 @section('content')
 <header class="flex justify-between items-center mb-8">
     @include('partials.favicon')
     <div>
-        <h1 class="text-3xl font-playfair font-bold text-gray-900">Analytics & CRM</h1>
+        <h1 class="text-3xl font-playfair font-bold text-gray-900">Analytics</h1>
         <p class="text-gray-600 text-sm mt-1">Sales analytics, top products, and customer insights.</p>
     </div>
     <form action="{{ route('admin.analytics.export') }}" method="GET" class="flex gap-2 items-center">

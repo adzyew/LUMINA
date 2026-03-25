@@ -20,6 +20,7 @@ class UserManagementController extends Controller
     public function index(Request $request)
     {
         $filter = $request->get('filter', 'all');
+        $roles = Role::whereIn('name', $this->staffRoleNames())->orderBy('name')->get();
 
         // "All" tab: return staff and customers as separate groups (no pagination)
         if ($filter === 'all') {
@@ -35,7 +36,7 @@ class UserManagementController extends Controller
                 ->latest()
                 ->get();
 
-            return view('admin.users.index', compact('staffUsers', 'customerUsers', 'filter'));
+            return view('admin.users.index', compact('staffUsers', 'customerUsers', 'filter', 'roles'));
         }
 
         $query = User::with('roles')->latest();
@@ -59,7 +60,7 @@ class UserManagementController extends Controller
 
         $users = $query->paginate(15)->withQueryString();
 
-        return view('admin.users.index', compact('users', 'filter'));
+        return view('admin.users.index', compact('users', 'filter', 'roles'));
     }
 
     /**
@@ -67,10 +68,10 @@ class UserManagementController extends Controller
      */
     public function create()
     {
-        $this->ensureArchivePermissionExists();
-        $roles = Role::whereIn('name', $this->staffRoleNames())->orderBy('name')->get();
-        $permissions = Permission::orderBy('name')->get();
-        return view('admin.users.create', compact('roles', 'permissions'));
+        return redirect()->route('admin.users.index', [
+            'filter' => 'staff',
+            'openAddStaff' => 1,
+        ]);
     }
 
     /**
@@ -112,8 +113,19 @@ class UserManagementController extends Controller
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
-            'password' => 'nullable|string|min:8|confirmed',
+            'password' => [
+                'nullable',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'confirmed',
+            ],
             'role'     => ['required', 'string', Rule::in($staffRoleNames)],
+        ], [
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.regex' => 'Password must include uppercase, lowercase, and a number.',
         ]);
 
         $user->name  = $request->name;
@@ -141,10 +153,21 @@ class UserManagementController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'confirmed',
+            ],
             'role' => ['required', 'string', Rule::in($staffRoleNames)],
             'permissions' => 'nullable|array',
             'permissions.*' => 'exists:permissions,name',
+        ], [
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.regex' => 'Password must include uppercase, lowercase, and a number.',
         ]);
 
             $user = User::create([

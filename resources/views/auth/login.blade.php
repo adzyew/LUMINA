@@ -491,8 +491,6 @@
                 if (isStrong) {
                     strengthLabel.textContent = 'Password strength: Strong';
                     strengthLabel.className = 'text-xs mt-2 text-green-600';
-                    rulesLabel.textContent = 'Good password. Requirements complete.';
-                    rulesLabel.className = 'text-xs mt-1 text-green-600';
                 } else {
                     strengthLabel.textContent = 'Password strength: Weak';
                     strengthLabel.className = 'text-xs mt-2 text-red-500';

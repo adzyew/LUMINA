@@ -18,6 +18,11 @@ class OrderController extends Controller
             'status' => 'nullable|in:pending,confirmed,processing,shipped,delivered,cancelled',
         ]);
 
+        $statsQuery = Order::query()->where('status', '!=', 'awaiting_payment');
+        $totalOrders = (clone $statsQuery)->count();
+        $completedOrders = (clone $statsQuery)->where('status', 'delivered')->count();
+        $cancelledOrders = (clone $statsQuery)->where('status', 'cancelled')->count();
+
         $query = Order::with(['user', 'items.product'])->latest();
 
         if ($request->filled('status')) {
@@ -26,7 +31,7 @@ class OrderController extends Controller
 
         $orders = $query->paginate(15)->withQueryString();
 
-        return view('admin.orders.index', compact('orders'));
+        return view('admin.orders.index', compact('orders', 'totalOrders', 'completedOrders', 'cancelledOrders'));
     }
 
     public function show(Order $order)

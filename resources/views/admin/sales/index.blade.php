@@ -24,6 +24,27 @@
     </div>
 </div>
 
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mb-8">
+    <div class="xl:col-span-2 bg-white border border-gray-200 rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-bold text-gray-900">Revenue Trend</h3>
+            <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">Last 6 Months</span>
+        </div>
+        <div id="salesTrendChart" class="h-[280px]"></div>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-2xl p-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-3">Payment Mix</h3>
+        @if(count($paymentMixSeries) > 0)
+            <div id="paymentMixChart" class="h-[280px]"></div>
+        @else
+            <div class="h-[280px] flex items-center justify-center text-sm text-gray-500 border border-dashed border-gray-200 rounded-xl">
+                No completed order payments yet.
+            </div>
+        @endif
+    </div>
+</div>
+
 <div class="bg-white border border-gray-200 rounded-2xl p-6">
     <h3 class="text-lg font-bold text-gray-900 mb-4">Sales History</h3>
     <table class="w-full text-left">
@@ -53,4 +74,78 @@
 </div>
 
 @if($orders->hasPages())<div class="mt-6">{{ $orders->links() }}</div>@endif
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const trendLabels = @json($salesTrendLabels);
+        const trendSeries = @json($salesTrendSeries);
+        const paymentLabels = @json($paymentMixLabels);
+        const paymentSeries = @json($paymentMixSeries);
+
+        new ApexCharts(document.querySelector('#salesTrendChart'), {
+            chart: {
+                type: 'area',
+                height: 280,
+                toolbar: { show: false },
+                fontFamily: 'inherit',
+            },
+            series: [{
+                name: 'Revenue',
+                data: trendSeries,
+            }],
+            xaxis: {
+                categories: trendLabels,
+                labels: { style: { colors: '#6b7280' } },
+            },
+            yaxis: {
+                labels: {
+                    style: { colors: '#6b7280' },
+                    formatter: function (val) {
+                        return 'P' + Number(val).toLocaleString();
+                    }
+                }
+            },
+            stroke: { curve: 'smooth', width: 3 },
+            dataLabels: { enabled: false },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.35,
+                    opacityTo: 0.05,
+                    stops: [0, 90, 100],
+                },
+            },
+            colors: ['#f59e0b'],
+            grid: { borderColor: '#f3f4f6' },
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        return 'P' + Number(val).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    }
+                }
+            }
+        }).render();
+
+        if (paymentSeries.length > 0) {
+            new ApexCharts(document.querySelector('#paymentMixChart'), {
+                chart: {
+                    type: 'donut',
+                    height: 280,
+                    fontFamily: 'inherit',
+                },
+                labels: paymentLabels,
+                series: paymentSeries,
+                colors: ['#f59e0b', '#10b981', '#3b82f6', '#f97316', '#8b5cf6', '#14b8a6'],
+                legend: {
+                    position: 'bottom',
+                    fontSize: '13px',
+                    labels: { colors: '#4b5563' },
+                },
+                dataLabels: { enabled: false },
+                stroke: { width: 0 },
+            }).render();
+        }
+    });
+</script>
 @endsection
