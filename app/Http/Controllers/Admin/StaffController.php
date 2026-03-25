@@ -39,8 +39,19 @@ class StaffController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'confirmed',
+            ],
             'role' => 'required|string|exists:roles,name',
+        ], [
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.regex' => 'Password must include uppercase, lowercase, and a number.',
         ]);
 
         $user = User::create([
@@ -75,8 +86,19 @@ class StaffController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:6|confirmed',
+            'password' => [
+                'nullable',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'confirmed',
+            ],
             'role' => 'required|string|exists:roles,name',
+        ], [
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.regex' => 'Password must include uppercase, lowercase, and a number.',
         ]);
 
         $user->name = $data['name'];

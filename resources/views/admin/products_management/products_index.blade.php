@@ -6,8 +6,7 @@
     <header class="flex justify-between items-center mb-8">
     @include('partials.favicon')
         <div>
-            <h1 class="text-3xl font-playfair font-bold text-gray-900">All Products</h1>
-            <p class="text-gray-600 text-sm mt-1">Manage your product catalog.</p>
+            <h1 class="text-3xl font-playfair font-bold text-gray-900">Product Management</h1>
         </div>
         <div class="flex gap-3 items-center">
             <a href="{{ route('admin.products.create') }}" class="px-5 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors">
