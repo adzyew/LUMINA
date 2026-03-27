@@ -36,7 +36,15 @@ class ProviderCallbackController extends Controller
             return redirect()->route('login')->withErrors(['provider' => 'Unable to read email from provider account.']);
         }
 
-        // 1. Find or create the user
+        // 1. Find existing user first to enforce archived-account policy
+        $existingUser = User::where('email', $socialEmail)->first();
+        if ($existingUser && $existingUser->archived_at) {
+            return redirect()->route('login')->withErrors([
+                'email' => 'This account has been archived. Contact admin.',
+            ]);
+        }
+
+        // 2. Create or update OAuth details after archive check passes
         $user = User::updateOrCreate(
             ['email' => $socialEmail],
             [

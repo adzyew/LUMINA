@@ -115,12 +115,6 @@
                     </a>
                 </div>
 
-                @if(session('success'))
-                    <div class="px-6 py-4 bg-green-500/10 border border-green-500/20 rounded-2xl text-green-400 text-center font-medium">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
                 <div class="mt-auto bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
                     <div class="flex items-center gap-4 text-gray-600">
                         <svg class="w-6 h-6 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"></path></svg>
@@ -251,7 +245,31 @@
                 }
             });
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const toast = document.getElementById('cartToast');
+            if (!toast) {
+                return;
+            }
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('opacity-0', 'translate-y-2', 'pointer-events-none');
+            });
+
+            window.setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2', 'pointer-events-none');
+            }, 2600);
+        });
     </script>
+
+    @if(session('success'))
+        <div id="cartToast" class="fixed top-24 right-4 sm:right-6 z-50 max-w-sm w-[calc(100vw-2rem)] sm:w-auto px-4 py-3 bg-green-500 text-white rounded-xl shadow-lg flex items-center gap-3 opacity-0 translate-y-2 pointer-events-none transition-all duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+            <span class="text-sm font-semibold">{{ session('success') }}</span>
+        </div>
+    @endif
 
     @include('partials.footer')
 </body>

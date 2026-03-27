@@ -7,8 +7,6 @@
     <title>Your Lumina Order Confirmation</title>
     <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { border-bottom: 2px solid #fbbf24; padding-bottom: 15px; margin-bottom: 25px; }
-        .brand { font-size: 24px; font-weight: bold; color: #1a1a1a; }
         h1 { color: #1a1a1a; font-size: 20px; margin: 0 0 10px 0; }
         .order-box { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; border: 1px solid #e5e7eb; }
         table { width: 100%; border-collapse: collapse; margin: 15px 0; }
@@ -19,7 +17,6 @@
         .address { background: #f3f4f6; padding: 15px; border-radius: 6px; margin: 15px 0; }
         .cta { margin: 16px 0 6px 0; }
         .cta a { display: inline-block; background: #111827; color: #ffffff; text-decoration: none; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
-        .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; font-size: 12px; color: #6b7280; }
     </style>
 </head>
 <body>
@@ -29,9 +26,7 @@
         $shipping = 0.00;
     @endphp
 
-    <div class="header">
-        <span class="brand">Lumina</span> Jewelry
-    </div>
+    @include('emails.partials.header', ['emailHeaderTitle' => 'Order Confirmation'])
 
     <h1>Your Lumina Order Confirmation</h1>
     <p>Dear {{ $order->user->name ?? 'Customer' }},</p>
@@ -77,11 +72,6 @@
 
     <p>If you have any questions or need to make changes to your order, please reply directly to this email or contact our support team at {{ $supportEmail ?? config('mail.from.address') }}.</p>
 
-    <div class="footer">
-        Warm regards,<br>
-        The Lumina Team<br>
-        <a href="{{ $websiteUrl ?? config('app.url') }}">{{ $websiteUrl ?? config('app.url') }}</a><br><br>
-        &copy; {{ date('Y') }} Lumina Jewelry. All rights reserved.
-    </div>
+    @include('emails.partials.footer')
 </body>
 </html>

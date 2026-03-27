@@ -108,8 +108,7 @@
                         Resend Code
                     </button>
                 </form>
-                <p id="resendHint" class="mt-2 text-xs text-gray-500"></p>
-                <a href="{{ route('login') }}" class="block mt-4 text-xs text-gray-500 hover:text-gray-700">Back to Login</a>
+                <a href="{{ route('login') }}" class="block mt-4 text-md text-gray-600 hover:text-amber-400">Back to Login</a>
             </div>
         </div>
     </div>

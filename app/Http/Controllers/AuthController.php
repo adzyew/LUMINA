@@ -208,7 +208,8 @@ class AuthController extends Controller
             ->where('status', '!=', 'awaiting_payment')
             ->with('items.product')
             ->latest()
-            ->get();
+            ->paginate(3)
+            ->withQueryString();
         return view("user.user_dashboard", compact('user', 'orders'));
     }
 
@@ -223,7 +224,7 @@ class AuthController extends Controller
             ->where('status', '!=', 'awaiting_payment')
             ->with('items.product')
             ->latest()
-            ->paginate(10)
+            ->paginate(3)
             ->withQueryString();
 
         return view('user.orders', compact('orders'));

@@ -7,8 +7,6 @@
     <title>Order Status Updated</title>
     <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { border-bottom: 2px solid #fbbf24; padding-bottom: 15px; margin-bottom: 25px; }
-        .brand { font-size: 24px; font-weight: bold; color: #1a1a1a; }
         h1 { color: #1a1a1a; font-size: 20px; margin: 0 0 10px 0; }
         .status-box { background: #f8f9fa; border-radius: 8px; padding: 16px; margin: 20px 0; border: 1px solid #e5e7eb; }
         .status { font-size: 18px; font-weight: bold; color: #111827; }
@@ -18,7 +16,6 @@
         .address { background: #f3f4f6; padding: 15px; border-radius: 6px; margin: 15px 0; }
         .cta { margin: 16px 0 6px 0; }
         .cta a { display: inline-block; background: #111827; color: #ffffff; text-decoration: none; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
-        .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; font-size: 12px; color: #6b7280; }
     </style>
 </head>
 <body>
@@ -47,9 +44,7 @@
         $message = $messages[$status] ?? 'Your order status has changed. Please review the latest order details below.';
     @endphp
 
-    <div class="header">
-        <span class="brand">Lumina</span> Jewelry
-    </div>
+    @include('emails.partials.header', ['emailHeaderTitle' => 'Order Status Update'])
 
     <h1>{{ $heading }}</h1>
     <p>Dear {{ $order->user->name ?? 'Customer' }},</p>
@@ -99,11 +94,6 @@
     </div>
     <p>If you need help, you can reply directly to this email or contact us at {{ $supportEmail ?? config('mail.from.address') }}.</p>
 
-    <div class="footer">
-        Best regards,<br>
-        The Lumina Team<br>
-        <a href="{{ $websiteUrl ?? config('app.url') }}">{{ $websiteUrl ?? config('app.url') }}</a><br><br>
-        &copy; {{ date('Y') }} Lumina Jewelry. All rights reserved.
-    </div>
+    @include('emails.partials.footer')
 </body>
 </html>

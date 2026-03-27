@@ -177,6 +177,24 @@
                             if (qtyEl) qtyEl.textContent = data.quantity;
                             const subEl = document.querySelector('.item-subtotal[data-id="' + id + '"]');
                             if (subEl) subEl.textContent = '₱' + data.item_subtotal;
+
+                            // Keep the +/- hidden quantity inputs in sync with latest quantity.
+                            const row = document.getElementById('cart-row-' + id);
+                            if (row) {
+                                const currentQty = Number(data.quantity) || 0;
+                                row.querySelectorAll('.cart-update-form').forEach(function(updateForm){
+                                    const quantityInput = updateForm.querySelector('input[name="quantity"]');
+                                    const submitBtn = updateForm.querySelector('button[type="submit"]');
+                                    if (!quantityInput || !submitBtn) return;
+
+                                    const label = (submitBtn.textContent || '').trim();
+                                    if (label === '−' || label === '-') {
+                                        quantityInput.value = String(Math.max(0, currentQty - 1));
+                                    } else {
+                                        quantityInput.value = String(currentQty + 1);
+                                    }
+                                });
+                            }
                         }
                         // update total in summary
                         document.querySelectorAll('.text-2xl.font-playfair.font-bold.text-amber-600, .text-gray-900.font-medium').forEach(function(el){
