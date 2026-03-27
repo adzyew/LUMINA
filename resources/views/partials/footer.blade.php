@@ -1,4 +1,4 @@
-<footer id="contact" class="bg-amber-50 border-t border-amber-200/50 pt-16 pb-8">
+<footer id="contact" class="bg-amber-50 border-t border-amber-200/50 pt-10 sm:pt-12 pb-8">
     <div class="container mx-auto px-4 sm:px-6">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
 
@@ -23,25 +23,13 @@
             </div>
 
             <div>
-                <h4 class="font-bold text-amber-900 mb-6 uppercase tracking-wider text-sm">Customer Care</h4>
+                <h4 class="font-bold text-amber-900 mb-4 uppercase tracking-wider text-sm">Customer Care</h4>
                 <ul class="space-y-3 text-amber-900/80 text-sm">
                     <li><a href="#" class="hover:text-amber-600 transition-colors">Shipping Information</a></li>
                     <li><a href="#" class="hover:text-amber-600 transition-colors">Returns & Exchange</a></li>
                     <li><a href="#" class="hover:text-amber-600 transition-colors">Lifetime Warranty</a></li>
                     <li><a href="#" class="hover:text-amber-600 transition-colors">Privacy Policy</a></li>
                     <li><a href="#" class="hover:text-amber-600 transition-colors">Terms of Service</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h4 class="font-bold text-amber-900 mb-6 uppercase tracking-wider text-sm">Our Team</h4>
-                <ul class="space-y-3 text-amber-900/80 text-sm">
-                    <li><span class="font-semibold text-amber-900">Project Manager:</span> Jandusay, Jexabelle</li>
-                    <li><span class="font-semibold text-amber-900">Business Analyst:</span> Aldea, Glydel P.</li>
-                    <li><span class="font-semibold text-amber-900">Front-End Developer:</span> Millano, Alena Beatriz P.</li>
-                    <li><span class="font-semibold text-amber-900">Back-End Developer:</span> Talub, Meriel Ady A.</li>
-                    <li><span class="font-semibold text-amber-900">Quality Assurance:</span> Alarcon, Mary Grace L.</li>
-                    <li><span class="font-semibold text-amber-900">Quality Assurance:</span> Lanoba Jr., John R.</li>
                 </ul>
             </div>
         </div>

@@ -55,6 +55,15 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="settings" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
+                    <h3 class="text-xl font-playfair font-bold text-gray-900 mb-2">Profile & Security</h3>
+                    <p class="text-gray-600 text-sm mb-4">Update your name, profile photo, and phone.</p>
+                    <a href="{{ route('profile.show') }}" class="inline-flex items-center gap-2 text-amber-600 text-sm font-semibold hover:text-amber-700 transition-colors">
+                        View profile
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </a>
+                </div>
             </div>
 
             <div class="lg:col-span-2 space-y-8">
@@ -107,16 +116,31 @@
             </div>
         @endforelse
     </div>
-</div>
 
-                <div id="settings" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 scroll-mt-24">
-                    <h3 class="text-xl font-playfair font-bold text-gray-900 mb-2">Profile & Security</h3>
-                    <p class="text-gray-600 text-sm mb-4">Update your name, profile photo, and phone.</p>
-                    <a href="{{ route('profile.show') }}" class="inline-flex items-center gap-2 text-amber-600 text-sm font-semibold hover:text-amber-700 transition-colors">
-                        View profile
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </a>
-                </div>
+    @if($orders->hasPages())
+        <div class="mt-5 flex items-center justify-end gap-2">
+            @if($orders->onFirstPage())
+                <span class="px-3 py-1.5 text-xs rounded-lg border border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed">Prev</span>
+            @else
+                <a href="{{ $orders->previousPageUrl() }}" class="px-3 py-1.5 text-xs rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-colors">Prev</a>
+            @endif
+
+            @foreach($orders->getUrlRange(max(1, $orders->currentPage() - 1), min($orders->lastPage(), $orders->currentPage() + 1)) as $page => $url)
+                @if($page == $orders->currentPage())
+                    <span class="px-3 py-1.5 text-xs rounded-lg bg-amber-300 text-black font-bold">{{ $page }}</span>
+                @else
+                    <a href="{{ $url }}" class="px-3 py-1.5 text-xs rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-colors">{{ $page }}</a>
+                @endif
+            @endforeach
+
+            @if($orders->hasMorePages())
+                <a href="{{ $orders->nextPageUrl() }}" class="px-3 py-1.5 text-xs rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-colors">Next</a>
+            @else
+                <span class="px-3 py-1.5 text-xs rounded-lg border border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed">Next</span>
+            @endif
+        </div>
+    @endif
+</div>
 
             </div>
         </div>

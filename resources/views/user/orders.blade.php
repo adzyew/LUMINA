@@ -67,8 +67,32 @@
             @endforelse
         </div>
 
-        @if($orders->hasPages())
-            <div class="mt-8">{{ $orders->links() }}</div>
-        @endif
+        <div class="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="text-sm text-gray-500">
+                Showing {{ $orders->firstItem() }} to {{ $orders->lastItem() }} of {{ $orders->total() }} orders
+            </p>
+
+            <div class="flex items-center gap-2">
+                @if($orders->onFirstPage())
+                    <span class="px-3 py-2 text-sm rounded-lg border border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed">Previous</span>
+                @else
+                    <a href="{{ $orders->previousPageUrl() }}" class="px-3 py-2 text-sm rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-colors">Previous</a>
+                @endif
+
+                @foreach($orders->getUrlRange(max(1, $orders->currentPage() - 1), min($orders->lastPage(), $orders->currentPage() + 1)) as $page => $url)
+                    @if($page == $orders->currentPage())
+                        <span class="px-3 py-2 text-sm rounded-lg bg-amber-300 text-black font-bold">{{ $page }}</span>
+                    @else
+                        <a href="{{ $url }}" class="px-3 py-2 text-sm rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-colors">{{ $page }}</a>
+                    @endif
+                @endforeach
+
+                @if($orders->hasMorePages())
+                    <a href="{{ $orders->nextPageUrl() }}" class="px-3 py-2 text-sm rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-colors">Next</a>
+                @else
+                    <span class="px-3 py-2 text-sm rounded-lg border border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed">Next</span>
+                @endif
+            </div>
+        </div>
     </div>
 @endsection
