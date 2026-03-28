@@ -33,6 +33,7 @@
                 <span class="text-xs text-gray-400 mt-1 ml-1">Customer</span>
             </div>
         </div>
+        @auth
         <div class="px-6 py-5 border-b border-gray-100">
             <div class="flex items-center gap-3">
                 @if(Auth::user()->profile_photo_url)
@@ -48,6 +49,7 @@
                 </div>
             </div>
         </div>
+        @endauth
         <nav class="px-3 py-4 space-y-1">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->routeIs('dashboard') ? 'text-amber-600 bg-amber-50 font-semibold' : 'text-gray-600 hover:text-amber-600 hover:bg-amber-50/70' }} transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">

@@ -87,14 +87,23 @@
                     </span>
                 </div>
 
-                <h1 class="text-4xl sm:text-5xl font-playfair font-bold text-gray-900 mb-6 leading-tight">{{ $product->name }}</h1>
-                <p class="text-4xl font-black text-amber-300 mb-8">₱{{ number_format($product->price ?? 0, 2) }}</p>
 
-                @if($product->description ?? null)
-                    <div class="mb-10">
-                        <p class="text-gray-600 leading-relaxed text-lg">{{ $product->description }}</p>
-                    </div>
-                @endif
+                <div class="mb-10">
+                    <h1 class="text-4xl sm:text-5xl font-playfair font-bold text-gray-900 mb-4 leading-tight">{{ $product->name }}</h1>
+                    <p class="text-4xl font-black text-amber-300 mb-6">₱{{ number_format($product->price ?? 0, 2) }}</p>
+                    @if($product->description ?? null)
+                        @php
+                            $features = explode('•', $product->description);
+                        @endphp
+                        <ul class="text-gray-600 leading-relaxed text-lg list-disc pl-6">
+                            @foreach($features as $feature)
+                                @if(trim($feature) !== '')
+                                    <li>{{ trim($feature) }}</li>
+                                @endif
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
 
                 <hr class="border-gray-200 mb-8">
 

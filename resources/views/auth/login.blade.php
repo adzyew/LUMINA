@@ -53,7 +53,7 @@
         <!-- Left Side - Form -->
         <div class="w-full lg:w-1/2 flex flex-col justify-center p-8 lg:p-16">
             <div class="auth-form-wrapper">
-                <a href="{{ url('/') }}" class="inline-flex items-center  mb-5 text-xs font-semibold hover:text-red-600 bg-amber-300 rounded-full p-2 transition-colors">
+                <a href="{{ url('/') }}" class="inline-flex items-center  mb-5 text-xs font-semibold hover:text-amber-300 bg-white hover:bg-amber-600 rounded-full p-2 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd" d="M11.707 4.293a1 1 0 010 1.414L8.414 9H16a1 1 0 110 2H8.414l3.293 3.293a1 1 0 01-1.414 1.414l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 0z" clip-rule="evenodd" />
                     </svg>

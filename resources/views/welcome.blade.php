@@ -173,7 +173,18 @@
                         </div>
                         <div class="p-5">
                             <h3 class="font-playfair font-semibold text-gray-900 mb-1 group-hover:text-amber-600 transition-colors">{{ $product->name }}</h3>
-                            <p class="text-gray-500 text-sm mb-3 line-clamp-2">{{ Str::limit($product->description ?? '', 60) }}</p>
+                            @if($product->description)
+                                @php
+                                    // Split on either • or newlines, trim, and filter out empty lines
+                                    $features = preg_split('/[•\n\r]+/', $product->description);
+                                    $features = array_filter(array_map('trim', $features));
+                                @endphp
+                                <ul class="text-gray-500 text-sm mb-3 list-disc list-inside">
+                                    @foreach($features as $feature)
+                                        <li>{{ $feature }}</li>
+                                    @endforeach
+                                </ul>
+                            @endif
                             @php
                                 $avgRating = (float) ($product->reviews_avg_rating ?? 0);
                                 $reviewCount = (int) ($product->reviews_count ?? 0);
@@ -200,18 +211,22 @@
     {{-- Shop by Category --}}
     <section class="py-20 bg-white scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
-            <h2 class="text-3xl font-playfair font-bold text-gray-900 text-center mb-10 scroll-scale">Shop by Category</h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
-                @foreach([['name'=>'Necklaces','img'=>'Necklace.jpg','cat'=>'necklaces'],['name'=>'Bracelets','img'=>'Bracelet.jpg','cat'=>'bracelets'],['name'=>'Earrings','img'=>'Earrings.jpg','cat'=>'earrings'],['name'=>'Rings','img'=>'Ring.jpg','cat'=>'rings'],['name'=>'Watches','img'=>'Watches.jpg','cat'=>'watches']] as $c)
-                    <a href="{{ route('products.index', ['category' => $c['cat']]) }}" class="group block bg-gray-50 rounded-xl overflow-hidden border border-gray-100 hover:border-amber-200 transition-all hover:shadow-md">
-                        <div class="aspect-square overflow-hidden">
-                            <img src="{{ asset('IMAGES/' . $c['img']) }}" alt="{{ $c['name'] }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
-                        </div>
-                        <div class="p-4 text-center">
-                            <h3 class="font-playfair font-semibold text-gray-900 group-hover:text-amber-600">{{ $c['name'] }}</h3>
-                        </div>
-                    </a>
-                @endforeach
+            <h2 class="text-3xl font-playfair font-bold text-gray-900 text-center mb-6 scroll-scale">Shop by Category</h2>
+            <div class="flex flex-col gap-4">
+                <!-- If you have a search bar, place it here and add mb-2 for spacing -->
+                {{-- <div class="mb-2">@include('partials.searchbar')</div> --}}
+                <div class="flex gap-3 overflow-x-auto pb-2 -mx-2 px-2 sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:gap-6 sm:overflow-visible sm:mx-0 sm:px-0">
+                    @foreach([['name'=>'Necklaces','img'=>'Necklace.jpg','cat'=>'necklaces'],['name'=>'Bracelets','img'=>'Bracelet.jpg','cat'=>'bracelets'],['name'=>'Earrings','img'=>'Earrings.jpg','cat'=>'earrings'],['name'=>'Rings','img'=>'Ring.jpg','cat'=>'rings'],['name'=>'Watches','img'=>'Watches.jpg','cat'=>'watches']] as $c)
+                        <a href="{{ route('products.index', ['category' => $c['cat']]) }}" class="group min-w-[140px] max-w-[180px] flex-shrink-0 bg-gray-50 rounded-xl overflow-hidden border border-gray-100 hover:border-amber-200 transition-all hover:shadow-md sm:min-w-0 sm:max-w-none">
+                            <div class="aspect-square overflow-hidden">
+                                <img src="{{ asset('IMAGES/' . $c['img']) }}" alt="{{ $c['name'] }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                            </div>
+                            <div class="p-4 text-center">
+                                <h3 class="font-playfair font-semibold text-gray-900 group-hover:text-amber-600">{{ $c['name'] }}</h3>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
             </div>
         </div>
     </section>

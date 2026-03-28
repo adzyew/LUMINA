@@ -82,5 +82,12 @@ Route::middleware('customer')->group(function () {
     });
 });
 
+// --- LEGAL & CUSTOMER CARE PAGES ---
+Route::view('/shipping-information', 'legal.shipping')->name('legal.shipping');
+Route::view('/returns-exchange', 'legal.returns')->name('legal.returns');
+Route::view('/lifetime-warranty', 'legal.warranty')->name('legal.warranty');
+Route::view('/privacy-policy', 'legal.privacy')->name('legal.privacy');
+Route::view('/terms-of-service', 'legal.terms')->name('legal.terms');
+
 Route::middleware('auth')->post('/logout', [AuthController::class, 'logout'])->name('logout');
 
