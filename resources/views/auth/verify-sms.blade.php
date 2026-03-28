@@ -91,9 +91,10 @@
                     @endfor
                 </div>
 
-                <p id="lock-timer" class="hidden text-center text-sm text-red-600 mb-3"></p>
-                <p id="attempts-info" class="text-center text-sm text-amber-600 mb-2"></p>
-                <p id="otp-timer" class="text-center text-sm text-gray-600 mb-6"></p>
+                <p id="lock-timer" class="hidden text-center text-sm text-red-600 mb-2"></p>
+                <p id="otp-timer" class="text-center text-sm text-gray-600 mb-1"></p>
+                <p id="attempts-info" class="text-center text-sm text-gray-600 mb-6"></p>
+
 
                 <button id="verifyBtn" type="submit" class="w-full py-4 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-all transform hover:scale-[1.02] shadow-lg shadow-amber-300/20 mb-6">
                     Verify Code

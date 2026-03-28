@@ -196,40 +196,51 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
             ->name('staff.destroy');
 
         // PRODUCTS
+        // ↓ RULE: all static segments (e.g. "create") and sub-resource routes
+        //   (e.g. "{product}/json") MUST come BEFORE the plain "{product}" show
+        //   route, otherwise Laravel swallows them as a product ID.
+
         Route::get('products', [ProductController::class, 'index'])
-            ->middleware('permission:inventory.view')
+            ->middleware('role_or_permission:admin|inventory.view')
             ->name('products.index');
 
         Route::get('products/create', [ProductController::class, 'create'])
-            ->middleware('permission:inventory.create')
+            ->middleware('role_or_permission:admin|inventory.create')
             ->name('products.create');
 
         Route::post('products', [ProductController::class, 'store'])
-            ->middleware('permission:inventory.create')
+            ->middleware('role_or_permission:admin|inventory.create')
             ->name('products.store');
 
+        // ← MUST be before products/{product} (show) so "json" isn't treated as an ID
+        Route::get('products/{product}/json', [ProductController::class, 'showJson'])
+            ->middleware('role_or_permission:admin|inventory.view')
+            ->name('products.json');
+
+
+        // archive/unarchive products (must come before products/{product})
+        Route::post('products/{product}/archive', [ProductController::class, 'archive'])
+            ->middleware('role_or_permission:admin|inventory.archive')
+            ->name('products.archive');
+        Route::post('products/{product}/unarchive', [ProductController::class, 'unarchive'])
+            ->middleware('role_or_permission:admin|inventory.archive')
+            ->name('products.unarchive');
+
         Route::get('products/{product}', [ProductController::class, 'show'])
-            ->middleware('permission:inventory.view')
+            ->middleware('role_or_permission:admin|inventory.view')
             ->name('products.show');
 
         Route::get('products/{product}/edit', [ProductController::class, 'edit'])
-            ->middleware('permission:inventory.update')
+            ->middleware('role_or_permission:admin|inventory.update')
             ->name('products.edit');
 
         Route::put('products/{product}', [ProductController::class, 'update'])
-            ->middleware('permission:inventory.update')
+            ->middleware('role_or_permission:admin|inventory.update')
             ->name('products.update');
 
         Route::delete('products/{product}', [ProductController::class, 'destroy'])
-            ->middleware('permission:inventory.delete')
+            ->middleware('role_or_permission:admin|inventory.delete')
             ->name('products.destroy');
-        // archive/unarchive products
-        Route::post('products/{product}/archive', [ProductController::class, 'archive'])
-            ->middleware('permission:inventory.archive')
-            ->name('products.archive');
-        Route::post('products/{product}/unarchive', [ProductController::class, 'unarchive'])
-            ->middleware('permission:inventory.archive')
-            ->name('products.unarchive');
 
         // ORDERS
         Route::get('orders', [AdminOrderController::class, 'index'])->middleware('permission:sales.view')->name('orders.index');

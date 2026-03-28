@@ -8,25 +8,22 @@ use App\Models\InventoryLog;
 use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
 
-
 class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $filter = $request->get('filter', 'all');
-        $stock = $request->get('stock', 'all');
-        $search = trim((string) $request->get('search', ''));
+        $filter   = $request->get('filter', 'all');
+        $stock    = $request->get('stock', 'all');
+        $search   = trim((string) $request->get('search', ''));
         $category = $request->get('category');
 
-        // Admin should be able to see archived products, so include trashed and remove storefront archive scope
         $products = Product::withTrashed()
             ->withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class);
 
         if ($filter === 'archived') {
             $products->whereNotNull('archived_at');
         } elseif ($filter === 'active') {
-            $products->whereNull('archived_at');
-            $products->whereNull('deleted_at');
+            $products->whereNull('archived_at')->whereNull('deleted_at');
         }
 
         if (!empty($category)) {
@@ -34,9 +31,9 @@ class ProductController extends Controller
         }
 
         if ($search !== '') {
-            $products->where(function ($query) use ($search): void {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+            $products->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -61,20 +58,38 @@ class ProductController extends Controller
         $products = $products->latest()->paginate(10)->withQueryString();
 
         return view('admin.products_management.products_index', compact(
-            'products',
-            'filter',
-            'stock',
-            'search',
-            'category',
-            'categories'
+            'products', 'filter', 'stock', 'search', 'category', 'categories'
         ));
     }
 
     public function show(Request $request, Product $product)
     {
+        $product = Product::withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class)
+            ->withTrashed()
+            ->findOrFail($product->id);
         return view('admin.products_management.products_show', compact('product'));
     }
-    
+
+    /**
+     * JSON endpoint for the Edit modal AJAX call.
+     * Route: GET /admin/products/{product}/json
+     */
+    public function showJson(Product $product)
+    {
+        $product = Product::withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class)
+            ->withTrashed()
+            ->findOrFail($product->id);
+        return response()->json([
+            'id'             => $product->id,
+            'name'           => $product->name,
+            'category'       => $product->category,
+            'price'          => $product->price,
+            'stock_quantity' => $product->stock_quantity,
+            'description'    => $product->description,
+            'image_url'      => $product->image_url,
+            'is_featured'    => (bool) $product->is_featured,
+        ]);
+    }
 
     public function create()
     {
@@ -83,7 +98,11 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        return view('admin.products_management.edit', compact('product'));
+        $product = Product::withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class)
+            ->withTrashed()
+            ->findOrFail($product->id);
+        $isArchived = $product->archived_at !== null;
+        return view('admin.products_management.edit', compact('product', 'isArchived'));
     }
 
     public function store(Request $request, CloudinaryService $cloudinary)
@@ -97,67 +116,33 @@ class ProductController extends Controller
             'image'          => 'required|image|max:10240',
         ]);
 
-        $file = $request->file('image');
+        $product = Product::withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class)
+            ->withTrashed()
+            ->findOrFail($product->id);
 
-        if (!$file || !$file->isValid()) {
-            return back()
-                ->withInput()
-                ->withErrors(['image' => 'Image upload failed. Please try again.']);
+        if ($product->archived_at !== null) {
+            // Prevent editing archived products
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Archived products cannot be edited.'], 403);
+            }
+            return redirect()->route('admin.products.index')->with('error', 'Archived products cannot be edited.');
         }
 
-        try {
-            $uploaded = $cloudinary->uploadImage($file->getRealPath());
-
-            Product::create([
-                'name'            => $request->name,
-                'description'     => $request->description,
-                'price'           => $request->price,
-                'category'        => $request->category,
-                'stock_quantity'  => $request->stock_quantity,
-                'is_featured'     => $request->boolean('is_featured'),
-                'image_url'       => $uploaded['url'],
-                'image_public_id' => $uploaded['public_id'],
-            ]);
-
-            return redirect()
-                ->route('admin.products.index')
-                ->with('success', 'Product created successfully!');
-
-        } catch (\Throwable $e) {
-            return back()
-                ->withInput()
-                ->withErrors(['image' => 'Upload failed: ' . $e->getMessage()]);
-        }
-    }
-
-     public function update(
-        Request $request,
-        Product $product,
-        CloudinaryService $cloudinary
-    ) {
         $validated = $request->validate([
             'name'           => 'required|string|max:255',
             'price'          => 'required|numeric|min:0',
             'category'       => 'nullable|string|max:255',
             'description'    => 'nullable|string',
             'stock_quantity' => 'required|integer|min:0',
-            // Main image replacement (optional)
             'image'          => 'nullable|image|max:5120',
-            // Add more gallery images (optional)
             'images'         => 'nullable|array',
             'images.*'       => 'nullable|image|max:5120',
         ]);
 
         if ($request->hasFile('image')) {
-            // delete old image
             $cloudinary->deleteImage($product->image_public_id);
-
-            // upload new
-            $image = $cloudinary->uploadImage(
-                $request->file('image')->getRealPath()
-            );
-
-            $product->image_url = $image['url'];
+            $image = $cloudinary->uploadImage($request->file('image')->getRealPath());
+            $product->image_url      = $image['url'];
             $product->image_public_id = $image['public_id'];
             $product->save();
         }
@@ -167,28 +152,28 @@ class ProductController extends Controller
             foreach (array_values($request->file('images')) as $offset => $file) {
                 $img = $cloudinary->uploadImage($file->getRealPath());
                 $product->images()->create([
-                    'image_url' => $img['url'],
+                    'image_url'       => $img['url'],
                     'image_public_id' => $img['public_id'],
-                    'sort_order' => $start + $offset,
+                    'sort_order'      => $start + $offset,
                 ]);
             }
         }
 
-        if($request->has('stock_quantity') && $request->stock_quantity ) {
+        if ($request->has('stock_quantity')) {
+            $oldStock   = $product->stock_quantity;
+            $newStock   = (int) $request->stock_quantity;
+            $difference = $newStock - $oldStock;
 
-        $oldStock = $product->stock_quantity;
-        $newStock = $request->stock_quantity;
-        $difference = $newStock - $oldStock;
-
-        InventoryLog::create([
-            'product_id' => $product->id,
-            
-            'quantity_change' => $difference,
-            'previous_stock' => $oldStock,
-            'new_stock' => $newStock,
-            'reason' => 'Stock updated via admin panel',
-            'reference_id' => null, // could be order ID or something if related to a specific action
-        ]);
+            if ($difference !== 0) {
+                InventoryLog::create([
+                    'product_id'      => $product->id,
+                    'quantity_change' => $difference,
+                    'previous_stock'  => $oldStock,
+                    'new_stock'       => $newStock,
+                    'reason'          => 'Stock updated via admin panel',
+                    'reference_id'    => null,
+                ]);
+            }
         }
 
         $product->update([
@@ -200,18 +185,37 @@ class ProductController extends Controller
             'is_featured'    => $request->boolean('is_featured'),
         ]);
 
-        return redirect()
-            ->route('admin.products.index')
-            ->with('success', 'Product updated successfully!');
+        // AJAX request from the modal → return JSON
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Product updated successfully!']);
+        }
+
+        return redirect()->route('admin.products.index')->with('success', 'Product updated successfully!');
+
+        $product->update([
+            'name'           => $validated['name'],
+            'description'    => $validated['description'] ?? null,
+            'price'          => $validated['price'],
+            'category'       => $validated['category'] ?? null,
+            'stock_quantity' => $validated['stock_quantity'],
+            'is_featured'    => $request->boolean('is_featured'),
+        ]);
+
+        // AJAX request from the modal → return JSON
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Product updated successfully!']);
+        }
+
+        return redirect()->route('admin.products.index')->with('success', 'Product updated successfully!');
     }
 
-    public function destroy($product, CloudinaryService $cloudinary)
+    public function destroy($id, CloudinaryService $cloudinary)
     {
-        $product = Product::withTrashed()->findOrFail($product);
+        // Must use withTrashed because archived products are soft-deleted
+        $product = Product::withTrashed()->findOrFail($id);
 
         $cloudinary->deleteImage($product->image_public_id);
 
-        // delete gallery images too
         $product->loadMissing('images');
         foreach ($product->images as $img) {
             $cloudinary->deleteImage($img->image_public_id);
@@ -219,18 +223,12 @@ class ProductController extends Controller
 
         $product->forceDelete();
 
-        return redirect()
-            ->route('admin.products.index')
-            ->with('success', 'Product permanently deleted!');
+        return redirect()->route('admin.products.index')->with('success', 'Product permanently deleted!');
     }
 
-    /**
-     * Archive a product (soft archive)
-     */
     public function archive(Product $product)
     {
-
-        $product->delete(); // This will set the deleted_at timestamp due to SoftDeletes trait
+        $product->delete();          // sets deleted_at (SoftDeletes)
         $product->archived_at = now();
         $product->save();
 
@@ -238,13 +236,16 @@ class ProductController extends Controller
     }
 
     /**
-     * Unarchive a product
+     * Unarchive — MUST resolve with withTrashed because the product is soft-deleted.
+     * We accept the raw $id and look it up manually instead of relying on route
+     * model binding, which would 404 on soft-deleted records by default.
      */
-    public function unarchive(Product $product)
+    public function unarchive($id)
     {
-        $product = Product::withTrashed()->findOrFail($product->id);
-        $product->restore(); // This will set the deleted_at timestamp to null
-
+        $product = Product::withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class)
+            ->withTrashed()
+            ->findOrFail($id);
+        $product->restore();         // clears deleted_at
         $product->archived_at = null;
         $product->save();
 
