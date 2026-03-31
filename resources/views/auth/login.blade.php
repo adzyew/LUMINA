@@ -46,6 +46,130 @@
             flex-shrink: 0;
             box-sizing: border-box;
         }
+
+        .floating-group {
+            position: relative;
+        }
+
+        .floating-input {
+            width: 100%;
+            background-color: white;
+            border: 1px solid rgb(229 231 235);
+            border-radius: 0.75rem;
+            color: rgb(17 24 39);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .floating-input:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 1px #f59e0b;
+        }
+
+        .floating-label {
+            position: absolute;
+            left: 3rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgb(156 163 175);
+            font-size: 1rem;
+            line-height: 1;
+            pointer-events: none;
+            transition: all 0.18s ease;
+            z-index: 20;
+            background: white;
+            padding: 0 0.35rem;
+        }
+
+        .floating-input:focus + .floating-label,
+        .floating-input:not(:placeholder-shown) + .floating-label {
+            top: 0;
+            transform: translateY(-50%);
+            font-size: 0.75rem;
+            color: #d97706;
+        }
+
+        .floating-label.no-icon {
+            left: 1rem;
+        }
+
+        /* Fix for intl-tel-input container */
+        .iti {
+            width: 100%;
+        }
+
+        /* Move label to the right (because of flag +63) */
+        .phone-label {
+            left: 4.5rem; /* adjust if needed */
+        }
+
+        /* When empty */
+        .floating-input:placeholder-shown + .phone-label {
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            color: rgb(156 163 175);
+        }
+
+        /* When focused or has value */
+        .floating-input:focus + .phone-label,
+        .floating-input:not(:placeholder-shown) + .phone-label {
+            top: 0;
+            transform: translateY(-50%);
+            font-size: 0.75rem;
+            color: #d97706;
+            background: white;
+            padding: 0 0.25rem;
+        }
+
+        .iti {
+            width: 100%;
+        }
+
+        .phone-floating-group {
+            position: relative;
+        }
+
+        .phone-floating-group .iti input {
+            width: 100%;
+            padding-bottom: 0.75rem;
+            padding-left: 5.5rem !important;
+            padding-right: 1rem;
+            background-color: white;
+            border: 1px solid rgb(229 231 235);
+            border-radius: 0.75rem;
+            color: rgb(17 24 39);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .phone-floating-group .iti input:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 1px #f59e0b;
+        }
+
+        .phone-floating-label {
+            position: absolute;
+            left: 5.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgb(156 163 175);
+            font-size: 1rem;
+            line-height: 1;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 20;
+        }
+
+        .phone-floating-group.is-focused .phone-floating-label,
+        .phone-floating-group.has-value .phone-floating-label {
+            top: 0;
+            transform: translateY(-50%);
+            font-size: 0.75rem;
+            color: #d97706;
+            background: white;
+            padding: 0 0.25rem;
+        }
     </style>
 </head>
 <body class="bg-white font-sans antialiased">
@@ -93,16 +217,16 @@
 
                                 <!-- Email -->
                                 <div>
-                                    <div class="relative">
-                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                    <div class="floating-group">
+                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 z-10">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                             </svg>
                                         </span>
-                                        <input type="email" name="email" value="{{ old('email') }}"
-                                            class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all"
-                                            placeholder="Email address">
+                                        <input type="email" name="email" id="login-email" value="{{ old('email') }}" placeholder=" " class=" floating-input peer pl-12 pr-12 py-4" >
+                                        <label for="login-email" class="floating-label">Email address</label>
                                     </div>
+
                                     @error('email')
                                         @if(($activeTab ?? 'login') === 'login')
                                             <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
@@ -112,16 +236,17 @@
 
                                 <!-- Password -->
                                 <div>
-                                    <div class="relative">
-                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                    <div class="floating-group">
+                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 z-10">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                             </svg>
                                         </span>
-                                        <input id="login-password" type="password" name="password"
-                                            class="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-600 text-gray-900 placeholder-gray-400 transition-all"
-                                            placeholder="Password">
-                                        <button type="button" onclick="togglePasswordField('login-password', 'login-eye-open', 'login-eye-closed')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
+
+                                        <input id="login-password" type="password" name="password" placeholder=" " class="floating-input pl-12 pr-12 py-4">
+                                        <label for="login-password" class="floating-label">Password</label>
+
+                                        <button type="button" onclick="togglePasswordField('login-password', 'login-eye-open', 'login-eye-closed')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none z-10">
                                             <svg id="login-eye-open" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -131,6 +256,7 @@
                                             </svg>
                                         </button>
                                     </div>
+
                                     @error('password')
                                         @if(($activeTab ?? 'login') === 'login')
                                             <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
@@ -197,41 +323,51 @@
                                 @endif
 
                                 <!-- Name Fields -->
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <input type="text" name="first_name" value="{{ old('first_name') }}"
-                                            class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all"
-                                            placeholder="First Name">
-                                        @error('first_name')
-                                            @if(($activeTab ?? 'login') === 'register')
-                                                <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
-                                            @endif
-                                        @enderror
-                                    </div>
-                                    <div>
-                                        <input type="text" name="last_name" value="{{ old('last_name') }}"
-                                            class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all"
-                                            placeholder="Last Name">
-                                        @error('last_name')
-                                            @if(($activeTab ?? 'login') === 'register')
-                                                <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
-                                            @endif
-                                        @enderror
-                                    </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                                <!-- First Name -->
+                                <div class="floating-group">
+                                    <input type="text" name="first_name" id="first_name" value="{{ old('first_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30">
+                                    <label for="first_name" class="floating-label no-icon">
+                                        First Name
+                                    </label>
+
+                                    @error('first_name')
+                                        @if(($activeTab ?? 'login') === 'register')
+                                            <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                                        @endif
+                                    @enderror
                                 </div>
+
+                                <!-- Last Name -->
+                                <div class="floating-group">
+                                    <input type="text" name="last_name" id="last_name" value="{{ old('last_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30">
+                                    <label for="last_name" class="floating-label no-icon">
+                                        Last Name
+                                    </label>
+
+                                    @error('last_name')
+                                        @if(($activeTab ?? 'login') === 'register')
+                                            <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                                        @endif
+                                    @enderror
+                                </div>
+
+                            </div>
 
                                 <!-- Email -->
                                 <div>
-                                    <div class="relative">
-                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                    <div class="floating-group">
+                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 z-10">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                             </svg>
                                         </span>
-                                        <input type="email" name="email" value="{{ old('email', session('email')) }}"
-                                            class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all"
-                                            placeholder="Email address">
+
+                                        <input type="email" name="email" id="register-email" value="{{ old('email', session('email')) }}" placeholder=" " class="floating-input pl-12 pr-4 py-4" maxlength="50">
+                                        <label for="register-email" class="floating-label">Email address</label>
                                     </div>
+
                                     @error('email')
                                         @if(($activeTab ?? 'login') === 'register')
                                             <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
@@ -240,15 +376,12 @@
                                 </div>
 
                                 <!-- Phone -->
-                                <div>
-                                    <div class="relative">
-                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                                            </svg>
-                                        </span>
-                                        <input id="register-phone" type="text" name="phone" value="{{ old('phone') }}" class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all" placeholder="09171234567" inputmode="numeric" pattern="09[0-9]{9}" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length > 11) this.value = this.value.slice(0, 11);">
-                                    </div>
+                                <div class="phone-floating-group relative">
+                                    <input id="register-phone" type="tel" name="phone" value="{{ old('phone') }}" placeholder=" " class="floating-input phone-input w-full py-4">
+                                    <label for="register-phone" class="phone-floating-label pt-1 pb-1 py-4">
+                                        Phone Number
+                                    </label>
+
                                     @error('phone')
                                         @if(($activeTab ?? 'login') === 'register')
                                             <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
@@ -258,18 +391,17 @@
 
                                 <!-- Password -->
                                 <div>
-                                    <div class="relative">
-                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                    <div class="floating-group">
+                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 z-10">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                             </svg>
                                         </span>
-                                        <input id="register-password" type="password" name="password"
-                                            class="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all"
-                                            placeholder="Create Password"
-                                            minlength="8"
-                                            autocomplete="new-password">
-                                        <button type="button" onclick="togglePasswordField('register-password', 'register-eye-open', 'register-eye-closed')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
+
+                                        <input id="register-password" type="password" name="password" placeholder=" " class="floating-input pl-12 pr-12 py-4" minlength="8" autocomplete="new-password">
+                                        <label for="register-password" class="floating-label">Create Password</label>
+
+                                        <button type="button" onclick="togglePasswordField('register-password', 'register-eye-open', 'register-eye-closed')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none z-10">
                                             <svg id="register-eye-open" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -279,27 +411,30 @@
                                             </svg>
                                         </button>
                                     </div>
+
                                     @error('password')
                                         @if(($activeTab ?? 'login') === 'register')
                                             <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
                                         @endif
                                     @enderror
+
                                     <p id="register-password-strength" class="hidden text-xs mt-2 text-gray-500">Password strength: Weak</p>
                                     <p id="register-password-rules" class="hidden text-xs mt-1 text-gray-500">Use at least 8 characters with uppercase, lowercase, and a number.</p>
                                 </div>
 
                                 <!-- Confirm Password -->
                                 <div>
-                                    <div class="relative">
-                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                    <div class="floating-group">
+                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 z-10">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                             </svg>
                                         </span>
-                                        <input id="register-password-confirm" type="password" name="password_confirmation"
-                                            class="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all"
-                                            placeholder="Confirm Password">
-                                        <button type="button" onclick="togglePasswordField('register-password-confirm', 'confirm-eye-open', 'confirm-eye-closed')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
+
+                                        <input id="register-password-confirm" type="password" name="password_confirmation" placeholder=" " class="floating-input pl-12 pr-12 py-4">
+                                        <label for="register-password-confirm" class="floating-label">Confirm Password</label>
+
+                                        <button type="button" onclick="togglePasswordField('register-password-confirm', 'confirm-eye-open', 'confirm-eye-closed')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none z-10">
                                             <svg id="confirm-eye-open" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -309,6 +444,7 @@
                                             </svg>
                                         </button>
                                     </div>
+
                                     <p id="register-password-match" class="hidden text-xs mt-2">Passwords match.</p>
                                 </div>
 
@@ -568,6 +704,32 @@
                 }
             }
         });
+
+                document.addEventListener('DOMContentLoaded', function () {
+                const phoneInput = document.getElementById('register-phone');
+                const phoneWrapper = phoneInput.closest('.phone-floating-group');
+
+                function updatePhoneLabel() {
+                    if (phoneInput.value.trim() !== '') {
+                        phoneWrapper.classList.add('has-value');
+                    } else {
+                        phoneWrapper.classList.remove('has-value');
+                    }
+                }
+
+                phoneInput.addEventListener('focus', function () {
+                    phoneWrapper.classList.add('is-focused');
+                });
+
+                phoneInput.addEventListener('blur', function () {
+                    phoneWrapper.classList.remove('is-focused');
+                    updatePhoneLabel();
+                });
+
+                phoneInput.addEventListener('input', updatePhoneLabel);
+
+                updatePhoneLabel();
+            });
     </script>
 </body>
 </html>
