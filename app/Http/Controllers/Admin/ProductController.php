@@ -64,9 +64,6 @@ class ProductController extends Controller
 
     public function show(Request $request, Product $product)
     {
-        $product = Product::withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class)
-            ->withTrashed()
-            ->findOrFail($product->id);
         return view('admin.products_management.products_show', compact('product'));
     }
 
@@ -76,9 +73,6 @@ class ProductController extends Controller
      */
     public function showJson(Product $product)
     {
-        $product = Product::withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class)
-            ->withTrashed()
-            ->findOrFail($product->id);
         return response()->json([
             'id'             => $product->id,
             'name'           => $product->name,
@@ -98,11 +92,7 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        $product = Product::withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class)
-            ->withTrashed()
-            ->findOrFail($product->id);
-        $isArchived = $product->archived_at !== null;
-        return view('admin.products_management.edit', compact('product', 'isArchived'));
+        return view('admin.products_management.edit', compact('product'));
     }
 
     public function store(Request $request, CloudinaryService $cloudinary)
@@ -116,18 +106,35 @@ class ProductController extends Controller
             'image'          => 'required|image|max:10240',
         ]);
 
-        $product = Product::withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class)
-            ->withTrashed()
-            ->findOrFail($product->id);
+        $file = $request->file('image');
 
-        if ($product->archived_at !== null) {
-            // Prevent editing archived products
-            if ($request->expectsJson()) {
-                return response()->json(['success' => false, 'message' => 'Archived products cannot be edited.'], 403);
-            }
-            return redirect()->route('admin.products.index')->with('error', 'Archived products cannot be edited.');
+        if (!$file || !$file->isValid()) {
+            return back()->withInput()->withErrors(['image' => 'Image upload failed. Please try again.']);
         }
 
+        try {
+            $uploaded = $cloudinary->uploadImage($file->getRealPath());
+
+            Product::create([
+                'name'            => $request->name,
+                'description'     => $request->description,
+                'price'           => $request->price,
+                'category'        => $request->category,
+                'stock_quantity'  => $request->stock_quantity,
+                'is_featured'     => $request->boolean('is_featured'),
+                'image_url'       => $uploaded['url'],
+                'image_public_id' => $uploaded['public_id'],
+            ]);
+
+            return redirect()->route('admin.products.index')->with('success', 'Product created successfully!');
+
+        } catch (\Throwable $e) {
+            return back()->withInput()->withErrors(['image' => 'Upload failed: ' . $e->getMessage()]);
+        }
+    }
+
+    public function update(Request $request, Product $product, CloudinaryService $cloudinary)
+    {
         $validated = $request->validate([
             'name'           => 'required|string|max:255',
             'price'          => 'required|numeric|min:0',
@@ -142,7 +149,7 @@ class ProductController extends Controller
         if ($request->hasFile('image')) {
             $cloudinary->deleteImage($product->image_public_id);
             $image = $cloudinary->uploadImage($request->file('image')->getRealPath());
-            $product->image_url      = $image['url'];
+            $product->image_url       = $image['url'];
             $product->image_public_id = $image['public_id'];
             $product->save();
         }
@@ -185,25 +192,21 @@ class ProductController extends Controller
             'is_featured'    => $request->boolean('is_featured'),
         ]);
 
-        // AJAX request from the modal → return JSON
+        // AJAX request from the modal → return updated product as JSON
         if ($request->expectsJson()) {
-            return response()->json(['success' => true, 'message' => 'Product updated successfully!']);
-        }
-
-        return redirect()->route('admin.products.index')->with('success', 'Product updated successfully!');
-
-        $product->update([
-            'name'           => $validated['name'],
-            'description'    => $validated['description'] ?? null,
-            'price'          => $validated['price'],
-            'category'       => $validated['category'] ?? null,
-            'stock_quantity' => $validated['stock_quantity'],
-            'is_featured'    => $request->boolean('is_featured'),
-        ]);
-
-        // AJAX request from the modal → return JSON
-        if ($request->expectsJson()) {
-            return response()->json(['success' => true, 'message' => 'Product updated successfully!']);
+            $product->refresh();
+            return response()->json([
+                'success' => true,
+                'message' => 'Product updated successfully!',
+                'product' => [
+                    'id'             => $product->id,
+                    'name'           => $product->name,
+                    'category'       => $product->category,
+                    'price'          => $product->price,
+                    'stock_quantity' => $product->stock_quantity,
+                    'image_url'      => $product->image_url,
+                ],
+            ]);
         }
 
         return redirect()->route('admin.products.index')->with('success', 'Product updated successfully!');
@@ -211,7 +214,7 @@ class ProductController extends Controller
 
     public function destroy($id, CloudinaryService $cloudinary)
     {
-        // Must use withTrashed because archived products are soft-deleted
+        // withTrashed because archived products are soft-deleted
         $product = Product::withTrashed()->findOrFail($id);
 
         $cloudinary->deleteImage($product->image_public_id);
@@ -228,7 +231,7 @@ class ProductController extends Controller
 
     public function archive(Product $product)
     {
-        $product->delete();          // sets deleted_at (SoftDeletes)
+        $product->delete();
         $product->archived_at = now();
         $product->save();
 
@@ -236,16 +239,13 @@ class ProductController extends Controller
     }
 
     /**
-     * Unarchive — MUST resolve with withTrashed because the product is soft-deleted.
-     * We accept the raw $id and look it up manually instead of relying on route
-     * model binding, which would 404 on soft-deleted records by default.
+     * Unarchive — accepts raw $id because route model binding excludes
+     * soft-deleted records by default, causing archived products to 404.
      */
     public function unarchive($id)
     {
-        $product = Product::withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class)
-            ->withTrashed()
-            ->findOrFail($id);
-        $product->restore();         // clears deleted_at
+        $product = Product::withTrashed()->findOrFail($id);
+        $product->restore();
         $product->archived_at = null;
         $product->save();
 

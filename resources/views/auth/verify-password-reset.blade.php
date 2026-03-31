@@ -58,17 +58,15 @@
             </form>
 
             <div class="text-center">
-                <p class="text-sm text-gray-600 mb-2">Didn't receive a code?</p>
-                <form method="POST" action="{{ route('password.resend-otp') }}" class="inline" id="resendForm">
+                <form method="POST" action="{{ route('password.resend-otp') }}" class="inline-flex item-center gap-2" id="resendForm">
                     @csrf
+                    <p class="text-sm text-gray-600">Didn't receive a code?</p>
                     <button id="resendBtn" type="submit" class="text-amber-600 text-sm font-semibold hover:text-amber-700 disabled:text-gray-400 disabled:cursor-not-allowed">Resend OTP</button>
                 </form>
-                <p id="resendHint" class="mt-2 text-xs text-gray-500"></p>
                 <a href="{{ route('password.request') }}" class="block mt-4 text-xs text-gray-500 hover:text-gray-700">Use different email</a>
             </div>
         </div>
     </div>
-    @include('partials.footer')
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
