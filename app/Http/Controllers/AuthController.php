@@ -739,7 +739,7 @@ class AuthController extends Controller
         try {
             Mail::to($request->email)->send(new TestMail($otp));
         } catch (\Exception $e) {
-            return back()->withInput()->with('error', 'Failed to send email. Please try again later.');
+            return $e->getMessage();
         }
 
         session(['password_reset_email' => $request->email]);

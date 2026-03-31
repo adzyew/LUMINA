@@ -247,13 +247,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                                             </svg>
                                         </span>
-                                        <input id="register-phone" type="text" name="phone" value="{{ old('phone') }}"
-                                            class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all"
-                                            placeholder="09171234567"
-                                            inputmode="numeric"
-                                            pattern="09[0-9]{9}"
-                                            maxlength="11"
-                                            oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length > 11) this.value = this.value.slice(0, 11);">
+                                        <input id="register-phone" type="text" name="phone" value="{{ old('phone') }}" class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-gray-900 placeholder-gray-400 transition-all" placeholder="09171234567" inputmode="numeric" pattern="09[0-9]{9}" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.length > 11) this.value = this.value.slice(0, 11);">
                                     </div>
                                     @error('phone')
                                         @if(($activeTab ?? 'login') === 'register')

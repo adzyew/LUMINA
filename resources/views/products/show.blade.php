@@ -12,7 +12,6 @@
 <body class="bg-stone-100 text-gray-900 font-sans antialiased min-h-screen flex flex-col">
 
     <div class="fixed inset-0 -z-50 overflow-hidden">
-        <img src="{{ asset('IMAGES/BG.png') }}" alt="" class="w-full h-full object-cover"/>
         <div class="absolute inset-0 bg-stone-400/30 backdrop-blur-[2px]"></div>
         <div class="absolute inset-0 bg-linear-to-b from-stone-200/70 via-stone-100/50 to-stone-200/80"></div>
     </div>
@@ -78,24 +77,24 @@
             <div class="flex flex-col pt-2">
 
                 <div class="flex flex-wrap gap-2 mb-4">
-                    <span class="px-4 py-1.5 rounded-full border border-amber-200/50 text-xs font-semibold text-amber-600 uppercase tracking-widest">
+                    <span class="px-4 py-1.5 rounded-full border border-amber-600 text-xs font-semibold text-amber-600 uppercase tracking-widest">
                         {{ $product->category ?? 'Jewelry' }}
                     </span>
                     @php $inStock = ($product->stock_quantity ?? 0) > 0; @endphp
-                    <span class="px-4 py-1.5 rounded-full text-xs font-semibold border uppercase tracking-widest {{ $inStock ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20' }}">
+                    <span class="px-4 py-1.5 rounded-full text-xs font-semibold border uppercase tracking-widest {{ $inStock ? ' text-green-400 border-green-400' : 'bg-red-500/10 text-red-400 border-red-400' }}">
                         {{ $inStock ? 'In Stock' : 'Sold Out' }}
                     </span>
                 </div>
 
 
                 <div class="mb-10">
-                    <h1 class="text-4xl sm:text-5xl font-playfair font-bold text-gray-900 mb-4 leading-tight">{{ $product->name }}</h1>
-                    <p class="text-4xl font-black text-amber-300 mb-6">₱{{ number_format($product->price ?? 0, 2) }}</p>
+                    <h1 class="text-4xl sm:text-5xl font-playfair font-bold text-black mb-4 leading-tight">{{ $product->name }}</h1>
+                    <p class="text-4xl font-black text-amber-400 mb-6">₱{{ number_format($product->price ?? 0, 2) }}</p>
                     @if($product->description ?? null)
                         @php
                             $features = explode('•', $product->description);
                         @endphp
-                        <ul class="text-gray-600 leading-relaxed text-lg list-disc pl-6">
+                        <ul class="text-black leading-relaxed text-lg list-disc pl-6">
                             @foreach($features as $feature)
                                 @if(trim($feature) !== '')
                                     <li>{{ trim($feature) }}</li>
@@ -119,17 +118,17 @@
                         </span>
                     @endif
 
-                    <a href="{{ route('products.index') }}" class="w-full h-14 bg-white/70 text-gray-700 font-semibold rounded-full hover:bg-white border border-gray-200 transition-colors flex items-center justify-center">
+                    <a href="{{ route('products.index') }}" class="w-full h-14 bg-white/70 text-black font-semibold rounded-full hover:bg-white border border-gray-200 transition-colors flex items-center justify-center">
                         Continue Shopping
                     </a>
                 </div>
 
                 <div class="mt-auto bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
-                    <div class="flex items-center gap-4 text-gray-600">
+                    <div class="flex items-center gap-4 text-black">
                         <svg class="w-6 h-6 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"></path></svg>
                         <span class="text-sm">Authentic Lumina Quality</span>
                     </div>
-                    <div class="flex items-center gap-4 text-gray-600">
+                    <div class="flex items-center gap-4 text-black">
                         <svg class="w-6 h-6 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"></path></svg>
                         <span class="text-sm">Secure & Insured Shipping</span>
                     </div>

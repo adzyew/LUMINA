@@ -16,24 +16,14 @@
     </header>
 
     @if(session('success'))
-        <div 
-            x-data="{ show: true }" 
-            x-init="setTimeout(() => show = false, 3000)" 
-            x-show="show" 
-            x-transition:leave="transition ease-in duration-300" 
-            x-transition:leave-start="opacity-100 translate-y-0" 
-            x-transition:leave-end="opacity-0 -translate-y-2" 
-            class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-green-500/80 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 backdrop-blur-sm duration-100"
-            style="min-width: 220px;"
-        >
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-            <span>{{ session('success') }}</span>
+        <div class="mb-6 bg-green-100 text-green-800 p-4 rounded-lg border border-green-200">
+            {{ session('success') }}
         </div>
     @endif
 
     <div class="flex flex-wrap gap-2 mb-4">
-        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'all'])) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? 'all') === 'all' ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">All</a>
-        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'active'])) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'active' ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">Active</a>
+        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'all'])) }}"      class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? 'all') === 'all'      ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">All</a>
+        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'active'])) }}"   class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'active'   ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">Active</a>
         <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'archived'])) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'archived' ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">Archived</a>
     </div>
 
@@ -46,24 +36,22 @@
         </div>
         <div>
             <label for="category" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Category</label>
-            <select id="category" name="category"
-                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-300">
+            <select id="category" name="category" class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-300">
                 <option value="">All Categories</option>
                 @foreach(($categories ?? collect()) as $categoryOption)
                     @php($categoryLabel = trim((string) $categoryOption))
                     @continue($categoryLabel === '')
-                    <option style="color:#111827; background-color:#ffffff;" value="{{ $categoryOption }}" {{ ($category ?? '') === $categoryOption ? 'selected' : '' }}>{{ $categoryLabel }}</option>
+                    <option style="color:#111827;background-color:#ffffff;" value="{{ $categoryOption }}" {{ ($category ?? '') === $categoryOption ? 'selected' : '' }}>{{ $categoryLabel }}</option>
                 @endforeach
             </select>
         </div>
         <div>
             <label for="stock" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Stock Status</label>
-            <select id="stock" name="stock"
-                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-300">
-                <option style="color:#111827; background-color:#ffffff;" value="all"          {{ ($stock ?? 'all') === 'all'         ? 'selected' : '' }}>All Stock Levels</option>
-                <option style="color:#111827; background-color:#ffffff;" value="in_stock"     {{ ($stock ?? '') === 'in_stock'       ? 'selected' : '' }}>In Stock (6+)</option>
-                <option style="color:#111827; background-color:#ffffff;" value="low_stock"    {{ ($stock ?? '') === 'low_stock'      ? 'selected' : '' }}>Low Stock (1-5)</option>
-                <option style="color:#111827; background-color:#ffffff;" value="out_of_stock" {{ ($stock ?? '') === 'out_of_stock'   ? 'selected' : '' }}>Out of Stock (0)</option>
+            <select id="stock" name="stock" class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-300">
+                <option style="color:#111827;background-color:#ffffff;" value="all"          {{ ($stock ?? 'all') === 'all'        ? 'selected' : '' }}>All Stock Levels</option>
+                <option style="color:#111827;background-color:#ffffff;" value="in_stock"     {{ ($stock ?? '') === 'in_stock'      ? 'selected' : '' }}>In Stock (6+)</option>
+                <option style="color:#111827;background-color:#ffffff;" value="low_stock"    {{ ($stock ?? '') === 'low_stock'     ? 'selected' : '' }}>Low Stock (1-5)</option>
+                <option style="color:#111827;background-color:#ffffff;" value="out_of_stock" {{ ($stock ?? '') === 'out_of_stock'  ? 'selected' : '' }}>Out of Stock (0)</option>
             </select>
         </div>
         <div class="flex items-end gap-2">
@@ -86,14 +74,22 @@
             </thead>
             <tbody class="divide-y divide-gray-200">
                 @foreach($products as $product)
-                <tr class="hover:bg-amber-300/12 transition duration-300">
+                <tr id="product-row-{{ $product->id }}" class="hover:bg-amber-300/12 transition duration-300">
                     <td class="p-4">
-                        <img src="{{ $product->image_url }}" class="w-12 h-12 object-cover rounded border border-gray-200">
+                        <img id="product-img-{{ $product->id }}" src="{{ $product->image_url }}" class="w-12 h-12 object-cover rounded border border-gray-200">
                     </td>
-                    <td class="p-4 font-medium text-gray-900">{{ $product->name }}</td>
-                    <td class="p-4 text-gray-900 font-bold">{{ $product->category }}</td>
-                    <td class="p-4 text-gray-700">{{ $product->stock_quantity ?? 0 }}</td>
-                    <td class="p-4 text-amber-300 font-bold">₱{{ number_format($product->price, 2) }}</td>
+                    <td class="p-4 font-medium text-gray-900">
+                        <span id="product-name-{{ $product->id }}">{{ $product->name }}</span>
+                    </td>
+                    <td class="p-4 text-gray-900 font-bold">
+                        <span id="product-category-{{ $product->id }}">{{ $product->category }}</span>
+                    </td>
+                    <td class="p-4 text-gray-700">
+                        <span id="product-stock-{{ $product->id }}">{{ $product->stock_quantity ?? 0 }}</span>
+                    </td>
+                    <td class="p-4 text-amber-300 font-bold">
+                        <span id="product-price-{{ $product->id }}">₱{{ number_format($product->price, 2) }}</span>
+                    </td>
                     <td class="p-4">
                         <div class="flex justify-center gap-3">
 
@@ -127,36 +123,24 @@
 
                             {{-- Archive / Unarchive / Delete --}}
                             @if(isset($product->archived_at) && $product->archived_at)
-                                <form action="{{ route('admin.products.unarchive', $product->id) }}" method="POST"
-                                      onsubmit="return confirm('Unarchive this product?');">
+                                <form action="{{ route('admin.products.unarchive', $product->id) }}" method="POST" onsubmit="return confirm('Unarchive this product?');">
                                     @csrf
-                                    <button type="submit" title="Unarchive"
-                                            class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-500/10 hover:bg-gray-500 text-gray-500 hover:text-white transition-all duration-200">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-                                        </svg>
+                                    <button type="submit" title="Unarchive" class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-500/10 hover:bg-gray-500 text-gray-500 hover:text-white transition-all duration-200">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg>
                                     </button>
                                 </form>
-                                <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST"
-                                      onsubmit="return confirm('Permanently delete this product? This cannot be undone.');">
+                                <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Permanently delete this product? This cannot be undone.');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" title="Delete permanently"
-                                            class="w-10 h-10 flex items-center justify-center rounded-xl bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white transition-all duration-200">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                        </svg>
+                                    <button type="submit" title="Delete permanently" class="w-10 h-10 flex items-center justify-center rounded-xl bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white transition-all duration-200">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
                                     </button>
                                 </form>
                             @else
-                                <form action="{{ route('admin.products.archive', $product->id) }}" method="POST"
-                                      onsubmit="return confirm('Archive this product?');">
+                                <form action="{{ route('admin.products.archive', $product->id) }}" method="POST" onsubmit="return confirm('Archive this product?');">
                                     @csrf
-                                    <button type="submit" title="Archive"
-                                            class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-500/10 hover:bg-gray-500 text-gray-500 hover:text-white transition-all duration-200">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-                                        </svg>
+                                    <button type="submit" title="Archive" class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-500/10 hover:bg-gray-500 text-gray-500 hover:text-white transition-all duration-200">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg>
                                     </button>
                                 </form>
                             @endif
@@ -177,10 +161,19 @@
 
 
     {{-- ================================================================
+         TOAST NOTIFICATION
+         ================================================================ --}}
+    <div id="toast" class="fixed bottom-6 right-6 z-[200] hidden items-center gap-3 px-5 py-3.5 rounded-xl shadow-lg border text-sm font-medium transition-all duration-300 max-w-sm">
+        <svg id="toast-icon" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg>
+        <span id="toast-message"></span>
+    </div>
+
+
+    {{-- ================================================================
          VIEW MODAL
          ================================================================ --}}
-    <div id="view-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+    <div id="view-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4" onclick="event.stopPropagation()">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
                 <h2 class="text-xl font-playfair font-bold text-gray-900">Product Details</h2>
                 <button onclick="closeViewModal()" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors text-xl leading-none">&times;</button>
@@ -190,42 +183,21 @@
                     <img id="view-image" src="" alt="" class="w-full h-72 object-cover rounded-xl border border-gray-200 cursor-pointer" onclick="openViewImageZoom()">
                 </div>
                 <div class="space-y-5">
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Name</p>
-                        <p id="view-name" class="text-xl font-bold text-gray-900"></p>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Category</p>
-                        <p id="view-category" class="text-base font-semibold text-gray-700"></p>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Price</p>
-                        <p id="view-price" class="text-xl font-bold text-amber-600"></p>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Stock</p>
-                        <p id="view-stock" class="text-lg font-semibold text-gray-900"></p>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Status</p>
-                        <span id="view-status" class="inline-block px-3 py-1 rounded-full text-sm font-medium"></span>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Description</p>
-                        <p id="view-description" class="text-gray-600 leading-relaxed text-sm"></p>
-                    </div>
+                    <div><p class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Name</p><p id="view-name" class="text-xl font-bold text-gray-900"></p></div>
+                    <div><p class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Category</p><p id="view-category" class="text-base font-semibold text-gray-700"></p></div>
+                    <div><p class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Price</p><p id="view-price" class="text-xl font-bold text-amber-600"></p></div>
+                    <div><p class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Stock</p><p id="view-stock" class="text-lg font-semibold text-gray-900"></p></div>
+                    <div><p class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Status</p><span id="view-status" class="inline-block px-3 py-1 rounded-full text-sm font-medium"></span></div>
+                    <div><p class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Description</p><p id="view-description" class="text-gray-600 leading-relaxed text-sm"></p></div>
                 </div>
             </div>
             <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
-                <button id="view-edit-btn" type="button"
-                    class="px-5 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors text-sm">Edit</button>
-                <button onclick="closeViewModal()"
-                    class="px-5 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 border border-gray-200 transition-colors text-sm">Close</button>
+                <button id="view-edit-btn" type="button" class="px-5 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors text-sm">Edit</button>
+                <button onclick="closeViewModal()" class="px-5 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 border border-gray-200 transition-colors text-sm">Close</button>
             </div>
         </div>
     </div>
 
-    {{-- Image zoom --}}
     <div id="view-image-zoom" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/70 backdrop-blur-sm">
         <div class="absolute inset-0" onclick="closeViewImageZoom()"></div>
         <div class="relative max-w-4xl max-h-[90vh] p-4 z-10">
@@ -238,8 +210,8 @@
     {{-- ================================================================
          EDIT MODAL
          ================================================================ --}}
-    <div id="edit-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+    <div id="edit-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4" onclick="event.stopPropagation()">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
                 <div>
                     <h2 class="text-xl font-playfair font-bold text-gray-900">Edit Product</h2>
@@ -267,13 +239,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-500 mb-2">Product Name</label>
-                        <input type="text" id="edit-name" name="name" required
-                            class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 focus:ring-2 focus:ring-amber-100 outline-none transition-colors">
+                        <input type="text" id="edit-name" name="name" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 focus:ring-2 focus:ring-amber-100 outline-none transition-colors">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-500 mb-2">Category</label>
-                        <select id="edit-category" name="category"
-                            class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 focus:ring-2 focus:ring-amber-100 outline-none transition-colors">
+                        <select id="edit-category" name="category" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 focus:ring-2 focus:ring-amber-100 outline-none transition-colors">
                             <option value="Rings">Rings</option>
                             <option value="Necklaces">Necklaces</option>
                             <option value="Earrings">Earrings</option>
@@ -286,20 +256,17 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-500 mb-2">Price (₱)</label>
-                        <input type="number" step="0.01" id="edit-price" name="price" required
-                            class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 focus:ring-2 focus:ring-amber-100 outline-none transition-colors">
+                        <input type="number" step="0.01" id="edit-price" name="price" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 focus:ring-2 focus:ring-amber-100 outline-none transition-colors">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-500 mb-2">Stock Quantity</label>
-                        <input type="number" id="edit-stock-qty" name="stock_quantity" required
-                            class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 focus:ring-2 focus:ring-amber-100 outline-none transition-colors">
+                        <input type="number" id="edit-stock-qty" name="stock_quantity" required class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 focus:ring-2 focus:ring-amber-100 outline-none transition-colors">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-500 mb-2">Description</label>
-                    <textarea id="edit-description" name="description" rows="4"
-                        class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 focus:ring-2 focus:ring-amber-100 outline-none transition-colors resize-none"></textarea>
+                    <textarea id="edit-description" name="description" rows="4" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 focus:ring-2 focus:ring-amber-100 outline-none transition-colors resize-none"></textarea>
                 </div>
 
                 <div>
@@ -309,28 +276,24 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-500 mb-2">Change Image</label>
-                    <input type="file" name="image" accept="image/*"
-                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-amber-300 file:text-black hover:file:bg-amber-400 cursor-pointer">
+                    <input type="file" name="image" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-amber-300 file:text-black hover:file:bg-amber-400 cursor-pointer">
                     <p class="text-xs text-gray-400 mt-1">Leave empty to keep current image. Max 5MB.</p>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <input type="checkbox" id="edit-is-featured" name="is_featured" value="1"
-                        class="w-4 h-4 rounded border-gray-400 bg-white text-amber-300 focus:ring-amber-300">
+                    <input type="checkbox" id="edit-is-featured" name="is_featured" value="1" class="w-4 h-4 rounded border-gray-400 bg-white text-amber-300 focus:ring-amber-300">
                     <label for="edit-is-featured" class="text-sm text-gray-700">Featured Product</label>
                 </div>
 
                 <div class="flex gap-4 pt-2 border-t border-gray-100">
-                    <button type="submit" id="edit-submit-btn"
-                        class="px-6 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors flex items-center gap-2">
+                    <button type="submit" id="edit-submit-btn" class="px-6 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors flex items-center gap-2">
                         <span>Update Product</span>
                         <svg id="edit-submit-spinner" class="hidden animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                         </svg>
                     </button>
-                    <button type="button" onclick="closeEditModal()"
-                        class="px-6 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 border border-gray-300 transition-colors">Cancel</button>
+                    <button type="button" onclick="closeEditModal()" class="px-6 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 border border-gray-300 transition-colors">Cancel</button>
                 </div>
             </form>
         </div>
@@ -338,33 +301,63 @@
 
 
     {{-- ================================================================
-         JAVASCRIPT — inside @section('content') so it always renders
+         JAVASCRIPT
          ================================================================ --}}
     <script>
     (function () {
 
+        /* ── CSRF ─────────────────────────────────────────────────────── */
         var CSRF = '';
-        var meta = document.querySelector('meta[name="csrf-token"]');
-        if (meta) { CSRF = meta.getAttribute('content'); }
+        var metaTag = document.querySelector('meta[name="csrf-token"]');
+        if (metaTag) { CSRF = metaTag.getAttribute('content'); }
 
-        /* ── helpers ──────────────────────────────────────────────── */
+        /* ── TOAST ────────────────────────────────────────────────────── */
+        var toastTimer = null;
+
+        function showToast(message, type) {
+            var toast   = document.getElementById('toast');
+            var msgEl   = document.getElementById('toast-message');
+            var iconEl  = document.getElementById('toast-icon');
+
+            msgEl.textContent = message;
+
+            if (type === 'success') {
+                toast.className = 'fixed top-10 left-1/2 -translate-x-1/2 z-100 flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-lg border text-sm font-medium transition-all duration-300 max-w-sm bg-green-50 border-green-200 text-green-800';
+                iconEl.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>';
+            } else {
+                toast.className = 'fixed top-10 left-1/2 -translate-x-1/2 z-100 flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-lg border text-sm font-medium transition-all duration-300 max-w-sm bg-red-50 border-red-200 text-red-800';
+                iconEl.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
+            }
+
+            toast.classList.remove('hidden');
+            toast.classList.add('flex');
+
+            if (toastTimer) { clearTimeout(toastTimer); }
+            toastTimer = setTimeout(function () {
+                toast.classList.add('hidden');
+                toast.classList.remove('flex');
+            }, 3500);
+        }
+
+        /* ── MODAL HELPERS ────────────────────────────────────────────── */
         function showModal(id) {
             var el = document.getElementById(id);
             el.classList.remove('hidden');
             el.classList.add('flex');
             document.body.style.overflow = 'hidden';
         }
+
         function hideModal(id) {
             var el = document.getElementById(id);
             el.classList.add('hidden');
             el.classList.remove('flex');
-            var anyOpen = ['view-modal','edit-modal','view-image-zoom'].some(function (mid) {
+            var anyOpen = ['view-modal', 'edit-modal', 'view-image-zoom'].some(function (mid) {
                 return !document.getElementById(mid).classList.contains('hidden');
             });
             if (!anyOpen) { document.body.style.overflow = ''; }
         }
 
-        /* ── VIEW MODAL ───────────────────────────────────────────── */
+        /* ── VIEW MODAL ───────────────────────────────────────────────── */
         window.openViewModal = function (product) {
             document.getElementById('view-image').src           = product.image_url || '';
             document.getElementById('view-image').alt           = product.name;
@@ -395,15 +388,13 @@
             showModal('view-modal');
         };
 
-        window.closeViewModal    = function () { hideModal('view-modal'); };
-        window.openViewImageZoom = function () { showModal('view-image-zoom'); };
+        window.closeViewModal     = function () { hideModal('view-modal'); };
+        window.openViewImageZoom  = function () { showModal('view-image-zoom'); };
         window.closeViewImageZoom = function () { hideModal('view-image-zoom'); };
 
-        /* ── EDIT MODAL ───────────────────────────────────────────── */
+        /* ── EDIT MODAL ───────────────────────────────────────────────── */
         window.openEditModal = function (productId) {
-            /* reset to loading state */
             var loadingEl = document.getElementById('edit-modal-loading');
-            loadingEl.style.display = '';
             loadingEl.classList.remove('hidden');
             loadingEl.innerHTML =
                 '<svg class="animate-spin w-8 h-8 text-amber-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">' +
@@ -425,20 +416,20 @@
             })
             .then(function (resp) {
                 if (!resp.ok) {
-                    return resp.text().then(function (txt) {
-                        throw new Error('HTTP ' + resp.status + ' — ' + txt.substring(0, 120));
+                    return resp.text().then(function (t) {
+                        throw new Error('HTTP ' + resp.status + ' — ' + t.substring(0, 120));
                     });
                 }
                 return resp.json();
             })
             .then(function (data) {
-                document.getElementById('edit-modal-subtitle').textContent    = data.name;
-                document.getElementById('edit-name').value                    = data.name;
-                document.getElementById('edit-price').value                   = data.price;
-                document.getElementById('edit-stock-qty').value               = data.stock_quantity;
-                document.getElementById('edit-description').value             = data.description || '';
-                document.getElementById('edit-current-image').src             = data.image_url || '';
-                document.getElementById('edit-is-featured').checked           = !!data.is_featured;
+                document.getElementById('edit-modal-subtitle').textContent = data.name;
+                document.getElementById('edit-name').value                 = data.name;
+                document.getElementById('edit-price').value                = data.price;
+                document.getElementById('edit-stock-qty').value            = data.stock_quantity;
+                document.getElementById('edit-description').value          = data.description || '';
+                document.getElementById('edit-current-image').src          = data.image_url || '';
+                document.getElementById('edit-is-featured').checked        = !!data.is_featured;
 
                 var sel = document.getElementById('edit-category');
                 for (var i = 0; i < sel.options.length; i++) {
@@ -446,6 +437,7 @@
                 }
 
                 document.getElementById('edit-modal-form').setAttribute('action', '/admin/products/' + productId);
+                document.getElementById('edit-modal-form').setAttribute('data-product-id', productId);
                 loadingEl.classList.add('hidden');
                 document.getElementById('edit-modal-form').classList.remove('hidden');
             })
@@ -462,30 +454,33 @@
             document.getElementById('edit-modal-errors-list').innerHTML = '';
         };
 
-        /* ── EDIT FORM SUBMIT ─────────────────────────────────────── */
+        /* ── EDIT FORM SUBMIT ─────────────────────────────────────────── */
         document.getElementById('edit-modal-form').addEventListener('submit', function (e) {
             e.preventDefault();
 
+            var form    = this;
             var btn     = document.getElementById('edit-submit-btn');
             var spinner = document.getElementById('edit-submit-spinner');
             var errBox  = document.getElementById('edit-modal-errors');
             var errList = document.getElementById('edit-modal-errors-list');
+            var productId = form.getAttribute('data-product-id');
 
             btn.disabled = true;
             spinner.classList.remove('hidden');
             errBox.classList.add('hidden');
             errList.innerHTML = '';
 
-            fetch(this.getAttribute('action'), {
-                method: 'POST',
+            fetch(form.getAttribute('action'), {
+                method: 'POST',           // Laravel reads _method=PUT from FormData
                 headers: {
                     'X-CSRF-TOKEN': CSRF,
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
                 },
-                body: new FormData(this)
+                body: new FormData(form)
             })
             .then(function (resp) {
+                /* ── Validation errors ── */
                 if (resp.status === 422) {
                     return resp.json().then(function (json) {
                         var errors = json.errors || {};
@@ -500,13 +495,32 @@
                         errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     });
                 }
-                if (!resp.ok) throw new Error('Server error ' + resp.status);
-                closeEditModal();
-                window.location.reload();
+
+                /* ── Any other non-OK status ── */
+                if (!resp.ok) {
+                    throw new Error('Server error ' + resp.status);
+                }
+
+                /* ── Success — parse JSON returned by controller ── */
+                return resp.json().then(function (data) {
+                    closeEditModal();
+
+                    /* Update table row in-place */
+                    var id = productId;
+                    if (document.getElementById('product-name-'     + id)) document.getElementById('product-name-'     + id).textContent = data.product.name;
+                    if (document.getElementById('product-category-' + id)) document.getElementById('product-category-' + id).textContent = data.product.category || '—';
+                    if (document.getElementById('product-stock-'    + id)) document.getElementById('product-stock-'    + id).textContent = data.product.stock_quantity;
+                    if (document.getElementById('product-price-'    + id)) document.getElementById('product-price-'    + id).textContent = '₱' + parseFloat(data.product.price).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    if (data.product.image_url && document.getElementById('product-img-' + id)) {
+                        document.getElementById('product-img-' + id).src = data.product.image_url;
+                    }
+
+                    showToast('Product updated successfully!', 'success');
+                });
             })
-            .catch(function () {
-                errList.innerHTML = '<li>An unexpected error occurred. Please try again.</li>';
-                errBox.classList.remove('hidden');
+            .catch(function (err) {
+                showToast('An unexpected error occurred. Please try again.', 'error');
+                console.error(err);
             })
             .finally(function () {
                 btn.disabled = false;
@@ -514,20 +528,12 @@
             });
         });
 
-        /* ── BACKDROP CLICK ───────────────────────────────────────── */
-        document.getElementById('view-modal').addEventListener('click', function (e) {
-            if (e.target === this) { closeViewModal(); }
-        });
-        document.getElementById('edit-modal').addEventListener('click', function (e) {
-            if (e.target === this) { closeEditModal(); }
-        });
 
-        /* ── ESC KEY ──────────────────────────────────────────────── */
+        /* ── ESC KEY ──────────────────────────────────────────────────── */
         document.addEventListener('keydown', function (e) {
             if (e.key !== 'Escape') { return; }
             if (!document.getElementById('view-image-zoom').classList.contains('hidden')) { closeViewImageZoom(); return; }
-            if (!document.getElementById('view-modal').classList.contains('hidden'))      { closeViewModal(); return; }
-            if (!document.getElementById('edit-modal').classList.contains('hidden'))      { closeEditModal(); return; }
+            // Disabled closing view-modal and edit-modal with Escape
         });
 
     })();

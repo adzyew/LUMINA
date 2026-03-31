@@ -173,18 +173,18 @@
                         </div>
                         <div class="p-5">
                             <h3 class="font-playfair font-semibold text-gray-900 mb-1 group-hover:text-amber-600 transition-colors">{{ $product->name }}</h3>
-                            @if($product->description)
-                                @php
-                                    // Split on either • or newlines, trim, and filter out empty lines
-                                    $features = preg_split('/[•\n\r]+/', $product->description);
-                                    $features = array_filter(array_map('trim', $features));
-                                @endphp
-                                <ul class="text-gray-500 text-sm mb-3 list-disc list-inside">
-                                    @foreach($features as $feature)
-                                        <li>{{ $feature }}</li>
-                                    @endforeach
-                                </ul>
-                            @endif
+                            @if($product->description ?? null)
+                        @php
+                            $features = explode('•', $product->description);
+                        @endphp
+                        <ul class="text-sm text-gray-500 mb-6 line-clamp-2 leading-relaxed">
+                            @foreach($features as $feature)
+                                @if(trim($feature) !== '')
+                                    <li>{{ trim($feature) }}</li>
+                                @endif
+                            @endforeach
+                        </ul>
+                    @endif
                             @php
                                 $avgRating = (float) ($product->reviews_avg_rating ?? 0);
                                 $reviewCount = (int) ($product->reviews_count ?? 0);
