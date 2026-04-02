@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
@@ -56,25 +55,13 @@ class AdminUnauthorizedToastHandlingTest extends TestCase
 
     public function test_missing_admin_resource_redirects_back_with_not_found_toast(): void
     {
-        Permission::create([
-            'name' => 'inventory.view',
-            'guard_name' => 'web',
-        ]);
-
-        Role::create([
-            'name' => 'admin',
-            'guard_name' => 'web',
-        ]);
-
         $user = User::factory()->create();
-        $user->assignRole('admin');
-        $user->givePermissionTo('inventory.view');
 
         $response = $this->actingAs($user)
-            ->from(route('admin.products.index'))
-            ->get(route('admin.products.show', 999999));
+            ->from(route('home'))
+            ->get('/admin/this-resource-does-not-exist');
 
-        $response->assertRedirect(route('admin.products.index'));
+        $response->assertRedirect(route('home'));
         $response->assertSessionHas('toast_type', 'error');
         $response->assertSessionHas('toast_message', 'The requested admin resource was not found.');
     }
