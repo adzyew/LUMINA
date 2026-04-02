@@ -208,13 +208,6 @@
                             <form method="POST" action="{{ route('login.post') }}" class="space-y-5">
                                 @csrf
 
-                                @if(session('error') && ($activeTab ?? 'login') === 'login')
-                                    <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">{{ session('error') }}</div>
-                                @endif
-                                @if(session('success') && ($activeTab ?? 'login') === 'login')
-                                    <div class="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg text-sm">{{ session('success') }}</div>
-                                @endif
-
                                 <!-- Email -->
                                 <div>
                                     <div class="floating-group">
@@ -318,10 +311,6 @@
                             <form method="POST" action="{{ route('register.post') }}" class="space-y-4">
                                 @csrf
 
-                                @if(session('error') && ($activeTab ?? 'login') === 'register')
-                                    <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">{{ session('error') }}</div>
-                                @endif
-
                                 <!-- Name Fields -->
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
@@ -398,7 +387,7 @@
                                             </svg>
                                         </span>
 
-                                        <input id="register-password" type="password" name="password" placeholder=" " class="floating-input pl-12 pr-12 py-4" minlength="8" autocomplete="new-password">
+                                        <input id="register-password" type="password" name="password" placeholder=" " class="floating-input pl-12 pr-12 py-4" minlength="8" autocomplete="new-password" maxlength="15">
                                         <label for="register-password" class="floating-label">Create Password</label>
 
                                         <button type="button" onclick="togglePasswordField('register-password', 'register-eye-open', 'register-eye-closed')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none z-10">
@@ -431,7 +420,7 @@
                                             </svg>
                                         </span>
 
-                                        <input id="register-password-confirm" type="password" name="password_confirmation" placeholder=" " class="floating-input pl-12 pr-12 py-4">
+                                        <input id="register-password-confirm" type="password" name="password_confirmation" placeholder=" " class="floating-input pl-12 pr-12 py-4" maxlength="15">
                                         <label for="register-password-confirm" class="floating-label">Confirm Password</label>
 
                                         <button type="button" onclick="togglePasswordField('register-password-confirm', 'confirm-eye-open', 'confirm-eye-closed')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none z-10">
@@ -496,6 +485,8 @@
 
             @include('partials.terms_modal')
     </div>
+
+    @include('partials.toast')
 
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.3/build/js/intlTelInput.min.js"></script>
     <script>
@@ -596,7 +587,7 @@
                 signupBtn.disabled = !(termsAccepted && passwordsMatch);
             }
 
-            function updateRegisterPasswordStrength(showOutput = false) {
+            function updateRegisterPasswordStrength() {
                 if (!registerPassword || !strengthLabel || !rulesLabel) {
                     return;
                 }
@@ -608,13 +599,9 @@
                 const hasNumber = /\d/.test(value);
                 const isStrong = hasMinLength && hasLower && hasUpper && hasNumber;
 
-                if (!showOutput || value.length === 0) {
+                if (value.length === 0) {
                     strengthLabel.classList.add('hidden');
                     rulesLabel.classList.add('hidden');
-                    strengthLabel.textContent = 'Password strength: Weak';
-                    strengthLabel.className = 'text-xs mt-2 text-gray-500';
-                    rulesLabel.textContent = 'Use at least 8 characters with uppercase, lowercase, and a number.';
-                    rulesLabel.className = 'text-xs mt-1 text-gray-500';
                     return;
                 }
 
@@ -624,6 +611,8 @@
                 if (isStrong) {
                     strengthLabel.textContent = 'Password strength: Strong';
                     strengthLabel.className = 'text-xs mt-2 text-green-600';
+                    rulesLabel.textContent = 'Use at least 8 characters with uppercase, lowercase, and a number.';
+                    rulesLabel.className = 'text-xs mt-1 text-gray-500';
                 } else {
                     strengthLabel.textContent = 'Password strength: Weak';
                     strengthLabel.className = 'text-xs mt-2 text-red-500';
@@ -663,7 +652,7 @@
 
             if (registerPassword) {
                 registerPassword.addEventListener('input', function () {
-                    updateRegisterPasswordStrength(true);
+                    updateRegisterPasswordStrength();
                     updatePasswordMatch();
                 });
 

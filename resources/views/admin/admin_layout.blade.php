@@ -174,6 +174,7 @@
     </div>
 
     {{-- ↓ THIS IS THE FIX: page-level scripts injected here (modals, charts, etc.) --}}
+    @include('partials.toast')
     @stack('scripts')
 
     <script>
