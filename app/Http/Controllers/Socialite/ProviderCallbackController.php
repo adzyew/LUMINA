@@ -58,6 +58,7 @@ class ProviderCallbackController extends Controller
 
         if ($user->is_verified) {
             Auth::login($user);
+            request()->session()->regenerate();
             session(['otp_verified' => true]); // Satisfy the custom middleware
 
             // Redirect based on role

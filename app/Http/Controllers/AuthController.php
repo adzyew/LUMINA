@@ -413,7 +413,10 @@ class AuthController extends Controller
             }
 
             return redirect()->intended(route('dashboard'))
-                ->with("success", "Logged in Successfully!");
+                ->with([
+                    'toast_type' => 'success',
+                    'toast_message' => 'Logged in successfully!',
+                ]);
         }
 
         return back()->withErrors([
@@ -435,7 +438,10 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login')->with('success', 'Logged out successfully!');
+        return redirect('/login')->with([
+            'toast_type' => 'success',
+            'toast_message' => 'Logged out successfully!',
+        ]);
     }
 
     public function loginPost(Request $request)
@@ -486,7 +492,10 @@ class AuthController extends Controller
         }
 
         return redirect()->intended("dashboard")
-            ->with("success", "Logged in Successfully!");
+            ->with([
+                'toast_type' => 'success',
+                'toast_message' => 'Logged in successfully!',
+            ]);
     }
 
     // 5. IF NOT VERIFIED: Send OTP
@@ -567,13 +576,6 @@ class AuthController extends Controller
     $enteredOtp = implode('', $request->code);
     $cachedOtp  = Cache::get('otp_' . $email);
 
-    // Log values to help debug verification issues
-    Log::info('verifyOtp attempt', [
-        'session_email' => $email,
-        'entered_otp' => $enteredOtp,
-        'cached_otp' => $cachedOtp,
-    ]);
-
     if (!$cachedOtp || $enteredOtp != $cachedOtp) {
         $attempts = $this->incrementOtpAttempts($attemptsKey);
 
@@ -624,6 +626,7 @@ class AuthController extends Controller
 
         // ✅ B. Log the User In
         Auth::login($user);
+        $request->session()->regenerate();
         $this->rememberActiveSession($user, $request->session()->getId());
 
         // ✅ C. Clean Up
@@ -727,7 +730,7 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
-            return back()->withInput()->with('error', 'No account found with this email address.');
+            return back()->with('info', 'If the email exists in our system, we sent a 6-digit OTP to your inbox.');
         }
 
         $otp = rand(100000, 999999);
@@ -739,13 +742,18 @@ class AuthController extends Controller
         try {
             Mail::to($request->email)->send(new TestMail($otp));
         } catch (\Exception $e) {
-            return $e->getMessage();
+            Log::error('Password reset OTP email failed', [
+                'email' => $request->email,
+                'exception' => $e->getMessage(),
+            ]);
+
+            return back()->with('info', 'If the email exists in our system, we sent a 6-digit OTP to your inbox.');
         }
 
         session(['password_reset_email' => $request->email]);
 
         return redirect()->route('password.verify')
-            ->with('info', 'We\'ve sent a 6-digit OTP to your email. Please check your inbox.');
+            ->with('info', 'If the email exists in our system, we sent a 6-digit OTP to your inbox.');
     }
 
     public function showVerifyPasswordReset()
@@ -765,7 +773,10 @@ class AuthController extends Controller
 
     public function verifyPasswordResetOtp(Request $request)
     {
-        $request->validate(['code' => 'required|array|size:6']);
+        $request->validate([
+            'code' => 'required|array|size:6',
+            'code.*' => 'required|digits:1',
+        ]);
 
         $email = session('password_reset_email');
         if (!$email) {
@@ -788,10 +799,7 @@ class AuthController extends Controller
         $cachedOtp = Cache::get('password_reset_otp_' . $email);
 
         if (!$cachedOtp || $enteredOtp != $cachedOtp) {
-            $attempts = (int) Cache::increment($attemptsKey);
-            if ($attempts === 1) {
-                Cache::put($attemptsKey, 1, now()->addMinutes(self::OTP_LOCK_MINUTES));
-            }
+            $attempts = $this->incrementOtpAttempts($attemptsKey);
 
             if ($attempts >= self::OTP_MAX_ATTEMPTS) {
                 $lockUntil = now()->addMinutes(self::OTP_LOCK_MINUTES);
@@ -799,7 +807,7 @@ class AuthController extends Controller
                 Cache::forget($attemptsKey);
 
                 return back()->withErrors([
-                    'code' => 'Too many incorrect attempts. You are locked for 1 hour.',
+                    'code' => 'Too many incorrect attempts. You are locked for 5 minutes.',
                 ]);
             }
 
@@ -893,4 +901,3 @@ class AuthController extends Controller
         return redirect()->route('login')->with('success', 'Your password has been reset. You can now log in.');
     }
 }
-
