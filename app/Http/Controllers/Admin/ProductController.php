@@ -211,11 +211,14 @@ class ProductController extends Controller
 
         return redirect()->route('admin.products.index')->with('success', 'Product updated successfully!');
     }
+    
 
     public function destroy($id, CloudinaryService $cloudinary)
     {
-        // withTrashed because archived products are soft-deleted
-        $product = Product::withTrashed()->findOrFail($id);
+        // Include soft-deleted + archived records (archived items are hidden by global scope)
+        $product = Product::withTrashed()
+            ->withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class)
+            ->findOrFail($id);
 
         $cloudinary->deleteImage($product->image_public_id);
 
@@ -229,8 +232,12 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')->with('success', 'Product permanently deleted!');
     }
 
-    public function archive(Product $product)
+    public function archive($id)
     {
+        $product = Product::withTrashed()
+            ->withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class)
+            ->findOrFail($id);
+            
         $product->delete();
         $product->archived_at = now();
         $product->save();
@@ -244,7 +251,9 @@ class ProductController extends Controller
      */
     public function unarchive($id)
     {
-        $product = Product::withTrashed()->findOrFail($id);
+        $product = Product::withTrashed()
+            ->withoutGlobalScope(\App\Models\Scopes\NotArchivedScope::class)
+            ->findOrFail($id);
         $product->restore();
         $product->archived_at = null;
         $product->save();

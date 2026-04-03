@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\Product; // <--- IMPORT THIS LINE
+use App\Models\Review;
 
 class HomeController extends Controller
 {
@@ -21,7 +22,17 @@ class HomeController extends Controller
             ->take(6)
             ->get();
         $heroSlides = Product::whereNotNull('image_url')->inRandomOrder()->take(6)->get();
-        return view('welcome', compact('featuredProducts', 'heroSlides'));
+        $customerReviews = Review::query()
+            ->approved()
+            ->whereNotNull('comment')
+            ->whereRaw("TRIM(comment) <> ''")
+            ->with(['user:id,name', 'product:id,name'])
+            ->latest('moderated_at')
+            ->latest()
+            ->take(3)
+            ->get();
+
+        return view('welcome', compact('featuredProducts', 'heroSlides', 'customerReviews'));
     }
     /**
      * Display the homepage with featured products
@@ -68,8 +79,17 @@ class HomeController extends Controller
             ->take(12)
             ->get();
         $heroSlides = Product::whereNotNull('image_url')->inRandomOrder()->take(6)->get();
+        $customerReviews = Review::query()
+            ->approved()
+            ->whereNotNull('comment')
+            ->whereRaw("TRIM(comment) <> ''")
+            ->with(['user:id,name', 'product:id,name'])
+            ->latest('moderated_at')
+            ->latest()
+            ->take(3)
+            ->get();
 
-        return view('welcome', compact('featuredProducts', 'latestProducts', 'browseProducts', 'heroSlides'));
+        return view('welcome', compact('featuredProducts', 'latestProducts', 'browseProducts', 'heroSlides', 'customerReviews'));
     }
 
     /**

@@ -55,7 +55,39 @@ class ProductsController extends Controller
         /** @var \App\Models\User|null $currentUser */
         $currentUser = Auth::user();
         $isWishlisted = $currentUser ? $currentUser->wishlist()->where('product_id', $product->id)->exists() : false;
-        
-        return view('products.show', compact('product', 'reviews', 'averageRating', 'isWishlisted'));
+
+        $relatedProducts = Product::query()
+            ->where('id', '!=', $product->id)
+            ->when(!empty($product->category), function ($query) use ($product) {
+                $query->whereRaw('LOWER(category) = ?', [strtolower((string) $product->category)]);
+            })
+            ->withAvg(['reviews' => function ($query) {
+                $query->where('status', 'approved');
+            }], 'rating')
+            ->withCount(['reviews' => function ($query) {
+                $query->where('status', 'approved');
+            }])
+            ->inRandomOrder()
+            ->take(4)
+            ->get();
+
+        if ($relatedProducts->count() < 4) {
+            $fallback = Product::query()
+                ->where('id', '!=', $product->id)
+                ->whereNotIn('id', $relatedProducts->pluck('id'))
+                ->withAvg(['reviews' => function ($query) {
+                    $query->where('status', 'approved');
+                }], 'rating')
+                ->withCount(['reviews' => function ($query) {
+                    $query->where('status', 'approved');
+                }])
+                ->inRandomOrder()
+                ->take(4 - $relatedProducts->count())
+                ->get();
+
+            $relatedProducts = $relatedProducts->concat($fallback);
+        }
+
+        return view('products.show', compact('product', 'reviews', 'averageRating', 'isWishlisted', 'relatedProducts'));
     }
 }

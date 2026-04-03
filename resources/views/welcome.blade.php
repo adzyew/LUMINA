@@ -375,39 +375,74 @@
         <div class="container mx-auto px-4 sm:px-6">
             <h2 class="text-3xl font-playfair font-bold text-gray-900 text-center mb-12 scroll-scale">What Our Customers Say</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
-                    <div class="flex gap-1 text-amber-400 mb-4">★★★★★</div>
-                    <p class="text-gray-600 mb-6 leading-relaxed">"Stunning quality and fast shipping. The necklace I ordered exceeded my expectations. Lumina is now my go-to for special occasions."</p>
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-amber-200 rounded-full flex items-center justify-center font-bold text-gray-900">MR</div>
-                        <div>
-                            <p class="font-semibold text-gray-900">Maria Rodriguez</p>
-                            <p class="text-sm text-gray-500">Verified Customer</p>
+                @forelse(($customerReviews ?? collect()) as $review)
+                    @php
+                        $customerName = $review->user->name ?? 'Verified Customer';
+                        $initials = collect(explode(' ', trim($customerName)))
+                            ->filter()
+                            ->map(fn ($part) => strtoupper(substr($part, 0, 1)))
+                            ->take(2)
+                            ->implode('');
+                        $initials = $initials !== '' ? $initials : 'VC';
+                        $rating = (int) ($review->rating ?? 0);
+                    @endphp
+                    <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
+                        <div class="flex gap-1 mb-4">
+                            @for($star = 1; $star <= 5; $star++)
+                                <svg class="w-4 h-4 {{ $star <= $rating ? 'text-amber-400' : 'text-gray-300' }}" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.95a1 1 0 00.95.69h4.154c.969 0 1.371 1.24.588 1.81l-3.36 2.441a1 1 0 00-.364 1.118l1.285 3.95c.3.922-.755 1.688-1.538 1.118l-3.36-2.44a1 1 0 00-1.175 0l-3.36 2.44c-.783.57-1.838-.196-1.539-1.118l1.286-3.95a1 1 0 00-.364-1.118L2.07 9.377c-.783-.57-.38-1.81.588-1.81h4.154a1 1 0 00.95-.69l1.287-3.95z" />
+                                </svg>
+                            @endfor
+                        </div>
+                        <p class="text-gray-600 mb-6 leading-relaxed">"{{ \Illuminate\Support\Str::limit($review->comment, 190) }}"</p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-amber-200 rounded-full flex items-center justify-center font-bold text-gray-900">{{ $initials }}</div>
+                            <div>
+                                <p class="font-semibold text-gray-900">{{ $customerName }}</p>
+                                <p class="text-sm text-gray-500">
+                                    Verified Customer
+                                    @if($review->product)
+                                        • {{ $review->product->name }}
+                                    @endif
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
-                    <div class="flex gap-1 text-amber-400 mb-4">★★★★★</div>
-                    <p class="text-gray-600 mb-6 leading-relaxed">"Elegant, timeless pieces that get compliments every time. The craftsmanship is exceptional. Highly recommend Lumina to anyone looking for quality jewelry."</p>
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-amber-200 rounded-full flex items-center justify-center font-bold text-gray-900">JL</div>
-                        <div>
-                            <p class="font-semibold text-gray-900">James Lee</p>
-                            <p class="text-sm text-gray-500">Verified Customer</p>
+                @empty
+                    <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
+                        <div class="flex gap-1 text-amber-400 mb-4">★★★★★</div>
+                        <p class="text-gray-600 mb-6 leading-relaxed">"Stunning quality and fast shipping. The necklace I ordered exceeded my expectations. Lumina is now my go-to for special occasions."</p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-amber-200 rounded-full flex items-center justify-center font-bold text-gray-900">MR</div>
+                            <div>
+                                <p class="font-semibold text-gray-900">Maria Rodriguez</p>
+                                <p class="text-sm text-gray-500">Verified Customer</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
-                    <div class="flex gap-1 text-amber-400 mb-4">★★★★★</div>
-                    <p class="text-gray-600 mb-6 leading-relaxed">"Beautiful jewelry at fair prices. Customer service was excellent and helped me find the perfect gift. Will definitely be ordering again."</p>
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-amber-200 rounded-full flex items-center justify-center font-bold text-gray-900">SM</div>
-                        <div>
-                            <p class="font-semibold text-gray-900">Sofia Martinez</p>
-                            <p class="text-sm text-gray-500">Verified Customer</p>
+                    <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
+                        <div class="flex gap-1 text-amber-400 mb-4">★★★★★</div>
+                        <p class="text-gray-600 mb-6 leading-relaxed">"Elegant, timeless pieces that get compliments every time. The craftsmanship is exceptional. Highly recommend Lumina to anyone looking for quality jewelry."</p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-amber-200 rounded-full flex items-center justify-center font-bold text-gray-900">JL</div>
+                            <div>
+                                <p class="font-semibold text-gray-900">James Lee</p>
+                                <p class="text-sm text-gray-500">Verified Customer</p>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
+                        <div class="flex gap-1 text-amber-400 mb-4">★★★★★</div>
+                        <p class="text-gray-600 mb-6 leading-relaxed">"Beautiful jewelry at fair prices. Customer service was excellent and helped me find the perfect gift. Will definitely be ordering again."</p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-amber-200 rounded-full flex items-center justify-center font-bold text-gray-900">SM</div>
+                            <div>
+                                <p class="font-semibold text-gray-900">Sofia Martinez</p>
+                                <p class="text-sm text-gray-500">Verified Customer</p>
+                            </div>
+                        </div>
+                    </div>
+                @endforelse
             </div>
         </div>
     </section>
