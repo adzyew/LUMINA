@@ -15,12 +15,6 @@
         </div>
     </header>
 
-    @if(session('success'))
-        <div class="mb-6 bg-green-100 text-green-800 p-4 rounded-lg border border-green-200">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <div class="flex flex-wrap gap-2 mb-4">
         <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'all'])) }}"      class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? 'all') === 'all'      ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">All</a>
         <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'active'])) }}"   class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'active'   ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">Active</a>
@@ -123,13 +117,13 @@
 
                             {{-- Archive / Unarchive / Delete --}}
                             @if(isset($product->archived_at) && $product->archived_at)
-                                <form action="{{ route('admin.products.unarchive', $product->id) }}" method="POST" onsubmit="return confirm('Unarchive this product?');">
+                                <form action="{{ route('admin.products.unarchive', ['id' => $product->id]) }}" method="POST" class="confirm-action-form" data-confirm-message="Unarchive this product?" data-confirm-title="Unarchive Product" data-confirm-action="Unarchive">
                                     @csrf
                                     <button type="submit" title="Unarchive" class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-500/10 hover:bg-gray-500 text-gray-500 hover:text-white transition-all duration-200">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg>
                                     </button>
                                 </form>
-                                <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Permanently delete this product? This cannot be undone.');">
+                                <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" class="confirm-action-form" data-confirm-message="Permanently delete this product? This cannot be undone." data-confirm-title="Delete Product" data-confirm-action="Delete" data-confirm-delay="10">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" title="Delete permanently" class="w-10 h-10 flex items-center justify-center rounded-xl bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white transition-all duration-200">
@@ -139,7 +133,7 @@
                                     </button>
                                 </form>
                             @else
-                                <form action="{{ route('admin.products.archive', $product->id) }}" method="POST" onsubmit="return confirm('Archive this product?');">
+                                <form action="{{ route('admin.products.archive', ['id' => $product->id] ) }}" method="POST" class="confirm-action-form" data-confirm-message="Archive this product?" data-confirm-title="Archive Product" data-confirm-action="Archive">    
                                     @csrf
                                     <button type="submit" title="Archive" class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-500/10 hover:bg-gray-500 text-gray-500 hover:text-white transition-all duration-200">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg>
@@ -165,7 +159,7 @@
     {{-- ================================================================
          TOAST NOTIFICATION
          ================================================================ --}}
-    <div id="toast" class="fixed bottom-6 right-6 z-[200] hidden items-center gap-3 px-5 py-3.5 rounded-xl shadow-lg border text-sm font-medium transition-all duration-300 max-w-sm">
+    <div id="toast" class="fixed bottom-6 right-6 z-200 hidden items-center gap-3 px-5 py-3.5 rounded-xl shadow-lg border text-sm font-medium transition-all duration-300 max-w-sm">
         <svg id="toast-icon" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg>
         <span id="toast-message"></span>
     </div>
@@ -205,6 +199,19 @@
         <div class="relative max-w-4xl max-h-[90vh] p-4 z-10">
             <img id="view-image-zoom-src" src="" class="rounded-lg shadow-2xl max-h-[85vh] object-contain" alt="">
             <button onclick="closeViewImageZoom()" class="absolute -top-2 -right-2 bg-white text-gray-700 w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-100 border border-gray-200 shadow text-xl">&times;</button>
+        </div>
+    </div>
+
+    <div id="confirm-modal" class="fixed inset-0 z-70 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="absolute inset-0" data-confirm-close="1"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md border border-gray-200 p-6">
+            <h3 id="confirm-modal-title" class="text-xl font-playfair font-bold text-gray-900">Confirm Action</h3>
+            <p id="confirm-modal-message" class="text-sm text-gray-600 mt-2">Are you sure?</p>
+            <p id="confirm-modal-countdown-wrap" class="hidden text-sm text-gray-500 mt-2">Please wait <span id="confirm-modal-countdown" class="font-semibold text-red-500">10</span> seconds to confirm.</p>
+            <div class="mt-6 flex justify-end gap-3">
+                <button type="button" id="confirm-modal-cancel" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-100 transition-colors">Cancel</button>
+                <button type="button" id="confirm-modal-confirm" class="px-4 py-2 rounded-lg bg-amber-300 text-black font-bold hover:bg-amber-400 transition-colors">Confirm</button>
+            </div>
         </div>
     </div>
 
@@ -341,6 +348,12 @@
             }, 3500);
         }
 
+        var initialToastMessage = @json(session('toast_message') ?? session('success'));
+        var initialToastType = @json(session('toast_type') ?? (session()->has('success') ? 'success' : null));
+        if (initialToastMessage) {
+            showToast(initialToastMessage, initialToastType === 'error' ? 'error' : 'success');
+        }
+
         /* ── MODAL HELPERS ────────────────────────────────────────────── */
         function showModal(id) {
             var el = document.getElementById(id);
@@ -353,11 +366,92 @@
             var el = document.getElementById(id);
             el.classList.add('hidden');
             el.classList.remove('flex');
-            var anyOpen = ['view-modal', 'edit-modal', 'view-image-zoom'].some(function (mid) {
+            var anyOpen = ['view-modal', 'edit-modal', 'view-image-zoom', 'confirm-modal'].some(function (mid) {
                 return !document.getElementById(mid).classList.contains('hidden');
             });
             if (!anyOpen) { document.body.style.overflow = ''; }
         }
+
+        var pendingConfirmForm = null;
+        var confirmDelayTimer = null;
+
+        function resetConfirmModalState() {
+            var btn = document.getElementById('confirm-modal-confirm');
+            var wrap = document.getElementById('confirm-modal-countdown-wrap');
+            if (confirmDelayTimer) {
+                clearInterval(confirmDelayTimer);
+                confirmDelayTimer = null;
+            }
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            wrap.classList.add('hidden');
+        }
+
+        function openConfirmModal(title, message, actionLabel, delaySeconds) {
+            resetConfirmModalState();
+            document.getElementById('confirm-modal-title').textContent = title || 'Confirm Action';
+            document.getElementById('confirm-modal-message').textContent = message || 'Are you sure?';
+            var btn = document.getElementById('confirm-modal-confirm');
+            var wrap = document.getElementById('confirm-modal-countdown-wrap');
+            var countdownEl = document.getElementById('confirm-modal-countdown');
+            var label = actionLabel || 'Confirm';
+            btn.textContent = label;
+
+            if (delaySeconds > 0) {
+                var secondsLeft = delaySeconds;
+                wrap.classList.remove('hidden');
+                countdownEl.textContent = String(secondsLeft);
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                btn.textContent = label + ' (' + secondsLeft + 's)';
+
+                confirmDelayTimer = setInterval(function () {
+                    secondsLeft--;
+                    countdownEl.textContent = String(secondsLeft);
+
+                    if (secondsLeft <= 0) {
+                        clearInterval(confirmDelayTimer);
+                        confirmDelayTimer = null;
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        btn.textContent = label;
+                    } else {
+                        btn.textContent = label + ' (' + secondsLeft + 's)';
+                    }
+                }, 1000);
+            }
+            showModal('confirm-modal');
+        }
+        function closeConfirmModal() {
+            resetConfirmModalState();
+            pendingConfirmForm = null;
+            hideModal('confirm-modal');
+        }
+
+        document.addEventListener('submit', function (e) {
+            var form = e.target;
+            if (!form || !form.classList || !form.classList.contains('confirm-action-form')) { return; }
+            e.preventDefault();
+            pendingConfirmForm = form;            var delaySeconds = parseInt(form.getAttribute('data-confirm-delay') || '0', 10);
+            var delaySeconds = parseInt(form.getAttribute('data-confirm-delay') || '0', 10);
+            openConfirmModal(
+                form.getAttribute('data-confirm-title'),
+                form.getAttribute('data-confirm-message'),
+                form.getAttribute('data-confirm-action'),
+                isNaN(delaySeconds) ? 0 : delaySeconds
+            );
+        });
+
+        document.getElementById('confirm-modal-cancel').addEventListener('click', closeConfirmModal);
+        document.querySelectorAll('[data-confirm-close="1"]').forEach(function (el) {
+            el.addEventListener('click', closeConfirmModal);
+        });
+        document.getElementById('confirm-modal-confirm').addEventListener('click', function () {
+            if (!pendingConfirmForm) { closeConfirmModal(); return; }
+            var formToSubmit = pendingConfirmForm;
+            closeConfirmModal();
+            formToSubmit.submit();
+        });
 
         /* ── VIEW MODAL ───────────────────────────────────────────────── */
         window.openViewModal = function (product) {
@@ -535,6 +629,7 @@
         document.addEventListener('keydown', function (e) {
             if (e.key !== 'Escape') { return; }
             if (!document.getElementById('view-image-zoom').classList.contains('hidden')) { closeViewImageZoom(); return; }
+            if (!document.getElementById('confirm-modal').classList.contains('hidden')) { closeConfirmModal(); return; }
             // Disabled closing view-modal and edit-modal with Escape
         });
 

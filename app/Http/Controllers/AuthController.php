@@ -94,6 +94,60 @@ class AuthController extends Controller
         Cache::forget($key);
     }
 
+    private function cartCacheKey(User $user): string
+    {
+        return 'cart_user_' . $user->id;
+    }
+
+    private function mergeCarts(array $baseCart, array $incomingCart): array
+    {
+        foreach ($incomingCart as $productId => $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            $qty = (int) ($item['quantity'] ?? 0);
+            if ($qty <= 0) {
+                continue;
+            }
+
+            if (isset($baseCart[$productId])) {
+                $baseCart[$productId]['quantity'] = ((int) ($baseCart[$productId]['quantity'] ?? 0)) + $qty;
+                continue;
+            }
+
+            $baseCart[$productId] = [
+                'name' => (string) ($item['name'] ?? 'Product'),
+                'quantity' => $qty,
+                'price' => (float) ($item['price'] ?? 0),
+                'image' => (string) ($item['image'] ?? ''),
+            ];
+        }
+
+        return $baseCart;
+    }
+
+    private function restoreCartAfterLogin(Request $request, User $user): void
+    {
+        $sessionCart = $request->session()->get('cart', []);
+        $storedCart = Cache::get($this->cartCacheKey($user), []);
+
+        if (!is_array($sessionCart)) {
+            $sessionCart = [];
+        }
+        if (!is_array($storedCart)) {
+            $storedCart = [];
+        }
+
+        $mergedCart = $this->mergeCarts($storedCart, $sessionCart);
+        if ($mergedCart === []) {
+            return;
+        }
+
+        $request->session()->put('cart', $mergedCart);
+        Cache::put($this->cartCacheKey($user), $mergedCart, now()->addDays(30));
+    }
+
     public function showLogin()
     {
         return view('auth.login');
@@ -410,6 +464,7 @@ class AuthController extends Controller
             $authenticatedUser = Auth::user();
             if ($authenticatedUser instanceof User) {
                 $this->rememberActiveSession($authenticatedUser, $request->session()->getId());
+                $this->restoreCartAfterLogin($request, $authenticatedUser);
             }
 
             return redirect()->intended(route('dashboard'))
@@ -430,6 +485,10 @@ class AuthController extends Controller
     {
         $user = Auth::user();
         if ($user instanceof User) {
+            $sessionCart = $request->session()->get('cart', []);
+            if (is_array($sessionCart) && $sessionCart !== []) {
+                Cache::put($this->cartCacheKey($user), $sessionCart, now()->addDays(30));
+            }
             $this->clearActiveSession($user, $request->session()->getId());
         }
 
@@ -480,6 +539,7 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
         $this->rememberActiveSession($user, $request->session()->getId());
+        $this->restoreCartAfterLogin($request, $user);
 
         // Mark session as verified for your custom middleware
         session(['otp_verified' => true]); 
@@ -628,6 +688,7 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
         $this->rememberActiveSession($user, $request->session()->getId());
+        $this->restoreCartAfterLogin($request, $user);
 
         // ✅ C. Clean Up
         Cache::forget('otp_' . $email);

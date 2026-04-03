@@ -8,8 +8,10 @@ use App\Models\Product;
 use App\Services\PaymongoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 
 class PaymentController extends Controller
@@ -57,6 +59,9 @@ class PaymentController extends Controller
 
         if ($order->payment_status === 'paid') {
             $request->session()->forget('cart');
+            if (Auth::check()) {
+                Cache::forget('cart_user_' . (int) Auth::id());
+            }
         }
 
         if ($order->status === 'awaiting_payment') {
@@ -180,16 +185,21 @@ class PaymentController extends Controller
                 }
             }
 
-            $order->update([
+            $updateData = [
                 'payment_status' => 'paid',
-                'payment_channel' => $order->payment_method === 'paymongo'
-                    ? ($paymentChannel !== '' ? $paymentChannel : ($order->payment_channel ?: 'online'))
-                    : 'cod',
                 'status' => $order->status === 'awaiting_payment' || $order->status === 'pending'
                     ? 'processing'
                     : $order->status,
                 'paymongo_payment_intent_id' => $paymentIntentId !== '' ? $paymentIntentId : $order->paymongo_payment_intent_id,
-            ]);
+            ];
+
+            if (Schema::hasColumn('orders', 'payment_channel')) {
+                $updateData['payment_channel'] = $order->payment_method === 'paymongo'
+                    ? ($paymentChannel !== '' ? $paymentChannel : ($order->payment_channel ?: 'online'))
+                    : 'cod';
+            }
+
+            $order->update($updateData);
         });
     }
 

@@ -36,7 +36,7 @@
             @endphp
 
             <div class="lg:sticky lg:top-24 h-max">
-                <div class="relative bg-white rounded-[2rem] border border-amber-200/50 shadow-xl overflow-hidden flex items-center justify-center p-4 aspect-[4/5] sm:aspect-square group">
+                <div class="relative bg-white rounded-2xl border border-amber-200/50 shadow-xl overflow-hidden flex items-center justify-center p-4 aspect-[4/5] sm:aspect-square group">
                     @if($mainImg)
                         <img id="mainProductImage" src="{{ $mainImg }}" alt="{{ $product->name }}" class="w-full h-full object-contain mx-auto transition-transform duration-700 group-hover:scale-105">
                     @else
@@ -77,11 +77,11 @@
             <div class="flex flex-col pt-2">
 
                 <div class="flex flex-wrap gap-2 mb-4">
-                    <span class="px-4 py-1.5 rounded-full border border-amber-600 text-xs font-semibold text-amber-600 uppercase tracking-widest">
+                    <span class="px-4 py-1.5 rounded-xl border border-amber-600 text-xs font-semibold text-amber-600 uppercase tracking-widest">
                         {{ $product->category ?? 'Jewelry' }}
                     </span>
                     @php $inStock = ($product->stock_quantity ?? 0) > 0; @endphp
-                    <span class="px-4 py-1.5 rounded-full text-xs font-semibold border uppercase tracking-widest {{ $inStock ? ' text-green-400 border-green-400' : 'bg-red-500/10 text-red-400 border-red-400' }}">
+                    <span class="px-4 py-1.5 rounded-xl text-xs font-semibold border uppercase tracking-widest {{ $inStock ? ' text-green-400 border-green-400' : 'bg-red-500/10 text-red-400 border-red-400' }}">
                         {{ $inStock ? 'In Stock' : 'Sold Out' }}
                     </span>
                 </div>
@@ -108,8 +108,10 @@
 
                 <div class="flex flex-col gap-4 mb-8">
                     @if($inStock)
-                        <a href="{{ route('cart.add', $product->id) }}" class="w-full h-14 bg-amber-300 text-black font-bold text-lg rounded-full hover:bg-amber-400 transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(252,211,77,0.15)] hover:shadow-[0_0_30px_rgba(252,211,77,0.3)] hover:-translate-y-0.5">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                        <a href="{{ route('cart.add', $product->id) }}" class="w-full h-14 bg-amber-300 text-black font-bold text-lg rounded-xl hover:bg-amber-400 transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(252,211,77,0.15)] hover:shadow-[0_0_30px_rgba(252,211,77,0.3)] hover:-translate-y-0.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                        </svg>
                             Add to Cart
                         </a>
                     @else
@@ -118,12 +120,12 @@
                         </span>
                     @endif
 
-                    <a href="{{ route('products.index') }}" class="w-full h-14 bg-white/70 text-black font-semibold rounded-full hover:bg-white border border-gray-200 transition-colors flex items-center justify-center">
+                    <a href="{{ route('products.index') }}" class="w-full h-14 bg-white/70 text-black font-semibold rounded-xl hover:bg-white border border-gray-200 transition-colors flex items-center justify-center">
                         Continue Shopping
                     </a>
                 </div>
 
-                <div class="mt-auto bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
+                <div class="mt-auto bg-white rounded-xl p-6 border border-gray-100 shadow-sm space-y-2">
                     <div class="flex items-center gap-4 text-black">
                         <svg class="w-6 h-6 text-amber-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"></path></svg>
                         <span class="text-sm">Authentic Lumina Quality</span>
@@ -138,7 +140,7 @@
         </div>
 
         {{-- Reviews Section (Refined) --}}
-        <div class="mt-20 bg-white rounded-[2rem] p-8 sm:p-10 border border-gray-100 shadow-md">
+        <div class="mt-14 bg-white rounded-xl p-8 sm:p-10 border border-gray-100 shadow-md">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
                 <div>
                     <h2 class="text-3xl font-playfair font-bold text-gray-900 mb-3">Customer Reviews</h2>
@@ -176,7 +178,7 @@
                     <label class="block text-amber-400 text-sm font-medium mb-3">Rating</label>
                     <div class="flex gap-2" id="ratingStars">
                         @for($i = 1; $i <= 5; $i++)
-                            <button type="button" onclick="setRating({{ $i }})" class="star-rating w-10 h-10 text-gray-600 hover:text-amber-400 hover:scale-110 transition-all" data-rating="{{ $i }}">
+                            <button type="button" onclick="setRating({{ $i }})" class="star-rating w-10 h-10 text-amber-400 hover:text-amber-600 hover:scale-110 transition-all" data-rating="{{ $i }}">
                                 <svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
                             </button>
                         @endfor
@@ -232,6 +234,45 @@
                 <div class="mt-10">{{ $reviews->links() }}</div>
             @endif
         </div>
+
+        @if(isset($relatedProducts) && $relatedProducts->isNotEmpty())
+            <section class="mt-16">
+                <div class="flex items-center justify-between gap-4 mb-8">
+                    <h2 class="text-2xl font-playfair font-semibold text-gray-900">You may also like</h2>
+                    <a href="{{ route('products.index') }}" class="text-amber-600 hover:text-amber-700 font-semibold text-sm">View More</a>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                    @foreach($relatedProducts as $relatedProduct)
+                        @php
+                            $relatedAvgRating = (float) ($relatedProduct->reviews_avg_rating ?? 0);
+                            $relatedReviewCount = (int) ($relatedProduct->reviews_count ?? 0);
+                            $relatedFilledStars = (int) round($relatedAvgRating);
+                        @endphp
+                        <a href="{{ route('products.show', $relatedProduct) }}" class="group bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                            <div class="aspect-square bg-gray-100 overflow-hidden">
+                                <img src="{{ $relatedProduct->image_url ?? asset('IMAGES/Bracelet.jpg') }}" alt="{{ $relatedProduct->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                            <div class="p-4">
+                                <p class="text-xs text-amber-600 uppercase tracking-wider mb-1">{{ $relatedProduct->category ?? 'Jewelry' }}</p>
+                                <h3 class="font-playfair font-semibold text-gray-900 group-hover:text-amber-600 transition-colors line-clamp-1">{{ $relatedProduct->name }}</h3>
+                                <div class="flex items-center gap-2 my-2">
+                                    <div class="flex items-center gap-0.5">
+                                        @for($star = 1; $star <= 5; $star++)
+                                            <svg class="w-4 h-4 {{ $star <= $relatedFilledStars ? 'text-amber-400' : 'text-gray-300' }}" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.95a1 1 0 00.95.69h4.154c.969 0 1.371 1.24.588 1.81l-3.36 2.441a1 1 0 00-.364 1.118l1.285 3.95c.3.922-.755 1.688-1.538 1.118l-3.36-2.44a1 1 0 00-1.175 0l-3.36 2.44c-.783.57-1.838-.196-1.539-1.118l1.286-3.95a1 1 0 00-.364-1.118L2.07 9.377c-.783-.57-.38-1.81.588-1.81h4.154a1 1 0 00.95-.69l1.287-3.95z" />
+                                            </svg>
+                                        @endfor
+                                    </div>
+                                    <span class="text-xs text-gray-500">{{ number_format($relatedAvgRating, 1) }} ({{ $relatedReviewCount }})</span>
+                                </div>
+                                <p class="text-xl font-bold text-amber-500">₱{{ number_format($relatedProduct->price ?? 0, 2) }}</p>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </section>
+        @endif
     </main>
 
     <script>

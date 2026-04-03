@@ -13,10 +13,48 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
+use RuntimeException;
 
 
 class CartController extends Controller
 {
+    private const CART_CACHE_TTL_DAYS = 30;
+
+    private function cartCacheKey(int $userId): string
+    {
+        return 'cart_user_' . $userId;
+    }
+
+    private function syncPersistentCart(array $cart): void
+    {
+        if (!Auth::check()) {
+            return;
+        }
+
+        $userId = (int) Auth::id();
+        if ($userId <= 0) {
+            return;
+        }
+
+        Cache::put($this->cartCacheKey($userId), $cart, now()->addDays(self::CART_CACHE_TTL_DAYS));
+    }
+
+    private function clearPersistentCart(): void
+    {
+        if (!Auth::check()) {
+            return;
+        }
+
+        $userId = (int) Auth::id();
+        if ($userId <= 0) {
+            return;
+        }
+
+        Cache::forget($this->cartCacheKey($userId));
+    }
+
     // 1. SHOW CART PAGE (This fixes the error)
     public function index()
     {
@@ -41,6 +79,7 @@ class CartController extends Controller
         }
 
         session()->put('cart', $cart);
+        $this->syncPersistentCart($cart);
         return redirect()->back()->with('success', 'Added to cart!');
     }
 
@@ -52,6 +91,7 @@ class CartController extends Controller
             if(isset($cart[$request->id])) {
                 unset($cart[$request->id]);
                 session()->put('cart', $cart);
+                $this->syncPersistentCart($cart);
             }
             if ($request->ajax() || $request->wantsJson()) {
                 $total = 0;
@@ -89,6 +129,7 @@ class CartController extends Controller
         if ($quantity <= 0) {
             unset($cart[$id]);
             session()->put('cart', $cart);
+            $this->syncPersistentCart($cart);
             if ($request->ajax() || $request->wantsJson()) {
                 $total = 0;
                 foreach ($cart as $item) {
@@ -101,6 +142,7 @@ class CartController extends Controller
 
         $cart[$id]['quantity'] = $quantity;
         session()->put('cart', $cart);
+        $this->syncPersistentCart($cart);
 
         if ($request->ajax() || $request->wantsJson()) {
             $itemSubtotal = $cart[$id]['price'] * $cart[$id]['quantity'];
@@ -183,14 +225,13 @@ class CartController extends Controller
                 $fullAddress = implode(', ', $addressParts);
 
                 // 1. Create Order
-                $order = Order::create([
+                $orderData = [
                     'user_id' => Auth::id(),
                     'total_price' => $total,
                     'points_used' => $pointsUsed,
                     'discount_amount' => $discountAmount,
                     'status' => $request->payment_method === 'paymongo' ? 'awaiting_payment' : 'pending',
                     'payment_method' => $request->payment_method,
-                    'payment_channel' => $request->payment_method === 'paymongo' ? 'online' : 'cod',
                     'payment_status' => 'pending',
                     'shipping_address' => $fullAddress,
                     'contact_phone' => $request->contact_phone,
@@ -201,7 +242,13 @@ class CartController extends Controller
                     'shipping_postal_code' => $request->shipping_postal_code,
                     'shipping_country' => $request->shipping_country,
                     'notes' => $request->notes,
-                ]);
+                ];
+
+                if (Schema::hasColumn('orders', 'payment_channel')) {
+                    $orderData['payment_channel'] = $request->payment_method === 'paymongo' ? 'online' : 'cod';
+                }
+
+                $order = Order::create($orderData);
 
                 // 2. Process Items & Inventory
                 foreach ($cart as $productId => $item) {
@@ -255,10 +302,16 @@ class CartController extends Controller
                     'paymongo_reference' => data_get($checkoutSession, 'attributes.reference_number'),
                 ]);
 
-                return redirect()->away(data_get($checkoutSession, 'attributes.checkout_url'));
+                $checkoutUrl = (string) data_get($checkoutSession, 'attributes.checkout_url', '');
+                if ($checkoutUrl === '') {
+                    throw new RuntimeException('PayMongo checkout URL is missing from response.');
+                }
+
+                return redirect()->away($checkoutUrl);
             }
 
             session()->forget('cart');
+            $this->clearPersistentCart();
 
             // Send Email (We do this outside the transaction so if the email fails, 
             // the order isn't deleted!)

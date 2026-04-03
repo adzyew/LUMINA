@@ -219,11 +219,11 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
 
 
         // archive/unarchive products (must come before products/{product})
-        Route::post('products/{product}/archive', [ProductController::class, 'archive'])
-            ->middleware('role_or_permission:admin|inventory.archive')
+        Route::post('products/{id}/archive', [ProductController::class, 'archive'])
+            ->middleware('role_or_permission:admin|inventory_manager|inventory.archive')
             ->name('products.archive');
-        Route::post('products/{product}/unarchive', [ProductController::class, 'unarchive'])
-            ->middleware('role_or_permission:admin|inventory.archive')
+        Route::post('products/{id}/unarchive', [ProductController::class, 'unarchive'])
+            ->middleware('role_or_permission:admin|inventory_manager|inventory.archive')
             ->name('products.unarchive');
 
         Route::get('products/{product}', [ProductController::class, 'show'])
@@ -238,8 +238,8 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
             ->middleware('role_or_permission:admin|inventory.update')
             ->name('products.update');
 
-        Route::delete('products/{product}', [ProductController::class, 'destroy'])
-            ->middleware('role_or_permission:admin|inventory.delete')
+        Route::delete('products/{id}', [ProductController::class, 'destroy'])
+            ->middleware('role_or_permission:admin|inventory_manager|inventory.delete')
             ->name('products.destroy');
 
         // ORDERS
