@@ -248,6 +248,7 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
         Route::get('orders/{order}/email-preview/placed', [AdminOrderController::class, 'previewPlacedEmail'])->middleware('permission:sales.view')->name('orders.email_preview.placed');
         Route::get('orders/{order}/email-preview/status', [AdminOrderController::class, 'previewStatusEmail'])->middleware('permission:sales.view')->name('orders.email_preview.status');
         Route::put('orders/{order}', [AdminOrderController::class, 'update'])->middleware('permission:sales.view')->name('orders.update');
+        Route::post('orders/{order}', [AdminOrderController::class, 'update'])->middleware('permission:sales.view')->name('orders.update.post');
         Route::delete('orders/{order}', [AdminOrderController::class, 'destroy'])->middleware('permission:sales.view')->name('orders.destroy');
 
         // SALES

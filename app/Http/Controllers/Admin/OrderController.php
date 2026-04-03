@@ -84,17 +84,23 @@ class OrderController extends Controller
             'tracking_number' => $request->tracking_number,
             'courier_name' => $request->has('courier_name') ? $request->input('courier_name') : $order->courier_name,
             'tracking_url' => $request->has('tracking_url') ? $request->input('tracking_url') : $order->tracking_url,
-            'shipped_at' => $request->status === 'shipped' ? ($order->shipped_at ?? now()) : $order->shipped_at,
-            'delivered_at' => $request->status === 'delivered' ? now() : $order->delivered_at,
+            'shipped_at' => $request->status === 'shipped'
+                ? ($order->shipped_at ?? now())
+                : $order->shipped_at,
+            'delivered_at' => $request->status === 'delivered'
+                ? ($order->delivered_at ?? now())
+                : $order->delivered_at,
         ]);
 
-        // Restore stock when cancelling a non-cancelled order
         if ($request->status === 'cancelled' && $previousStatus !== 'cancelled') {
             $order->load('items.product');
+
             foreach ($order->items as $item) {
                 if ($item->product) {
                     $previousStock = $item->product->stock_quantity;
+
                     $item->product->increment('stock_quantity', $item->quantity);
+
                     InventoryLog::create([
                         'product_id'      => $item->product_id,
                         'user_id'         => auth()->id(),
@@ -119,9 +125,21 @@ class OrderController extends Controller
         }
 
         if ($request->status === 'delivered' && !$wasDelivered && $order->user) {
-            $pointsEarned = floor($order->total_price / 100); // 1 point per $100 spent
-
+            $pointsEarned = floor($order->total_price / 100);
             $order->user->increment('points_balance', $pointsEarned);
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Order updated successfully.',
+                'order' => [
+                    'id' => $order->id,
+                    'status' => $order->status,
+                    'courier_name' => $order->courier_name,
+                    'tracking_number' => $order->tracking_number,
+                ],
+            ]);
         }
 
         return redirect()->back()->with('success', 'Order updated successfully.');

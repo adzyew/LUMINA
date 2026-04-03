@@ -20,7 +20,7 @@
     <img
         src="{{ $headerImage }}"
         alt="Lumina Email Header"
-        style="display:block;width:100%;max-height:220px;height:220px;object-fit:cover;object-position:center;"
+        style="display:block;width:100%;max-height:150px;height:220px;object-fit:cover;object-position:center;"
     >
     @if($headerTitle)
         <div style="padding:12px 16px;background:#fffaf0;border-top:1px solid #f3e8c8;">
