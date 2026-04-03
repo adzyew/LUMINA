@@ -91,3 +91,10 @@ Route::view('/terms-of-service', 'legal.terms')->name('legal.terms');
 
 Route::middleware('auth')->post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::get('/debug-env', function () {
+    return [
+        'app_env' => app()->environment(),
+        'app_env_raw' => config('app.env'),
+    ];
+});
+

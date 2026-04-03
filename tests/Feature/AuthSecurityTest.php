@@ -22,7 +22,7 @@ class AuthSecurityTest extends TestCase
             'email_verified_at' => null,
         ])->save();
 
-        Cache::put('otp_'.$user->email, '123456', now()->addMinutes(2));
+        Cache::put('otp_' . $user->email, '123456', now()->addMinutes(2));
 
         $this->withSession(['email' => $user->email])
             ->withCookie(config('session.cookie'), 'fixed-session-id')
@@ -48,7 +48,10 @@ class AuthSecurityTest extends TestCase
             ]);
 
         $response->assertRedirect(route('password.request'));
-        $response->assertSessionHas('info', 'If the email exists in our system, we sent a 6-digit OTP to your inbox.');
+        $response->assertSessionHas(
+            'info',
+            'If the email exists in our system, we sent a 6-digit OTP to your inbox.'
+        );
         $response->assertSessionMissing('error');
     }
 
@@ -61,11 +64,41 @@ class AuthSecurityTest extends TestCase
         $response->assertOk();
         $response->assertHeader('X-Frame-Options', 'SAMEORIGIN');
         $response->assertHeader('X-Content-Type-Options', 'nosniff');
+        $response->assertHeader('X-XSS-Protection', '1; mode=block');
         $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->assertHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-        $response->assertHeader(
-            'Content-Security-Policy',
-            "default-src 'self'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'; img-src 'self' data: https:; font-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:; connect-src 'self' https:; object-src 'none'; upgrade-insecure-requests"
-        );
+        $response->assertHeader('Content-Security-Policy', $this->expectedCspForCurrentEnvironment());
+    }
+
+    private function expectedCspForCurrentEnvironment(): string
+    {
+        if (app()->environment('local')) {
+            return implode('; ', [
+                "default-src 'self'",
+                "base-uri 'self'",
+                "frame-ancestors 'self'",
+                "form-action 'self'",
+                "img-src 'self' data: https:",
+                "font-src 'self' data: https:",
+                "style-src 'self' 'unsafe-inline' https: http://localhost:5173 http://127.0.0.1:5173 http://[::1]:5173",
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http://localhost:5173 http://127.0.0.1:5173 http://[::1]:5173",
+                "connect-src 'self' https: http://localhost:5173 http://127.0.0.1:5173 http://[::1]:5173 ws://localhost:5173 ws://127.0.0.1:5173 ws://[::1]:5173",
+                "object-src 'none'",
+            ]);
+        }
+
+        return implode('; ', [
+            "default-src 'self'",
+            "base-uri 'self'",
+            "frame-ancestors 'self'",
+            "form-action 'self'",
+            "img-src 'self' data: https:",
+            "font-src 'self' data: https:",
+            "style-src 'self' 'unsafe-inline' https:",
+            "script-src 'self' 'unsafe-inline' https:",
+            "connect-src 'self' https:",
+            "object-src 'none'",
+            "upgrade-insecure-requests",
+        ]);
     }
 }

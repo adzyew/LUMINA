@@ -173,7 +173,7 @@
                 @csrf
                 <h3 class="text-xl font-bold text-gray-900 mb-6">Write Your Review</h3>
                 <div class="mb-6">
-                    <label class="block text-gray-600 text-sm font-medium mb-3">Rating</label>
+                    <label class="block text-amber-400 text-sm font-medium mb-3">Rating</label>
                     <div class="flex gap-2" id="ratingStars">
                         @for($i = 1; $i <= 5; $i++)
                             <button type="button" onclick="setRating({{ $i }})" class="star-rating w-10 h-10 text-gray-600 hover:text-amber-400 hover:scale-110 transition-all" data-rating="{{ $i }}">
