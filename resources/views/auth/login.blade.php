@@ -316,7 +316,7 @@
 
                                 <!-- First Name -->
                                 <div class="floating-group">
-                                    <input type="text" name="first_name" id="first_name" value="{{ old('first_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30">
+                                    <input type="text" pattern="^[a-zA-Z ]+$"  name="first_name" id="first_name" value="{{ old('first_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30">
                                     <label for="first_name" class="floating-label no-icon">
                                         First Name
                                     </label>
