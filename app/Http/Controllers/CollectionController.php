@@ -14,6 +14,9 @@ class CollectionController extends Controller
             'category' => 'nullable|string|max:100',
             'material' => 'nullable|string|max:100',
             'sort'     => 'nullable|in:price_asc,price_desc,latest',
+            'price_range' => 'nullable|in:100-500,500-1000,1000-2000,2000-5000,5000+',
+            'min_price' => 'nullable|numeric|min:0',
+            'max_price' => 'nullable|numeric|min:0',
         ]);
 
         $products = Product::query();
@@ -30,6 +33,27 @@ class CollectionController extends Controller
             $products->whereHas('features', function ($query) use ($request) {
                 $query->where('name', 'like', '%' . $request->material . '%'); 
             });
+        }
+
+        if ($request->filled('min_price')) {
+            $products->where('price', '>=', (float) $request->min_price);
+        }
+
+        if ($request->filled('max_price')) {
+            $products->where('price', '<=', (float) $request->max_price);
+        } elseif ($request->filled('price_range')) {
+            $range = (string) $request->price_range;
+            if ($range === '100-500') {
+                $products->whereBetween('price', [100, 500]);
+            } elseif ($range === '500-1000') {
+                $products->whereBetween('price', [500, 1000]);
+            } elseif ($range === '1000-2000') {
+                $products->whereBetween('price', [1000, 2000]);
+            } elseif ($range === '2000-5000') {
+                $products->whereBetween('price', [2000, 5000]);
+            } elseif ($range === '5000+') {
+                $products->where('price', '>=', 5000);
+            }
         }
 
         if ($request->filled('sort')){

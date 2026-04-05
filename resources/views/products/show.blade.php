@@ -75,7 +75,7 @@
 
             {{-- RIGHT COL: Product Details --}}
             <div class="flex flex-col pt-2">
-
+                
                 <div class="flex flex-wrap gap-2 mb-4">
                     <span class="px-4 py-1.5 rounded-xl border border-amber-600 text-xs font-semibold text-amber-600 uppercase tracking-widest">
                         {{ $product->category ?? 'Jewelry' }}
