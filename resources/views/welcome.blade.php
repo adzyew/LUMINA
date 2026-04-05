@@ -232,15 +232,15 @@
     </section>
 
     {{-- About Us / Our Story --}}
-    <section id="about" class="py-20 bg-gray-50 scroll-fade-in">
-        <div class="container mx-auto px-4 sm:px-6">
+    <section id="about" class="py-35  bg-gray-50 scroll-fade-in">
+        <div class="container mx-auto px-4 sm:px-10">
             <div class="max-w-4xl mx-auto text-center">
                 <h2 class="text-4xl font-playfair font-bold text-gray-900 mb-6 scroll-scale">About Lumina</h2>
                 <p class="text-lg text-gray-600 leading-relaxed mb-6">
-                    Lumina was born from a passion for creating jewelry that transcends trends. Every piece we craft is designed to tell a story—yours. From elegant necklaces to timeless bracelets, our handcrafted collections blend traditional craftsmanship with modern elegance.
+                    Lumina was born from a passion for creating jewelry that transcends trends. Every piece we craft is designed to tell a story yours. From elegant necklaces to timeless bracelets, our handcrafted collections blend traditional craftsmanship with modern elegance.
                 </p>
                 <p class="text-lg text-gray-600 leading-relaxed mb-8">
-                    We believe that true luxury lies in the details. Each piece undergoes meticulous quality checks, ensuring you receive nothing but the finest. Experience the Lumina difference—where artistry meets excellence, and every jewel becomes a cherished memory.
+                    We believe that true luxury lies in the details. Each piece undergoes meticulous quality checks, ensuring you receive nothing but the finest. Experience the Lumina difference where artistry meets excellence, and every jewel becomes a cherished memory.
                 </p>
                
             </div>
