@@ -13,6 +13,8 @@ class ProductsController extends Controller
         $request->validate([
             'search'   => 'nullable|string|max:100',
             'category' => 'nullable|string|max:100',
+            'min_price' => 'nullable|numeric|min:0',
+            'max_price' => 'nullable|numeric|min:0',
         ]);
 
         $products = Product::query();
@@ -23,6 +25,14 @@ class ProductsController extends Controller
 
         if ($request->filled('search')) {
             $products->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('min_price')) {
+            $products->where('price', '>=', (float) $request->min_price);
+        }
+
+        if ($request->filled('max_price')) {
+            $products->where('price', '<=', (float) $request->max_price);
         }
 
         $products = $products->latest()->paginate(12)->withQueryString();
