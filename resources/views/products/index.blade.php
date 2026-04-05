@@ -24,7 +24,7 @@
     @include('partials.navbar')
 
     <section class="relative min-h-48 pt-20">
-        <div class="container mx-auto px-4">
+        <div class="container mt-10 mx-auto px-4">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                 <div class="sm:flex-1 text-left">
                     <h1 class="text-4xl sm:text-5xl font-playfair font-bold mt-4">
@@ -87,7 +87,7 @@
         </div>
 
         {{-- Products Grid --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             @forelse($products as $product)
                 <div class="bg-white rounded-2xl p-3 sm:p-4 border border-amber-100/60 hover:border-amber-200 shadow-md hover:shadow-xl hover:shadow-amber-200/40 transition-all duration-300 flex flex-col h-full group relative">
                     <div class="relative w-full aspect-4/5 sm:aspect-square rounded-2xl overflow-hidden bg-amber-50/50 mb-4">
@@ -101,9 +101,17 @@
                             @endif
                         </a>
 
+                        
+                    </div>
+
+                    <div class="flex-1 flex flex-col px-1 sm:px-2">
+                        <a href="{{ route('products.show', $product) }}">
+                            <h3 class="text-2xl font-playfair font-black text-black mb-2 line-clamp-1" title="{{ $product->name }}">{{ $product->name }}</h3>
+                        </a>
+                        
                         @auth
-                            @php $isWishlisted = auth()->user()->wishlist()->where('product_id', $product->id)->exists(); @endphp
-                            <form action="{{ route('wishlist.toggle', $product) }}" method="POST" class="absolute top-3 right-3 z-10">
+                        @php $isWishlisted = auth()->user()->wishlist()->where('product_id', $product->id)->exists(); @endphp
+                            <form action="{{ route('wishlist.toggle', $product) }}" method="POST" class="absolute bottom right-3 z-10">
                                 @csrf
                                 <button type="submit" class="w-10 h-10 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-full flex items-center justify-center hover:bg-red-50 hover:border-red-200 hover:scale-110 transition-all duration-200 shadow-sm">
                                     <svg class="w-5 h-5 transition-colors duration-200 {{ $isWishlisted ? 'text-red-500 fill-red-500' : 'text-gray-400 hover:text-red-500' }}" fill="{{ $isWishlisted ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,23 +120,8 @@
                                 </button>
                             </form>
                         @endauth
-                    </div>
+                        
 
-                    <div class="flex-1 flex flex-col px-1 sm:px-2">
-                        <a href="{{ route('products.show', $product) }}">
-                            <h3 class="text-lg font-playfair font-bold text-gray-900 mb-2 line-clamp-1" title="{{ $product->name }}">{{ $product->name }}</h3>
-                        </a>
-
-                        <div class="flex flex-wrap gap-2 mb-3">
-                            <span class="px-3 py-1 rounded-full border border-amber-200 bg-amber-50 text-xs font-medium text-amber-700 capitalize">
-                                {{ $product->category ?? 'Jewelry' }}
-                            </span>
-                            <span class="px-3 py-1 rounded-full text-xs font-medium border {{ ($product->stock_quantity ?? 0) > 0 ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200' }}">
-                                {{ ($product->stock_quantity ?? 0) > 0 ? 'In Stock' : 'Sold Out' }}
-                            </span>
-                        </div>
-
-                        <p class="text-sm text-gray-500 mb-2 line-clamp-2 leading-relaxed">Description: 
                         @if($product->description ?? null)
                                 @php
                                     $features = explode('•', $product->description);
@@ -142,13 +135,21 @@
                                 </ul>
                             @endif
                         </p>
+                        <div class="flex flex-wrap gap-2 mb-3">
+                            <span class="px-3 py-1 rounded-full border border-amber-200 bg-amber-50 text-xs font-medium text-amber-700 capitalize">
+                                {{ $product->category ?? 'Jewelry' }}
+                            </span>
+                            <span class="px-3 py-1 rounded-full text-xs font-medium border {{ ($product->stock_quantity ?? 0) > 0 ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200' }}">
+                                {{ ($product->stock_quantity ?? 0) > 0 ? 'In Stock' : 'Sold Out' }}
+                            </span>
+                        </div>
 
                         <div class="mt-auto flex items-center justify-between pt-2">
-                            <span class="text-2xl font-black text-amber-600">
+                            <span class="text-xl font-bold text-amber-600">
                                 ₱{{ number_format($product->price ?? 0, 2) }}
                             </span>
 
-                            <a href="{{ route('cart.add', $product->id) }}" class="flex items-center gap-2 bg-amber-300 hover:bg-amber-400 text-black px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-bold text-sm transition-colors shadow-sm">
+                            <a href="{{ route('cart.add', $product->id) }}" class="flex items-center gap-2 bg-amber-300 hover:bg-amber-400 text-black px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold text-md transition-colors shadow-sm">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 sm:w-5 sm:h-5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                                 </svg>

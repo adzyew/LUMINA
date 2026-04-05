@@ -157,7 +157,7 @@
     </section>
 
     {{-- Featured Collections --}}
-    <section id="about" class="py-20 bg-gray-50 scroll-fade-in">
+    <section  class="py-20 bg-gray-50 scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10 scroll-slide-left">
                 <h2 class="text-3xl font-playfair font-bold text-gray-900">Featured Collections</h2>
@@ -165,7 +165,7 @@
                     View All <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </a>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                 @foreach($featuredProducts ?? [] as $product)
                     <a href="{{ route('products.show', $product) }}" class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300 hover:-translate-y-1">
                         <div class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
@@ -232,7 +232,7 @@
     </section>
 
     {{-- About Us / Our Story --}}
-    <section class="py-20 bg-gray-50 scroll-fade-in">
+    <section id="about" class="py-20 bg-gray-50 scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
             <div class="max-w-4xl mx-auto text-center">
                 <h2 class="text-4xl font-playfair font-bold text-gray-900 mb-6 scroll-scale">About Lumina</h2>

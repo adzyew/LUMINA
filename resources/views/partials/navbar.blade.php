@@ -1,29 +1,26 @@
 <nav id="mainNavbar" class="{{ ($authPage ?? false) ? 'fixed top-0 left-0 right-0 z-50 bg-amber-50  backdrop-blur-md border-b border-amber-300 text-gray-900' : (($welcomeLayout ?? false) ? 'w-full bg-amber-50 backdrop-blur-md border-b border-amber-300 text-gray-900' : 'fixed top-0 left-0 right-0 z-50 bg-amber-50 backdrop-blur-md border-b border-amber-300 text-gray-900') }} transition-colors duration-300">
         <div class="navbar-shell container mx-auto px-4 sm:px-6 py-3 sm:py-4 transition-all duration-300">
-            <div class="flex items-center {{ ($authPage ?? false) ? 'justify-center' : 'justify-between' }}">
-                <!-- Logo -->
-            <a href="{{ url('/') }}" class="flex items-center group">
-                <img src="{{ asset('IMAGES/Lumina (1).svg') }}" alt="Lumina" class="navbar-logo h-10 sm:h-11 w-auto origin-left scale-[2.30] transition-transform duration-300">
-            </a>
+            
+            <div class="flex items-center relative {{ ($authPage ?? false) ? 'justify-center' : 'justify-between' }}">
+                
+                <a href="{{ url('/') }}" class="flex items-center">
+                    <img src="{{ asset('IMAGES/Lumina (1).svg') }}" alt="Lumina" class="navbar-logo h-10 sm:h-11 w-auto origin-left scale-[2.30] transition-transform duration-300">
+                </a>
 
                 @if(!($authPage ?? false))
-                <!-- Navigation Links - Desktop -->
-                <div class="hidden md:flex items-center space-x-6 lg:space-x-8 navbar-links">
-                <a href="{{ url('/') }}" data-nav-target="home" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 xl:text-xl font-sans font-semibold">Home</a>
-                <a href="{{ route('products.index') }}" data-nav-target="collections" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 xl:text-xl font-sans font-semibold">Collections</a>
-                <a href="{{ url('/#about') }}" data-nav-target="about" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 xl:text-xl font-sans font-semibold">About</a>
-                <a href="{{ url('/#contact') }}" data-nav-target="contact" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 xl:text-xl font-sans font-semibold">Contact</a>
+                <div class="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 justify-center items-center gap-8 navbar-links">
+                    <a href="{{ url('/') }}" data-nav-target="home" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 xl:text-xl font-sans font-semibold">Home</a>
+                    <a href="{{ route('products.index') }}" data-nav-target="collections" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 xl:text-xl font-sans font-semibold">Collections</a>
+                    <a href="{{ url('/#about') }}" data-nav-target="about" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 xl:text-xl font-sans font-semibold">About</a>
+                    <a href="{{ url('/#contact') }}" data-nav-target="contact" class="nav-link text-gray-900 hover:text-amber-500 transition-colors duration-300 xl:text-xl font-sans font-semibold">Contact</a>
                 </div>
 
-            <!-- Icons & Actions - Desktop -->
-            <div class="flex items-center gap-2 sm:gap-4 navbar-actions">
+            <div class="flex items-center justify-end gap-4 navbar-actions">
 
                 {{-- User dropdown (auth) or Login/Sign Up (guest) --}}
-
-
                 @auth
-                    <a href="{{ route('wishlist.index') }}" class="relative p-2 rounded-lg text-gray-500 hover:text-amber-500 hover:bg-gray-100 transition-colors group" aria-label="Wishlist">
-                        <svg class="w-5 h-5 sm:w-6 sm:h-6 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a href="{{ route('wishlist.index') }}" class="relative p-2 rounded-lg text-amber-400 hover:text-amber-500 transition-colors group" aria-label="Wishlist">
+                        <svg class="w-6 h-6 sm:w-7 sm:h-7 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                         </svg>
                     </a>
@@ -36,11 +33,11 @@
                 @endauth
                 @if(!request()->routeIs('login')&& !request()->routeIs('register'))
                 <a href="{{ route('cart.index') }}" class="relative p-2 rounded-lg text-amber-400 hover:text-amber-500 transition-colors group">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7 transform group-hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 sm:w-7 sm:h-7 transform group-hover:scale-110 transition-transform">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                         </svg>
                         @if(session('cart') && count(session('cart')) > 0)
-                        <span class="absolute -top-0.5 -right-0.5 sm:top-0 sm:right-0 bg-amber-300 text-black text-[10px] sm:text-xs rounded-full min-w-4.5 h-4.5 flex items-center justify-center font-bold">
+                        <span class="absolute -top-0.5 -right-0.5 sm:top-0 sm:right-0 bg-amber-300 text-black text-[10px] sm:text-xs rounded-full min-w-4.5 h-4.5 grid grid-cols-3 items-center font-bold">
                                 {{ count(session('cart')) }}
                             </span>
                         @endif
@@ -81,7 +78,7 @@
                                 Orders
                             </a>
                             <a href="{{ route('wishlist.index') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                <svg class="w-6 h-6 sm:w-7 sm:h-7 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                                 Wishlist
                             </a>
                             <a href="{{ route('profile.show') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
