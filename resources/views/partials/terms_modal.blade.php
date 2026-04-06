@@ -9,9 +9,6 @@
                     <button type="button" onclick="showTermsTab('privacy')" id="privacyTabBtn" class="px-3 py-1">Privacy</button>
                 </nav>
             </div>
-            <div>
-                <button type="button" onclick="closeTermsModal()" class="text-gray-500 hover:text-gray-700">Close</button>
-            </div>
         </div>
 
         <div class="p-6 max-h-[70vh] overflow-y-auto bg-white text-gray-800" id="termsModalBody">
@@ -76,7 +73,6 @@
                 </label>
             </div>
             <div class="flex items-center gap-3">
-                <button type="button" onclick="closeTermsModal()" class="px-4 py-2 rounded-xl bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200 transition-colors">Cancel</button>
                 <button type="button" onclick="acceptTermsFromModal()" class="px-4 py-2 rounded-xl bg-amber-300 text-black font-semibold">Agree & Continue</button>
             </div>
         </div>
