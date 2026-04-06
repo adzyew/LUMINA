@@ -21,7 +21,7 @@ class SecurityHeaders
                 $scheme = parse_url($appUrl, PHP_URL_SCHEME);
                 $host = parse_url($appUrl, PHP_URL_HOST);
                 $isLoopbackHost = in_array($host, ['localhost', '127.0.0.1', '::1'], true);
-                if ($scheme && $host) {
+                if ($scheme && $host && ! $isLoopbackHost) {
                     $appOrigin = "{$scheme}://{$host}";
                 }
             }
