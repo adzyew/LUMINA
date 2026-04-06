@@ -93,47 +93,14 @@
             left: 1rem;
         }
 
-        /* Fix for intl-tel-input container */
-        .iti {
-            width: 100%;
-        }
-
-        /* Move label to the right (because of flag +63) */
-        .phone-label {
-            left: 4.5rem; /* adjust if needed */
-        }
-
-        /* When empty */
-        .floating-input:placeholder-shown + .phone-label {
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1rem;
-            color: rgb(156 163 175);
-        }
-
-        /* When focused or has value */
-        .floating-input:focus + .phone-label,
-        .floating-input:not(:placeholder-shown) + .phone-label {
-            top: 0;
-            transform: translateY(-50%);
-            font-size: 0.75rem;
-            color: #d97706;
-            background: white;
-            padding: 0 0.25rem;
-        }
-
-        .iti {
-            width: 100%;
-        }
-
         .phone-floating-group {
             position: relative;
         }
 
-        .phone-floating-group .iti input {
+        .phone-floating-group .floating-input.phone-input {
             width: 100%;
             padding-bottom: 0.75rem;
-            padding-left: 5.5rem !important;
+            padding-left: 4rem;
             padding-right: 1rem;
             background-color: white;
             border: 1px solid rgb(229 231 235);
@@ -143,14 +110,25 @@
             transition: all 0.2s ease;
         }
 
-        .phone-floating-group .iti input:focus {
+        .phone-floating-group .floating-input.phone-input:focus {
             border-color: #f59e0b;
             box-shadow: 0 0 0 1px #f59e0b;
         }
 
+        .phone-prefix {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgb(55 65 81);
+            font-weight: 600;
+            z-index: 15;
+            pointer-events: none;
+        }
+
         .phone-floating-label {
             position: absolute;
-            left: 5.5rem;
+            left: 4rem;
             top: 50%;
             transform: translateY(-50%);
             color: rgb(156 163 175);
@@ -217,7 +195,7 @@
                                             </svg>
                                         </span>
                                         <input type="email" name="email" id="login-email" value="{{ old('email') }}" placeholder=" " class=" floating-input peer pl-12 pr-12 py-4" >
-                                        <label for="login-email" class="floating-label">Email address</label>
+                                        <label for="login-email" class="floating-label">Email Address</label>
                                     </div>
 
                                     @error('email')
@@ -354,7 +332,7 @@
                                         </span>
 
                                         <input type="email" name="email" id="register-email" value="{{ old('email', session('email')) }}" placeholder=" " class="floating-input pl-12 pr-4 py-4" maxlength="50">
-                                        <label for="register-email" class="floating-label">Email address</label>
+                                        <label for="register-email" class="floating-label">Email Address</label>
                                     </div>
 
                                     @error('email')
@@ -366,7 +344,8 @@
 
                                 <!-- Phone -->
                                 <div class="phone-floating-group relative">
-                                    <input id="register-phone" type="tel" name="phone" value="{{ old('phone') }}" placeholder=" " class="floating-input phone-input w-full py-4">
+                                    <span class="phone-prefix ">+63</span>
+                                    <input id="register-phone" pattern="[0-9]*" type="tel" name="phone" value="{{ old('phone') }}" placeholder=" " class="floating-input phone-input w-full py-3">
                                     <label for="register-phone" class="phone-floating-label pt-1 pb-1 py-4">
                                         Phone Number
                                     </label>
@@ -672,15 +651,7 @@
 
             updateSignupButtonState();
 
-            if (registerPhone && window.intlTelInput) {
-                window.intlTelInput(registerPhone, {
-                    initialCountry: 'ph',
-                    onlyCountries: ['ph'],
-                    separateDialCode: true,
-                    nationalMode: true,
-                    autoPlaceholder: 'polite',
-                });
-
+            if (registerPhone) {
                 registerPhone.addEventListener('blur', function () {
                     registerPhone.value = normalizePhilippineMobile(registerPhone.value);
                 });

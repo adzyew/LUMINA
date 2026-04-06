@@ -61,7 +61,7 @@
         </div>
     </div>
 
-    <form method="POST" action="{{ route('place.order') }}" class="space-y-4 lg:order-1">
+    <form method="POST" action="{{ route('place.order', [], false) }}" class="space-y-4 lg:order-1">
         @csrf
         <div class="space-y-4 p-4 rounded-xl bg-gray-50 border border-gray-200">
             <h3 class="text-xl font-bold text-gray-900">Contact Information</h3>

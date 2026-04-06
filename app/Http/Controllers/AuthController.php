@@ -274,14 +274,26 @@ class AuthController extends Controller
             abort(403);
         }
 
-        $orders = $user->orders()
+        $allowedStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
+        $selectedStatus = strtolower((string) $request->query('status', ''));
+        if (!in_array($selectedStatus, $allowedStatuses, true)) {
+            $selectedStatus = '';
+        }
+
+        $ordersQuery = $user->orders()
             ->where('status', '!=', 'awaiting_payment')
-            ->with('items.product')
+            ->with('items.product');
+
+        if ($selectedStatus !== '') {
+            $ordersQuery->where('status', $selectedStatus);
+        }
+
+        $orders = $ordersQuery
             ->latest()
             ->paginate(3)
             ->withQueryString();
 
-        return view('user.orders', compact('orders'));
+        return view('user.orders', compact('orders', 'selectedStatus', 'allowedStatuses'));
     }
 
     public function showOrder(Order $order)
