@@ -45,7 +45,6 @@ class SecurityHeaders
                 . "upgrade-insecure-requests";
         }
 
-        $response->headers->set('X-Debug-Security', 'hit');
         $response->headers->set('Content-Security-Policy', $csp);
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
         $response->headers->set('X-Content-Type-Options', 'nosniff');

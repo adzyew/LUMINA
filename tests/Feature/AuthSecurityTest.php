@@ -73,25 +73,30 @@ class AuthSecurityTest extends TestCase
     private function expectedCspForCurrentEnvironment(): string
     {
         if (app()->environment('local')) {
-            return implode('; ', [
-                "default-src 'self'",
-                "base-uri 'self'",
-                "frame-ancestors 'self'",
-                "form-action 'self'",
-                "img-src 'self' data: https:",
-                "font-src 'self' data: https:",
-                "style-src 'self' 'unsafe-inline' https: http://localhost:5173 http://127.0.0.1:5173 http://[::1]:5173",
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http://localhost:5173 http://127.0.0.1:5173 http://[::1]:5173",
-                "connect-src 'self' https: http://localhost:5173 http://127.0.0.1:5173 http://[::1]:5173 ws://localhost:5173 ws://127.0.0.1:5173 ws://[::1]:5173",
-                "object-src 'none'",
-            ]);
+            return "default-src * 'unsafe-inline' 'unsafe-eval' data: blob: http: https: ws: wss:;";
+        }
+
+        $appOrigin = '';
+        $appUrl = (string) config('app.url', '');
+        if ($appUrl !== '') {
+            $scheme = parse_url($appUrl, PHP_URL_SCHEME);
+            $host = parse_url($appUrl, PHP_URL_HOST);
+            $isLoopbackHost = in_array($host, ['localhost', '127.0.0.1', '::1'], true);
+            if ($scheme && $host && ! $isLoopbackHost) {
+                $appOrigin = "{$scheme}://{$host}";
+            }
+        }
+
+        $formAction = "form-action 'self'";
+        if ($appOrigin !== '') {
+            $formAction .= " {$appOrigin}";
         }
 
         return implode('; ', [
             "default-src 'self'",
             "base-uri 'self'",
             "frame-ancestors 'self'",
-            "form-action 'self'",
+            $formAction,
             "img-src 'self' data: https:",
             "font-src 'self' data: https:",
             "style-src 'self' 'unsafe-inline' https:",
