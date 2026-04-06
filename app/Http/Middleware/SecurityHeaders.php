@@ -15,27 +15,10 @@ class SecurityHeaders
         if (app()->environment('local')) {
             $csp = "default-src * 'unsafe-inline' 'unsafe-eval' data: blob: http: https: ws: wss:;";
         } else {
-            $appOrigin = '';
-            $appUrl = (string) config('app.url', '');
-            if ($appUrl !== '') {
-                $scheme = parse_url($appUrl, PHP_URL_SCHEME);
-                $host = parse_url($appUrl, PHP_URL_HOST);
-                $isLoopbackHost = in_array($host, ['localhost', '127.0.0.1', '::1'], true);
-                if ($scheme && $host && ! $isLoopbackHost) {
-                    $appOrigin = "{$scheme}://{$host}";
-                }
-            }
-
-            $formAction = "form-action 'self'";
-            if ($appOrigin !== '') {
-                $formAction .= " {$appOrigin}";
-            }
-            $formAction .= '; ';
-
             $csp = "default-src 'self'; "
                 . "base-uri 'self'; "
                 . "frame-ancestors 'self'; "
-                . $formAction
+                . "form-action 'self'; "
                 . "img-src 'self' data: https:; "
                 . "font-src 'self' data: https:; "
                 . "style-src 'self' 'unsafe-inline' https:; "
