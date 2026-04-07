@@ -167,7 +167,7 @@
                 </a>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                @foreach($latestProducts->take(8) as $product)
+                @foreach($latestProducts->take(4) as $product)
                     <a href="{{ route('products.show', $product) }}" class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300 hover:-translate-y-1">
                         <div class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
                             <img src="{{ $product->image_url ?? asset('IMAGES/Bracelet.jpg') }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -399,7 +399,7 @@
     </section>
 
     {{-- Newsletter / Subscribe --}}
-    <section class="py-20 bg-white border-t border-gray-100 scroll-fade-in">
+    <section id="contact" class="py-40 bg-white border-t border-gray-100 scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
             <div class="max-w-2xl mx-auto text-center scroll-scale">
                 <h2 class="text-3xl font-playfair font-bold text-gray-900 mb-4">Join the Lumina Family</h2>

@@ -40,7 +40,14 @@
                 <td class="p-4"><span class="px-2 py-1 rounded-full text-xs font-medium {{ $order->status === 'delivered' ? 'bg-green-500/20 text-green-400' : ($order->status === 'shipped' ? 'bg-purple-500/20 text-purple-400' : 'bg-indigo-500/20 text-indigo-400') }}">{{ ucfirst($order->status) }}</span></td>
                 <td class="p-4 text-gray-600">{{ $order->tracking_number ?? '—' }}</td>
                 <td class="p-4 text-gray-500">{{ $order->shipped_at ? $order->shipped_at->format('M d, Y') : '—' }}</td>
-                <td class="p-4"><a href="{{ route('admin.deliveries.show', $order) }}" class="inline-flex px-4 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 text-sm">Track</a></td>
+                <td class="p-4">
+                    <a href="{{ route('admin.deliveries.show', $order) }}" class="inline-flex px-4 py-2 bg-amber-300 text-white font-bold rounded-lg hover:bg-amber-400 text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                        </svg>
+                    </a>
+                </td>
             </tr>
             @empty
             <tr><td colspan="6" class="p-12 text-center text-gray-500">No deliveries in progress.</td></tr>

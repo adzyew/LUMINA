@@ -9,10 +9,6 @@
     <p class="text-gray-600 text-sm mt-1">Track and manage customer orders.</p>
 </header>
 
-@if(session('success'))
-    <div class="mb-6 bg-green-100 text-green-800 p-4 rounded-lg border border-green-200">{{ session('success') }}</div>
-@endif
-
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
     <div class="bg-white border border-gray-200 rounded-2xl p-5">
         <p class="text-xs uppercase tracking-wide text-gray-500 font-semibold">Total Orders</p>

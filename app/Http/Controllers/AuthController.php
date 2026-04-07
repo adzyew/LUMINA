@@ -403,7 +403,12 @@ class AuthController extends Controller
         ));
     }
 
-            public function updateProfile(Request $request, CloudinaryService $cloudinary)
+    public function helpSupport()
+    {
+        return view('user.help_support');
+    }
+
+    public function updateProfile(Request $request, CloudinaryService $cloudinary)
     {
         $validated = $request->validate([
             'active_tab' => 'nullable|string',
@@ -1062,4 +1067,3 @@ class AuthController extends Controller
         return redirect()->route('login')->with('success', 'Your password has been reset. You can now log in.');
     }
 }
-

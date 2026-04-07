@@ -83,6 +83,7 @@ Route::middleware('customer')->group(function () {
         Route::get('/dashboard/profile', [AuthController::class, 'showProfile'])->name('profile.show');
         Route::get('/dashboard/profile/edit', [AuthController::class, 'editProfile'])->name('profile.edit');
         Route::put('/dashboard/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
+        Route::get('/dashboard/help-support', [AuthController::class, 'helpSupport'])->name('support.index');
         Route::post('/dashboard/deactivate', [AuthController::class, 'deactivateAccount'])->name('account.deactivate');
     });
 });

@@ -49,21 +49,12 @@
                         <div>
                             <p class="text-gray-900 font-normal text-sm">Order Number: {{ $order->display_order_number }} </p>
                         </div>
-                        
-                        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
-                            {{ $order->status === 'pending' ? 'bg-amber-100 text-amber-700 border border-amber-200' : '' }}
-                            {{ $order->status === 'confirmed' ? 'bg-blue-100 text-blue-700 border border-blue-200' : '' }}
-                            {{ $order->status === 'processing' ? 'bg-indigo-100 text-indigo-700 border border-indigo-200' : '' }}
-                            {{ $order->status === 'shipped' ? 'bg-purple-100 text-purple-700 border border-purple-200' : '' }}
-                            {{ $order->status === 'delivered' ? 'bg-green-100 text-green-700 border border-green-200' : '' }}
-                            {{ $order->status === 'cancelled' ? 'bg-red-100 text-red-700 border border-red-200' : '' }}
-                        ">{{ $order->status }}</span>
                         <div>
                             <p class="text-gray-600 text-sm">{{ $order->created_at->format('M d, Y h:i A') }}</p>
                         </div>
                     </div>
 
-                    <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-6 gap-2 text-sm">
+                    <div class="mt-2 pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-7 gap-2 text-sm">
                         <div>
                             <div class="flex items-center gap-3">
                                 @if($primaryProduct && ($primaryProduct->image_url ?? null))
@@ -96,6 +87,21 @@
                             <div class="flex items-center justify-between gap-3">
                                 <p class="text-gray-700 font-medium">{{ $order->tracking_number ?? 'Pending assignment' }}</p>
                             </div>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Status</p>
+                            <div class="flex items-center justify-between">
+                                <span class="px-1 text-xs font-bold uppercase tracking-wider
+                                {{ $order->status === 'pending' ? ' text-amber-700 ' : '' }}
+                                {{ $order->status === 'confirmed' ? ' text-blue-700 ' : '' }}
+                                {{ $order->status === 'processing' ? ' text-indigo-700  ' : '' }}
+                                {{ $order->status === 'shipped' ? ' text-purple-700  ' : '' }}
+                                {{ $order->status === 'delivered' ? ' text-green-700  ' : '' }}
+                                {{ $order->status === 'cancelled' ? ' text-red-700  ' : '' }}">
+                                {{ $order->status }}
+                            </span>
+                            </div>
+                            
                         </div>
                         <div>
                             <div class="flex items-center justify-center">

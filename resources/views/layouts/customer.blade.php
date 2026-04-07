@@ -106,7 +106,7 @@
             <div>
                 <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Support</p>
                 <div class="space-y-1">
-                    <a href="{{ route('legal.shipping') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl {{ request()->routeIs('legal.shipping') ? 'text-amber-600 bg-amber-50 font-semibold' : 'text-gray-600 hover:text-amber-600 hover:bg-amber-50/70' }} transition-colors">
+                    <a href="{{ route('support.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl {{ request()->routeIs('support.*') ? 'text-amber-600 bg-amber-50 font-semibold' : 'text-gray-600 hover:text-amber-600 hover:bg-amber-50/70' }} transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.742-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.035.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.966-1.584A6.062 6.062 0 0 1 6 18.75m12-6.75a6 6 0 0 0-12 0v.75a6 6 0 0 0 12 0V12Z" />
                         </svg>

@@ -122,6 +122,7 @@
             transform: translateY(-50%);
             color: rgb(55 65 81);
             font-weight: 600;
+            line-height: 1;
             z-index: 15;
             pointer-events: none;
         }
@@ -344,11 +345,13 @@
 
                                 <!-- Phone -->
                                 <div class="phone-floating-group relative">
-                                    <span class="phone-prefix ">+63</span>
-                                    <input id="register-phone" pattern="[0-9]*" type="tel" name="phone" value="{{ old('phone') }}" placeholder=" " class="floating-input phone-input w-full py-3" inputmode="numeric" maxlength="11">
-                                    <label for="register-phone" class="phone-floating-label pt-1 pb-1 py-4">
-                                        Phone Number
-                                    </label>
+                                    <div class="relative">
+                                        <span class="phone-prefix">+63</span>
+                                        <input id="register-phone" pattern="[0-9]*" type="tel" name="phone" value="{{ old('phone') }}" placeholder=" " class="floating-input phone-input w-full py-3 leading-tight" inputmode="numeric" maxlength="11">
+                                        <label for="register-phone" class="phone-floating-label pt-1 pb-1 py-4">
+                                            Phone Number
+                                        </label>
+                                    </div>
 
                                     @error('phone')
                                         @if(($activeTab ?? 'login') === 'register')
