@@ -258,13 +258,71 @@ class AuthController extends Controller
         if (!$user instanceof User) {
             abort(403);
         }
-        $orders = $user->orders()
+
+        $ordersQuery = $user->orders()
             ->where('status', '!=', 'awaiting_payment')
+            ->where('status', '!=', 'draft');
+
+        $orders = (clone $ordersQuery)
             ->with('items.product')
             ->latest()
             ->paginate(3)
             ->withQueryString();
-        return view("user.user_dashboard", compact('user', 'orders'));
+
+        $pendingStatuses = ['pending', 'confirmed', 'processing'];
+        $spentStatuses = ['confirmed', 'processing', 'shipped', 'delivered'];
+
+        $totalPurchases = (clone $ordersQuery)->count();
+        $pendingPurchases = (clone $ordersQuery)->whereIn('status', $pendingStatuses)->count();
+        $completedPurchases = (clone $ordersQuery)->where('status', 'delivered')->count();
+        $totalSpent = (float) (clone $ordersQuery)->whereIn('status', $spentStatuses)->sum('total_price');
+
+        $recentPurchases = (clone $ordersQuery)
+            ->where('created_at', '>=', now()->subDays(30))
+            ->count();
+
+        $statusCountsRaw = (clone $ordersQuery)
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $statusLabels = ['Pending', 'Confirmed', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+        $statusKeys = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
+        $statusChartData = collect($statusKeys)
+            ->map(fn ($key) => (int) ($statusCountsRaw[$key] ?? 0))
+            ->values()
+            ->all();
+
+        $startMonth = now()->startOfMonth()->subMonths(5);
+        $monthlyTotalsRaw = (clone $ordersQuery)
+            ->whereIn('status', $spentStatuses)
+            ->where('created_at', '>=', $startMonth)
+            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month_key, SUM(total_price) as total")
+            ->groupBy('month_key')
+            ->pluck('total', 'month_key');
+
+        $spendingChartLabels = [];
+        $spendingChartData = [];
+        for ($i = 0; $i < 6; $i++) {
+            $month = $startMonth->copy()->addMonths($i);
+            $key = $month->format('Y-m');
+            $spendingChartLabels[] = $month->format('M Y');
+            $spendingChartData[] = (float) ($monthlyTotalsRaw[$key] ?? 0);
+        }
+
+        return view('user.user_dashboard', compact(
+            'user',
+            'orders',
+            'totalPurchases',
+            'pendingPurchases',
+            'completedPurchases',
+            'totalSpent',
+            'recentPurchases',
+            'statusLabels',
+            'statusChartData',
+            'spendingChartLabels',
+            'spendingChartData'
+        ));
     }
 
     public function orders(Request $request)
@@ -314,95 +372,119 @@ class AuthController extends Controller
 
     public function showProfile()
     {
-        return view('user.profile_show', ['user' => Auth::user()]);
+        return redirect()->route('profile.edit');
     }
 
     
 
     public function editProfile()
     {
-        return view('user.profile_edit', ['user' => Auth::user()]);
-    }
-
-    public function updateProfile(Request $request, CloudinaryService $cloudinary)
-{
-    $validated = $request->validate([
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'phone' => ['required', 'regex:/^09\\d{9}$/'],
-        'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-        'current_password' => 'nullable|required_with:new_password|string',
-        'new_password' => [
-            'nullable',
-            'string',
-            'min:8',
-            'regex:/[a-z]/',
-            'regex:/[A-Z]/',
-            'regex:/[0-9]/',
-            'confirmed',
-        ],
-
-        'shipping_street' => 'nullable|string|max:255',
-        'shipping_secondary_address' => 'nullable|string|max:255',
-        'shipping_city' => 'required|string|max:100',
-        'shipping_barangay' => 'required|string|max:100',
-        'shipping_region' => 'nullable|string|max:100',
-        'shipping_postal_code' => 'required|string|max:20',
-        'notify_order_updates' => 'nullable|boolean',
-        'notify_promotions' => 'nullable|boolean',
-        'notify_loyalty' => 'nullable|boolean',
-    ], [
-        'phone.regex' => 'Please enter a valid Philippine mobile number (e.g. 09171234567).',
-        'new_password.min' => 'Password must be at least 8 characters.',
-        'new_password.regex' => 'Password must include uppercase, lowercase, and a number.',
-    ]);
-
-    $user = Auth::user();
-    if (!$user instanceof User) {
-        abort(403);
-    }
-
-    $validated['name'] = trim($validated['first_name'] . ' ' . $validated['last_name']);
-    $validated['notify_order_updates'] = $request->boolean('notify_order_updates');
-    $validated['notify_promotions'] = $request->boolean('notify_promotions');
-    $validated['notify_loyalty'] = $request->boolean('notify_loyalty');
-
-    if ($request->filled('new_password')) {
-        if (!$request->filled('current_password') || !Hash::check($request->input('current_password'), $user->password)) {
-            return back()->withErrors(['current_password' => 'Current password is incorrect.'])->withInput();
-        }
-        $validated['password'] = Hash::make($request->input('new_password'));
-    }
-
-    if ($request->hasFile('profile_photo')) {
-        if ($user->profile_photo_public_id) {
-            $cloudinary->deleteImage($user->profile_photo_public_id);
+        $user = Auth::user();
+        if (!$user instanceof User) {
+            abort(403);
         }
 
-        $file = $request->file('profile_photo');
-        $publicId = 'profile_pictures/user_' . $user->id;
-        $uploaded = $cloudinary->uploadImage($file->getRealPath(), 'profile_pictures', $publicId, 'profile_pictures');
-        $validated['profile_photo_url'] = $uploaded['url'];
-        $validated['profile_photo_public_id'] = $uploaded['public_id'];
+        $ordersQuery = $user->orders()->where('status', '!=', 'awaiting_payment');
+        $totalOrders = (clone $ordersQuery)->count();
+        $deliveredOrders = (clone $ordersQuery)->where('status', 'delivered')->count();
+        $pendingOrders = (clone $ordersQuery)->whereIn('status', ['pending', 'confirmed', 'processing'])->count();
+        $lifetimeSpend = (float) (clone $ordersQuery)->whereIn('status', ['confirmed', 'processing', 'shipped', 'delivered'])->sum('total_price');
+
+        return view('user.profile_edit', compact(
+            'user',
+            'totalOrders',
+            'deliveredOrders',
+            'pendingOrders',
+            'lifetimeSpend'
+        ));
     }
 
-    // ✅ BUILD FULL SHIPPING ADDRESS HERE
-    $validated['shipping_address'] = implode(', ', array_filter([
-        $validated['shipping_street'] ?? null,
-        $validated['shipping_secondary_address'] ?? null,
-        $validated['shipping_barangay'],
-        $validated['shipping_city'],
-        'Metro Manila',
-        $validated['shipping_postal_code'],
-        'Philippines'
-    ]));
+            public function updateProfile(Request $request, CloudinaryService $cloudinary)
+    {
+        $validated = $request->validate([
+            'active_tab' => 'nullable|string',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'phone' => ['required', 'regex:/^09\\d{9}$/'],
+            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'current_password' => 'nullable|required_with:new_password|string|max:72',
+            'new_password' => [
+                'nullable',
+                'string',
+                'min:8',
+                'max:72',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'confirmed',
+            ],
+            'shipping_street' => 'nullable|string|max:255',
+            'shipping_secondary_address' => 'nullable|string|max:255',
+            'shipping_city' => 'nullable|string|max:100',
+            'shipping_barangay' => 'nullable|string|max:100',
+            'shipping_region' => 'nullable|string|max:100',
+            'shipping_postal_code' => 'nullable|string|max:20',
+            'notify_order_updates' => 'nullable|boolean',
+            'notify_promotions' => 'nullable|boolean',
+            'notify_loyalty' => 'nullable|boolean',
+        ], [
+            'phone.regex' => 'Please enter a valid Philippine mobile number (e.g. 09171234567).',
+            'new_password.min' => 'Password must be at least 8 characters.',
+            'new_password.max' => 'Password cannot exceed 72 characters.',
+            'current_password.max' => 'Current password cannot exceed 72 characters.',
+            'new_password.regex' => 'Password must include uppercase, lowercase, and a number.',
+        ]);
 
-    // ✅ SAVE EVERYTHING
-    $user->update($validated);
+        $user = Auth::user();
+        if (!$user instanceof User) {
+            abort(403);
+        }
 
-    return redirect()->route('profile.show')->with('success', 'Profile updated successfully.');
-}
+        $validated['name'] = trim(($validated['first_name'] ?? '') . ' ' . ($validated['last_name'] ?? ''));
+        $validated['notify_order_updates'] = $request->boolean('notify_order_updates');
+        $validated['notify_promotions'] = $request->boolean('notify_promotions');
+        $validated['notify_loyalty'] = $request->boolean('notify_loyalty');
 
+        if ($request->filled('new_password')) {
+            if (!$request->filled('current_password') || !Hash::check($request->input('current_password'), $user->password)) {
+                return back()->withErrors(['current_password' => 'Current password is incorrect.'])->withInput();
+            }
+
+            $validated['password'] = Hash::make($request->input('new_password'));
+        }
+
+        if ($request->hasFile('profile_photo')) {
+            if ($user->profile_photo_public_id) {
+                $cloudinary->deleteImage($user->profile_photo_public_id);
+            }
+
+            $file = $request->file('profile_photo');
+            $publicId = 'profile_pictures/user_' . $user->id;
+            $uploaded = $cloudinary->uploadImage($file->getRealPath(), 'profile_pictures', $publicId, 'profile_pictures');
+            $validated['profile_photo_url'] = $uploaded['url'];
+            $validated['profile_photo_public_id'] = $uploaded['public_id'];
+        }
+
+        $addressParts = array_filter([
+            $validated['shipping_street'] ?? null,
+            $validated['shipping_secondary_address'] ?? null,
+            $validated['shipping_barangay'] ?? null,
+            $validated['shipping_city'] ?? null,
+            'Metro Manila',
+            $validated['shipping_postal_code'] ?? null,
+            'Philippines',
+        ]);
+        $validated['shipping_address'] = $addressParts !== [] ? implode(', ', $addressParts) : null;
+
+        unset($validated['active_tab'], $validated['current_password'], $validated['new_password']);
+
+        $user->update($validated);
+
+        return redirect()->route('profile.edit')->with([
+            'toast_type' => 'success',
+            'toast_message' => 'Settings updated successfully.',
+        ]);
+    }
     public function deactivateAccount(Request $request)
     {
         $user = Auth::user();
@@ -974,3 +1056,5 @@ class AuthController extends Controller
         return redirect()->route('login')->with('success', 'Your password has been reset. You can now log in.');
     }
 }
+
+

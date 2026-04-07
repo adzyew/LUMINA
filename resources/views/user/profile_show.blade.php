@@ -10,7 +10,9 @@
         </div>
     @endif
 
-    <div class="bg-white rounded-xl  sm:p-8 border border-gray-200 shadow-sm">
+    {{-- 1. Added 'min-h-[calc(100vh-12rem)]' to stretch the card, and 'flex flex-col' to manage internal spacing --}}
+    <div class="bg-white rounded-xl p-6 sm:p-8 border border-gray-200 shadow-sm min-h-[calc(100vh-12rem)] flex flex-col">
+        
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div>
                 <h1 class="text-3xl font-playfair font-bold text-gray-900">My Profile</h1>
@@ -18,18 +20,19 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-[120px_1fr] gap-6 items-start mb-8">
+        {{-- 2. Added 'flex-grow' to the main content area so it expands to fill the empty space --}}
+        <div class="grid grid-cols-1 md:grid-cols-[120px_1fr] gap-6 items-start flex-grow">
             <div>
                 @if($user->profile_photo_url)
                     <img src="{{ $user->profile_photo_url }}" alt="Profile" class="w-24 h-24 rounded-full object-cover border border-amber-300/30">
                 @else
-                    <div class="w-24 h-24 bg-linear-to-br from-amber-300 to-amber-600 rounded-full flex items-center justify-center text-black text-2xl font-bold">
+                    <div class="w-24 h-24 bg-gradient-to-br from-amber-300 to-amber-600 rounded-full flex items-center justify-center text-black text-2xl font-bold">
                         {{ strtoupper(substr($user->name, 0, 1)) }}
                     </div>
                 @endif
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 h-max">
                 <div class="bg-gray-50 rounded-xl border border-gray-200 px-4 py-3">
                     <p class="text-xs text-gray-500 uppercase tracking-wide">Full Name</p>
                     <p class="mt-1 font-semibold text-gray-900">{{ $user->name }}</p>
@@ -47,14 +50,15 @@
                     <p class="mt-1 font-semibold text-gray-700">{{ $user->shipping_address ?: 'Not set' }}</p>
                 </div>
             </div>
-            <div class="sm:col-span-2 flex justify-end">
-                <a href="{{ route('profile.edit') }}" class="inline-flex items-center justify-center px-5 py-2.5 bg-amber-300 text-black font-bold rounded-xl hover:bg-amber-400 transition-colors">
-                    Edit Profile
-                </a>
-            </div>
         </div>
+
+        {{-- 3. Moved the button outside the grid, added 'mt-auto' to push it to the bottom, and added a subtle top border --}}
+        <div class="flex justify-end mt-auto pt-6 border-t border-gray-100">
+            <a href="{{ route('profile.edit') }}" class="inline-flex items-center justify-center px-5 py-2.5 bg-amber-300 text-black font-bold rounded-xl hover:bg-amber-400 transition-colors">
+                Edit Profile
+            </a>
+        </div>
+        
     </div>
 </div>
-
 @endsection
-

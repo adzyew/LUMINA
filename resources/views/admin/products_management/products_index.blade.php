@@ -8,17 +8,17 @@
         <div>
             <h1 class="text-3xl font-playfair font-bold text-gray-900">Product Management</h1>
         </div>
-        <div class="flex gap-3 items-center">
+    </header>
+
+    <div class="flex flex-wrap gap-2 mb-2">
+        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'all'])) }}"      class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? 'all') === 'all'      ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">All</a>
+        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'active'])) }}"   class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'active'   ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">Active</a>
+        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'archived'])) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'archived' ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">Archived</a>
+        <div class="flex flex-wrap justify-end items-end ml-auto">
             <a href="{{ route('admin.products.create') }}" class="px-5 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors">
                 + Add New Product
             </a>
         </div>
-    </header>
-
-    <div class="flex flex-wrap gap-2 mb-4">
-        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'all'])) }}"      class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? 'all') === 'all'      ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">All</a>
-        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'active'])) }}"   class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'active'   ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">Active</a>
-        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'archived'])) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'archived' ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">Archived</a>
     </div>
 
     <form method="GET" action="{{ route('admin.products.index') }}" class="mb-6 bg-white border border-gray-200 rounded-2xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -172,7 +172,6 @@
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
                 <h2 class="text-xl font-playfair font-bold text-gray-900">Product Details</h2>
-                <button onclick="closeViewModal()" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors text-xl leading-none">&times;</button>
             </div>
             <div class="p-6 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>

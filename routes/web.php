@@ -69,6 +69,7 @@ Route::middleware('customer')->group(function () {
         Route::get('/payments/paymongo/cancel', [PaymentController::class, 'paymongoCancel'])->name('payments.paymongo.cancel');
         
         Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+        Route::get('/my-wishlist', [WishlistController::class, 'storefront'])->name('wishlist.storefront');
 
         Route::post('/products/{product}/review', [ReviewController::class, 'store'])->name('reviews.store');
 
@@ -97,4 +98,3 @@ Route::get('/debug-env', function () {
         'app_env_raw' => config('app.env'),
     ];
 });
-

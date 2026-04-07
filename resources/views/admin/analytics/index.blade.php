@@ -7,7 +7,6 @@
     @include('partials.favicon')
     <div>
         <h1 class="text-3xl font-playfair font-bold text-gray-900">Analytics</h1>
-        <p class="text-gray-600 text-sm mt-1">Sales analytics, top products, and customer insights.</p>
     </div>
     <form action="{{ route('admin.analytics.export') }}" method="GET" class="flex gap-2 items-center">
         <input type="date" name="from" class="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900" placeholder="From">
@@ -38,6 +37,24 @@
     <div class="bg-white border border-gray-200 rounded-2xl p-6">
         <h3 class="text-gray-500 text-sm font-medium mb-1">Revenue Change</h3>
         <p class="text-3xl font-bold {{ $revenueChange >= 0 ? 'text-green-400' : 'text-red-400' }}">{{ $revenueChange >= 0 ? '+' : '' }}{{ $revenueChange }}%</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    <div class="bg-white border border-gray-200 rounded-2xl p-6">
+        <h3 class="text-gray-500 text-sm font-medium mb-1">Cash Inflow (6 Months)</h3>
+        <p class="text-3xl font-bold text-green-500">₱{{ number_format($totalCashInflow, 2) }}</p>
+        <p class="text-xs text-gray-500 mt-2">From completed sales</p>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-2xl p-6">
+        <h3 class="text-gray-500 text-sm font-medium mb-1">Cash Outflow (6 Months)</h3>
+        <p class="text-3xl font-bold text-red-500">₱{{ number_format($totalCashOutflow, 2) }}</p>
+        <p class="text-xs text-gray-500 mt-2">Discounts and points redeemed</p>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-2xl p-6">
+        <h3 class="text-gray-500 text-sm font-medium mb-1">Net Cashflow (6 Months)</h3>
+        <p class="text-3xl font-bold {{ $totalNetCashflow >= 0 ? 'text-emerald-500' : 'text-red-500' }}">₱{{ number_format($totalNetCashflow, 2) }}</p>
+        <p class="text-xs text-gray-500 mt-2">Inflow minus outflow</p>
     </div>
 </div>
 
@@ -83,25 +100,10 @@
         </table>
     </div>
     <div class="bg-white border border-gray-200 rounded-2xl p-6">
-        <h3 class="text-lg font-bold text-gray-900 mb-4">Top Customers</h3>
-        <table class="w-full text-sm">
-            <thead>
-                <tr class="text-gray-500 border-b border-gray-200">
-                    <th class="pb-3 text-left">Customer</th>
-                    <th class="pb-3 text-right">Total Spent</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($topCustomers as $customer)
-                <tr class="border-b border-gray-100">
-                    <td class="py-3 text-gray-900">{{ $customer->name }}</td>
-                    <td class="py-3 text-right text-amber-300 font-bold">₱{{ number_format($customer->total_spent ?? 0, 2) }}</td>
-                </tr>
-                @empty
-                <tr><td colspan="2" class="py-6 text-center text-gray-500">No customer data yet.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-bold text-gray-900">Moneyflow (Last 6 Months)</h3>
+        </div>
+        <div id="salesTrendChart" class="h-70"></div>
     </div>
 </div>
 
@@ -165,6 +167,33 @@ document.addEventListener('DOMContentLoaded', function () {
             dataLabels: { enabled: false },
             legend: { position: 'bottom' },
             stroke: { width: 0 },
+        }).render();
+    }
+
+    const cashflowLabels = {!! json_encode($cashflowLabels) !!};
+    const cashInflowSeries = {!! json_encode($cashInflowSeries) !!};
+    const cashOutflowSeries = {!! json_encode($cashOutflowSeries) !!};
+    const netCashflowSeries = {!! json_encode($netCashflowSeries) !!};
+
+    const cashflowEl = document.getElementById('salesTrendChart');
+    if (cashflowEl) {
+        new ApexCharts(cashflowEl, {
+            chart: { type: 'line', height: 300, toolbar: { show: false }, background: 'transparent' },
+            theme: { mode: isDark ? 'dark' : 'light' },
+            series: [
+                { name: 'Cash Inflow', type: 'column', data: cashInflowSeries },
+                { name: 'Cash Outflow', type: 'column', data: cashOutflowSeries },
+                { name: 'Net Cashflow', type: 'line', data: netCashflowSeries },
+            ],
+            xaxis: { categories: cashflowLabels },
+            yaxis: { labels: { formatter: pesoFmt } },
+            colors: ['#22c55e', '#ef4444', '#f59e0b'],
+            stroke: { width: [0, 0, 3], curve: 'smooth' },
+            dataLabels: { enabled: false },
+            plotOptions: { bar: { columnWidth: '40%', borderRadius: 6 } },
+            grid: { borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#f3f4f6' },
+            tooltip: { y: { formatter: pesoFmt } },
+            legend: { position: 'top' },
         }).render();
     }
 });

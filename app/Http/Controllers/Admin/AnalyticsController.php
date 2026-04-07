@@ -84,6 +84,44 @@ class AnalyticsController extends Controller
                 ->sum('total_price');
         }
 
+        $cashflowMonths = collect(range(5, 0))->map(fn (int $offset) => now()->copy()->subMonths($offset));
+
+        $cashflowLabels = $cashflowMonths
+            ->map(fn ($month) => $month->format('M Y'))
+            ->values()
+            ->all();
+
+        $cashInflowSeries = $cashflowMonths
+            ->map(function ($month) use ($completedStatuses): float {
+                return (float) Order::query()
+                    ->whereIn('status', $completedStatuses)
+                    ->whereYear('created_at', $month->year)
+                    ->whereMonth('created_at', $month->month)
+                    ->sum('total_price');
+            })
+            ->values()
+            ->all();
+
+        $cashOutflowSeries = $cashflowMonths
+            ->map(function ($month) use ($completedStatuses): float {
+                return (float) Order::query()
+                    ->whereIn('status', $completedStatuses)
+                    ->whereYear('created_at', $month->year)
+                    ->whereMonth('created_at', $month->month)
+                    ->sum('discount_amount');
+            })
+            ->values()
+            ->all();
+
+        $netCashflowSeries = collect($cashInflowSeries)
+            ->map(fn ($inflow, $index): float => (float) $inflow - (float) ($cashOutflowSeries[$index] ?? 0))
+            ->values()
+            ->all();
+
+        $totalCashInflow = array_sum($cashInflowSeries);
+        $totalCashOutflow = array_sum($cashOutflowSeries);
+        $totalNetCashflow = $totalCashInflow - $totalCashOutflow;
+
         return view('admin.analytics.index', compact(
             'totalRevenue',
             'thisMonthRevenue',
@@ -95,7 +133,14 @@ class AnalyticsController extends Controller
             'ordersLast24Hours',
             'ordersLast7Days',
             'ordersLast30Days',
-            'ordersLast12Months'
+            'ordersLast12Months',
+            'cashflowLabels',
+            'cashInflowSeries',
+            'cashOutflowSeries',
+            'netCashflowSeries',
+            'totalCashInflow',
+            'totalCashOutflow',
+            'totalNetCashflow'
         ));
     }
 

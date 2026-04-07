@@ -192,10 +192,10 @@
                         
                         @auth
                         @php $isWishlisted = auth()->user()->wishlist()->where('product_id', $product->id)->exists(); @endphp
-                            <form action="{{ route('wishlist.toggle', $product) }}" method="POST" class="absolute bottom right-3 z-10">
+                            <form action="{{ route('wishlist.toggle', $product) }}" method="POST" class="absolute bottom right-3 z-10 js-wishlist-form">
                                 @csrf
-                                <button type="submit" class="w-10 h-10 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-full flex items-center justify-center hover:bg-red-50 hover:border-red-200 hover:scale-110 transition-all duration-200 shadow-sm">
-                                    <svg class="w-5 h-5 transition-colors duration-200 {{ $isWishlisted ? 'text-red-500 fill-red-500' : 'text-gray-400 hover:text-red-500' }}" fill="{{ $isWishlisted ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                <button type="submit" class="js-wishlist-btn w-10 h-10 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-full flex items-center justify-center hover:bg-red-50 hover:border-red-200 hover:scale-110 transition-all duration-200 shadow-sm" data-wishlisted="{{ $isWishlisted ? '1' : '0' }}">
+                                    <svg class="js-wishlist-icon w-5 h-5 transition-colors duration-200 {{ $isWishlisted ? 'text-red-500 fill-red-500' : 'text-gray-400 hover:text-red-500' }}" fill="{{ $isWishlisted ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                                     </svg>
                                 </button>
@@ -230,7 +230,7 @@
                                 ₱{{ number_format($product->price ?? 0, 2) }}
                             </span>
 
-                            <a href="{{ route('cart.add', $product->id) }}" class="flex items-center gap-2 bg-amber-300 hover:bg-amber-400 text-black px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold text-md transition-colors shadow-sm">
+                            <a href="{{ route('cart.add', $product->id) }}" class="js-add-to-cart-btn flex items-center gap-2 bg-amber-300 hover:bg-amber-400 text-black px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold text-md transition-colors shadow-sm">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 sm:w-5 sm:h-5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                                 </svg>
@@ -264,6 +264,116 @@
                     window.setTimeout(() => {
                         toast.classList.add('opacity-0', 'translate-y-2', 'pointer-events-none');
                     }, 2600);
+                }
+
+                function showActionToast(message, tone) {
+                    let toast = document.getElementById('cartToast');
+                    if (!toast) {
+                        toast = document.createElement('div');
+                        toast.id = 'cartToast';
+                        toast.className = 'fixed top-24 left-1/2 -translate-x-1/2 z-50 max-w-sm w-[calc(100vw-1rem)] sm:w-auto px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 opacity-0 translate-y-2 pointer-events-none transition-all duration-500';
+                        toast.innerHTML = '<span class="text-sm font-semibold"></span>';
+                        document.body.appendChild(toast);
+                    }
+
+                    toast.classList.remove('bg-amber-300', 'text-black', 'bg-emerald-500', 'text-white', 'bg-red-500');
+                    if (tone === 'success') {
+                        toast.classList.add('bg-emerald-500', 'text-white');
+                    } else if (tone === 'error') {
+                        toast.classList.add('bg-red-500', 'text-white');
+                    } else {
+                        toast.classList.add('bg-amber-300', 'text-black');
+                    }
+
+                    const text = toast.querySelector('span');
+                    if (text) text.textContent = message;
+
+                    requestAnimationFrame(() => {
+                        toast.classList.remove('opacity-0', 'translate-y-2', 'pointer-events-none');
+                    });
+                    window.setTimeout(() => {
+                        toast.classList.add('opacity-0', 'translate-y-2', 'pointer-events-none');
+                    }, 2200);
+                }
+
+                function updateNavbarCartCount(nextCount) {
+                    const badge = document.getElementById('navbarCartCount');
+                    if (!badge) return;
+                    const parsed = Number(nextCount) || 0;
+                    badge.textContent = String(parsed);
+                    badge.classList.toggle('hidden', parsed <= 0);
+                }
+
+                function bindProductActionButtons() {
+                    document.querySelectorAll('.js-add-to-cart-btn').forEach((link) => {
+                        if (link.dataset.ajaxBound) return;
+                        link.dataset.ajaxBound = '1';
+                        link.addEventListener('click', async function (event) {
+                            event.preventDefault();
+                            if (link.dataset.loading === '1') return;
+                            link.dataset.loading = '1';
+                            link.classList.add('opacity-70', 'pointer-events-none');
+
+                            try {
+                                const response = await fetch(link.href, {
+                                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                                });
+                                const data = await response.json();
+                                if (!response.ok || !data.success) {
+                                    throw new Error(data.message || 'Failed to add to cart');
+                                }
+                                updateNavbarCartCount(data.cart_count);
+                                showActionToast(data.message || 'Added to cart!', 'success');
+                            } catch (error) {
+                                showActionToast('Failed to add to cart.', 'error');
+                            } finally {
+                                link.classList.remove('opacity-70', 'pointer-events-none');
+                                link.dataset.loading = '0';
+                            }
+                        });
+                    });
+
+                    document.querySelectorAll('.js-wishlist-form').forEach((form) => {
+                        if (form.dataset.ajaxBound) return;
+                        form.dataset.ajaxBound = '1';
+                        form.addEventListener('submit', async function (event) {
+                            event.preventDefault();
+                            const button = form.querySelector('.js-wishlist-btn');
+                            const icon = form.querySelector('.js-wishlist-icon');
+                            if (!button || !icon) return;
+                            if (button.dataset.loading === '1') return;
+
+                            button.dataset.loading = '1';
+                            button.classList.add('opacity-70', 'pointer-events-none');
+
+                            try {
+                                const fd = new FormData(form);
+                                const response = await fetch(form.action, {
+                                    method: 'POST',
+                                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                                    body: fd,
+                                });
+                                const data = await response.json();
+                                if (!response.ok || !data.success) {
+                                    throw new Error(data.message || 'Failed to update wishlist');
+                                }
+
+                                const isAdded = Boolean(data.added);
+                                button.dataset.wishlisted = isAdded ? '1' : '0';
+                                icon.classList.toggle('text-red-500', isAdded);
+                                icon.classList.toggle('fill-red-500', isAdded);
+                                icon.classList.toggle('text-gray-400', !isAdded);
+                                icon.setAttribute('fill', isAdded ? 'currentColor' : 'none');
+
+                                showActionToast(data.message || 'Wishlist updated.', 'success');
+                            } catch (error) {
+                                showActionToast('Failed to update wishlist.', 'error');
+                            } finally {
+                                button.classList.remove('opacity-70', 'pointer-events-none');
+                                button.dataset.loading = '0';
+                            }
+                        });
+                    });
                 }
 
                 function setSearchHiddenValue(name, value) {
@@ -478,6 +588,7 @@
 
                     initPriceSlider('priceRangeSlider', 'priceBubble', 'maxPriceInput', 'minPriceInput');
                     initPriceSlider('priceRangeSliderMobile', 'priceBubbleMobile', 'maxPriceInputMobile', 'minPriceInputMobile');
+                    bindProductActionButtons();
                 }
 
                 window.addEventListener('popstate', function () {
@@ -502,4 +613,3 @@
     @include('partials.footer')
 </body>
 </html>
-

@@ -80,6 +80,19 @@ class CartController extends Controller
 
         session()->put('cart', $cart);
         $this->syncPersistentCart($cart);
+
+        if (request()->ajax() || request()->wantsJson()) {
+            $cartCount = collect($cart)->sum(function ($item) {
+                return (int) ($item['quantity'] ?? 0);
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Added to cart!',
+                'cart_count' => $cartCount,
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Added to cart!');
     }
 
@@ -98,7 +111,15 @@ class CartController extends Controller
                 foreach ($cart as $item) {
                     $total += $item['price'] * $item['quantity'];
                 }
-                return response()->json(['success' => true, 'message' => 'Removed!', 'total' => number_format($total,2)]);
+                $cartCount = collect($cart)->sum(function ($item) {
+                    return (int) ($item['quantity'] ?? 0);
+                });
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Removed!',
+                    'total' => number_format($total, 2),
+                    'cart_count' => $cartCount,
+                ]);
             }
             return redirect()->back()->with('success', 'Removed!');
         }
@@ -135,7 +156,16 @@ class CartController extends Controller
                 foreach ($cart as $item) {
                     $total += $item['price'] * $item['quantity'];
                 }
-                return response()->json(['success' => true, 'message' => 'Removed from cart.', 'removed' => true, 'total' => number_format($total,2)]);
+                $cartCount = collect($cart)->sum(function ($item) {
+                    return (int) ($item['quantity'] ?? 0);
+                });
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Removed from cart.',
+                    'removed' => true,
+                    'total' => number_format($total, 2),
+                    'cart_count' => $cartCount,
+                ]);
             }
             return redirect()->back()->with('success', 'Removed from cart.');
         }
@@ -150,12 +180,16 @@ class CartController extends Controller
             foreach ($cart as $item) {
                 $total += $item['price'] * $item['quantity'];
             }
+            $cartCount = collect($cart)->sum(function ($item) {
+                return (int) ($item['quantity'] ?? 0);
+            });
             return response()->json([
                 'success' => true,
                 'message' => 'Cart updated.',
                 'quantity' => $cart[$id]['quantity'],
                 'item_subtotal' => number_format($itemSubtotal, 2),
                 'total' => number_format($total, 2),
+                'cart_count' => $cartCount,
             ]);
         }
 

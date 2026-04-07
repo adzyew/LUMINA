@@ -19,7 +19,7 @@
 
                 {{-- User dropdown (auth) or Login/Sign Up (guest) --}}
                 @auth
-                    <a href="{{ route('wishlist.index') }}" class="relative p-2 rounded-lg text-amber-400 hover:text-amber-500 transition-colors group" aria-label="Wishlist">
+                    <a href="{{ route('wishlist.storefront') }}" class="relative p-2 rounded-lg text-amber-400 hover:text-amber-500 transition-colors group" aria-label="Wishlist">
                         <svg class="w-6 h-6 sm:w-7 sm:h-7 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                         </svg>
@@ -36,11 +36,17 @@
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 sm:w-7 sm:h-7 transform group-hover:scale-110 transition-transform">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                         </svg>
-                        @if(session('cart') && count(session('cart')) > 0)
-                        <span class="absolute -top-3 -right-0.5 sm:top-0 sm:right-0 bg-amber-300 text-black text-[10px] sm:text-xs rounded-full min-w-4.5 h-4.5 grid grid-cols-3 items-center font-bold">
-                                {{ count(session('cart')) }}
-                            </span>
-                        @endif
+                        @php
+                            $navbarCartCount = 0;
+                            if (session('cart') && is_array(session('cart'))) {
+                                foreach (session('cart') as $cartItem) {
+                                    $navbarCartCount += (int) ($cartItem['quantity'] ?? 0);
+                                }
+                            }
+                        @endphp
+                        <span id="navbarCartCount" class="absolute -top-3 -right-0.5 sm:top-0 sm:right-0 bg-amber-300 text-black text-[10px] sm:text-xs rounded-full min-w-4.5 h-4.5 grid grid-cols-1 justify-items-center font-bold {{ $navbarCartCount > 0 ? '' : 'hidden' }}">
+                            {{ $navbarCartCount }}
+                        </span>
                     </a>
                 @endif
                 @auth
@@ -77,7 +83,7 @@
                                 <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
                                 Orders
                             </a>
-                            <a href="{{ route('wishlist.index') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                            <a href="{{ route('wishlist.storefront') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                 <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                                 Wishlist
                             </a>
@@ -134,7 +140,7 @@
                         @endif
                         <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 rounded-lg transition-colors">View Profile</a>
                         <a href="{{ route('orders.index') }}" class="flex items-center gap-3 px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 rounded-lg transition-colors">Orders</a>
-                        <a href="{{ route('wishlist.index') }}" class="flex items-center gap-3 px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 rounded-lg transition-colors">Wishlist</a>
+                        <a href="{{ route('wishlist.storefront') }}" class="flex items-center gap-3 px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 rounded-lg transition-colors">Wishlist</a>
                         <a href="{{ route('profile.show') }}" class="flex items-center gap-3 px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 rounded-lg transition-colors">Settings</a>
                             <form method="POST" action="{{ route('logout') }}" onsubmit="return confirm('Are you sure you want to logout?');">
                                 @csrf
@@ -300,3 +306,4 @@
     });
 
 </script>
+
