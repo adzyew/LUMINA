@@ -49,4 +49,15 @@ class WishlistController extends Controller
 
         return view('wishlist.index', compact('wishlistItems'));
     }
+
+    public function storefront()
+    {
+        $wishlistItems = Wishlist::query()
+            ->where('user_id', Auth::id())
+            ->with('product')
+            ->latest()
+            ->paginate(12);
+
+        return view('wishlist.storefront', compact('wishlistItems'));
+    }
 }

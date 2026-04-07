@@ -3,7 +3,7 @@
 @section('title', 'My Dashboard | Lumina')
 
 @section('content')
-    <div class="container mx-auto px-4 sm:px-6 lg:px-10 py-12 max-w-7xl">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-3 py-12 max-w-7xl">
         @if(session('success'))
             <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm">
                 {{ session('success') }}
@@ -12,129 +12,163 @@
 
         <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-gray-200 pb-6">
             <div>
-                <h1 class="text-3xl md:text-4xl font-playfair font-bold text-gray-900 mb-2">Account Overview</h1>
-                <p class="text-gray-600">Manage your profile and view your order history.</p>
+                <h1 class="text-2xl md:text-4xl font-playfair font-medium text-gray-900 mb-2">Dashboard</h1>
             </div>
             <a href="{{ route('products.index') }}" class="mt-4 md:mt-0 text-amber-600 hover:text-amber-700 transition-colors text-sm font-semibold flex items-center gap-1">
                 Continue Shopping &rarr;
             </a>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sticky top-24">
-                    @if(Auth::user()->profile_photo_url)
-                        <img src="{{ Auth::user()->profile_photo_url }}" alt="Profile" class="w-20 h-20 rounded-full object-cover mx-auto mb-6 border-2 border-amber-300/30">
-                    @else
-                    <div class="w-20 h-20 bg-linear-to-br from-amber-300 to-amber-600 rounded-full flex items-center justify-center text-black text-3xl font-bold mb-6 mx-auto">
-                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                    </div>
-                    @endif
-                    <h2 class="text-center text-xl font-bold text-gray-900 mb-1">{{ Auth::user()->name }}</h2>
-                    <p class="text-center text-gray-500 text-sm mb-6">{{ Auth::user()->email }}</p>
-
-
-                    <div class="space-y-3">
-                        <div class="flex justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
-                            <span class="text-gray-500 text-xs">Member Since</span>
-                            <span class="text-gray-900 font-semibold text-sm">{{ Auth::user()->created_at->format('M Y') }}</span>
-                        </div>
-                        <div class="flex justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
-                            <span class="text-gray-500 text-xs">Account Status</span>
-                            <span class="text-green-600 text-sm font-bold flex items-center gap-1">
-                                <span class="w-2 h-2 bg-green-500 rounded-full"></span> Active
-                            </span>
-                        </div>
-                        <div class="p-3 bg-amber-50 rounded-lg border border-amber-200">
-                            <div class="flex items-center justify-between">
-                                <span class="text-amber-700 text-xs font-semibold uppercase tracking-wider">Lumina Rewards</span>
-                                <span class="text-amber-700 text-sm font-bold">{{ Auth::user()->points_balance }} pts</span>
-                            </div>
-                            <p class="text-[11px] text-amber-700 mt-1">Earn 1 point for every ₱100 spent.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="settings" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
-                    <h3 class="text-xl font-playfair font-bold text-gray-900 mb-2">Profile & Security</h3>
-                    <p class="text-gray-600 text-sm mb-4">Update your name, profile photo, and phone.</p>
-                    <a href="{{ route('profile.show') }}" class="inline-flex items-center gap-2 text-amber-600 text-sm font-semibold hover:text-amber-700 transition-colors">
-                        View profile
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </a>
-                </div>
-            </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
             <div class="lg:col-span-2 space-y-8">
-
-                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-    <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-        Recent Orders
-    </h3>
-
-    <div class="space-y-4">
-        @forelse($orders as $order)
-            <div class="bg-white rounded-xl p-5 border border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <p class="text-gray-900 font-bold text-lg">Order #{{ $order->display_order_number }}</p>
-                    <p class="text-gray-600 text-sm">{{ $order->created_at->format('M d, Y') }}</p>
-                    <p class="text-gray-600 text-sm mt-1">
-                        {{ $order->items->count() }} item(s) • ₱{{ number_format($order->total_price, 2) }}
-                    </p>
-                    <p class="text-gray-600 text-sm mt-1">Payment: {{ $order->payment_display }}</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+                    <div class="bg-white rounded-2xl border border-gray-200 border-t-4 border-t-indigo-500 shadow-sm p-5">
+                        <div class="flex items-center justify-between">
+                            <p class="text-xs font-semibold tracking-wide uppercase text-gray-500">Total Purchases</p>
+                            <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"></path></svg>
+                            </span>
+                        </div>
+                        <p class="mt-4 text-3xl font-bold text-gray-900">{{ $totalPurchases }}</p>
+                        <div id="purchasesSparkline" class="mt-2 h-10"></div>
+                        <p class="text-[11px] text-gray-400">All-time order count</p>
+                    </div>
+                    <div class="bg-white rounded-2xl border border-gray-200 border-t-4 border-t-amber-500 shadow-sm p-5">
+                        <div class="flex items-center justify-between">
+                            <p class="text-xs font-semibold tracking-wide uppercase text-gray-500">Pending Orders</p>
+                            <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v6l4 2m6-2a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z"></path></svg>
+                            </span>
+                        </div>
+                        <p class="mt-4 text-3xl font-bold text-amber-600">{{ $pendingPurchases }}</p>
+                        <div id="pendingSparkline" class="mt-2 h-10"></div>
+                        <p class="text-[11px] text-gray-400">Orders waiting fulfillment</p>
+                    </div>
+                    <div class="bg-white rounded-2xl border border-gray-200 border-t-4 border-t-emerald-500 shadow-sm p-5">
+                        <div class="flex items-center justify-between">
+                            <p class="text-xs font-semibold tracking-wide uppercase text-gray-500">Delivered</p>
+                            <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-green-50 text-green-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m4.5 12.75 6 6 9-13.5"></path></svg>
+                            </span>
+                        </div>
+                        <p class="mt-4 text-3xl font-bold text-green-700">{{ $completedPurchases }}</p>
+                        <div id="deliveredSparkline" class="mt-2 h-10"></div>
+                        <p class="text-[11px] text-gray-400">Successfully completed</p>
+                    </div>
+                    <div class="bg-white rounded-2xl border border-gray-200 border-t-4 border-t-fuchsia-500 shadow-sm p-5">
+                        <div class="flex items-center justify-between">
+                            <p class="text-xs font-semibold tracking-wide uppercase text-gray-500">Total Spent</p>
+                            <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v12m3-9H9m9 9a9 9 0 1 0-12 0h12Z"></path></svg>
+                            </span>
+                        </div>
+                        <p class="mt-2 text-2xl font-bold text-gray-900">PHP {{ number_format($totalSpent, 2) }}</p>
+                        <div id="spentSparkline" class="mt-2 h-10"></div>
+                        <p class="mt-1 text-xs text-gray-500">{{ $recentPurchases }} purchase(s) in last 30 days</p>
+                    </div>
                 </div>
 
-                <div class="flex flex-col sm:items-end gap-2">
-                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
-                        {{ $order->status === 'pending' ? 'bg-amber-100 text-amber-700' : '' }}
-                        {{ $order->status === 'processing' ? 'bg-blue-100 text-blue-700' : '' }}
-                        {{ $order->status === 'shipped' ? 'bg-blue-100 text-blue-700' : '' }}
-                        {{ $order->status === 'delivered' ? 'bg-green-100 text-green-700' : '' }}
-                        {{ $order->status === 'cancelled' ? 'bg-red-100 text-red-700' : '' }}
-                    ">
-                        {{ $order->status }}
-                    </span>
-
-                    {{--<a href="{{ route('orders.invoice', $order->id) }}" class="text-amber-600 hover:text-amber-700 text-sm font-semibold flex items-center gap-1 transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>
-                        Invoice
-                    </a>--}}
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-900 mb-1 flex items-center gap-2">
+                            <span class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.75 15.75 8.25 11.25l3 3 5.25-6"></path></svg>
+                            </span>
+                            Total Spent
+                        </h3>
+                        <div class="h-64">
+                            <div id="spendingTrendChart" class="h-full"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-900 mb-1 flex items-center gap-2">
+                            <span class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.75 3v18h18M7.5 13.5V9.75m4.5 3.75V6.75m4.5 6.75V11.25"></path></svg>
+                            </span>
+                            Order Status Breakdown
+                        </h3>
+                        <div class="h-64">
+                            <div id="statusBreakdownChart" class="h-full"></div>
+                        </div>
+                    </div>
                 </div>
+
+                <div id="recentOrdersSection" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 ">
+                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                    Recent Orders
+                </h3>               
+
+    @if($orders->isEmpty())
+        <div class="text-center py-10">
+            <div class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-400">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
             </div>
-        @empty
-            <div class="text-center py-10">
-                <div class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-400">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                </div>
-                <p class="text-gray-900 font-bold text-lg mb-1">No orders found</p>
-                <p class="text-gray-600 mb-6">You haven't purchased any luxury items yet.</p>
-                <a href="{{ route('collection') }}" class="px-6 py-3 bg-amber-300 text-black font-bold rounded-full hover:bg-amber-400 transition-colors">
-                    Browse Collection
-                </a>
-            </div>
-        @endforelse
-    </div>
+            <p class="text-gray-900 font-bold text-lg mb-1">No orders found</p>
+            <p class="text-gray-600 mb-6">You haven't purchased any luxury items yet.</p>
+            <a href="{{ route('collection') }}" class="px-6 py-3 bg-amber-300 text-black font-bold rounded-full hover:bg-amber-400 transition-colors">
+                Browse Collection
+            </a>
+        </div>
+    @else
+        <div class="overflow-x-auto rounded-xl border border-gray-200">
+            <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600">Order</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600">Date</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600">Items</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600">Payment</th>
+                        <th class="px-4 py-3 text-right font-semibold text-gray-600">Total</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 bg-white">
+                    @foreach($orders as $order)
+                        <tr class="hover:bg-gray-50/70">
+                            <td class="px-4 py-3 font-semibold text-gray-900 whitespace-nowrap">#{{ $order->display_order_number }}</td>
+                            <td class="px-4 py-3 text-gray-600 whitespace-nowrap">{{ $order->created_at->format('M d, Y') }}</td>
+                            <td class="px-4 py-3 text-gray-600 whitespace-nowrap">{{ $order->items->count() }}</td>
+                            <td class="px-4 py-3 text-gray-600 whitespace-nowrap">{{ $order->payment_display }}</td>
+                            <td class="px-4 py-3 text-right text-gray-900 whitespace-nowrap">PHP {{ number_format($order->total_price, 2) }}</td>
+                            <td class="px-4 py-3">
+                                <span class="inline-flex px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide
+                                    {{ $order->status === 'pending' ? 'bg-amber-100 text-amber-700' : '' }}
+                                    {{ $order->status === 'confirmed' ? 'bg-indigo-100 text-indigo-700' : '' }}
+                                    {{ $order->status === 'processing' ? 'bg-blue-100 text-blue-700' : '' }}
+                                    {{ $order->status === 'shipped' ? 'bg-sky-100 text-sky-700' : '' }}
+                                    {{ $order->status === 'delivered' ? 'bg-green-100 text-green-700' : '' }}
+                                    {{ $order->status === 'cancelled' ? 'bg-red-100 text-red-700' : '' }}
+                                ">
+                                    {{ $order->status }}
+                                </span>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
 
     @if($orders->hasPages())
         <div class="mt-5 flex items-center justify-end gap-2">
             @if($orders->onFirstPage())
                 <span class="px-3 py-1.5 text-xs rounded-lg border border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed">Prev</span>
             @else
-                <a href="{{ $orders->previousPageUrl() }}" class="px-3 py-1.5 text-xs rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-colors">Prev</a>
+                <a href="{{ $orders->previousPageUrl() }}" class="js-recent-orders-link px-3 py-1.5 text-xs rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-colors">Prev</a>
             @endif
 
             @foreach($orders->getUrlRange(max(1, $orders->currentPage() - 1), min($orders->lastPage(), $orders->currentPage() + 1)) as $page => $url)
                 @if($page == $orders->currentPage())
                     <span class="px-3 py-1.5 text-xs rounded-lg bg-amber-300 text-black font-bold">{{ $page }}</span>
                 @else
-                    <a href="{{ $url }}" class="px-3 py-1.5 text-xs rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-colors">{{ $page }}</a>
+                    <a href="{{ $url }}" class="js-recent-orders-link px-3 py-1.5 text-xs rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-colors">{{ $page }}</a>
                 @endif
             @endforeach
 
             @if($orders->hasMorePages())
-                <a href="{{ $orders->nextPageUrl() }}" class="px-3 py-1.5 text-xs rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-colors">Next</a>
+                <a href="{{ $orders->nextPageUrl() }}" class="js-recent-orders-link px-3 py-1.5 text-xs rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-colors">Next</a>
             @else
                 <span class="px-3 py-1.5 text-xs rounded-lg border border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed">Next</span>
             @endif
@@ -146,3 +180,205 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('click', async function (event) {
+                const link = event.target.closest('.js-recent-orders-link');
+                if (!link) return;
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+                const section = document.getElementById('recentOrdersSection');
+                if (!section) return;
+
+                event.preventDefault();
+                section.classList.add('opacity-60', 'pointer-events-none');
+                section.setAttribute('aria-busy', 'true');
+
+                try {
+                    const response = await fetch(link.href, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                    });
+
+                    if (!response.ok) {
+                        window.location.href = link.href;
+                        return;
+                    }
+
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const incoming = doc.getElementById('recentOrdersSection');
+
+                    if (!incoming) {
+                        window.location.href = link.href;
+                        return;
+                    }
+
+                    section.outerHTML = incoming.outerHTML;
+                    window.history.replaceState({}, '', link.href);
+                } catch (error) {
+                    window.location.href = link.href;
+                } finally {
+                    const updated = document.getElementById('recentOrdersSection');
+                    if (updated) {
+                        updated.classList.remove('opacity-60', 'pointer-events-none');
+                        updated.removeAttribute('aria-busy');
+                    }
+                }
+            });
+
+            if (typeof ApexCharts === 'undefined') return;
+
+            const spendingSeries = @json($spendingChartData).map((value) => Number(value) || 0);
+            const statusSeries = @json($statusChartData).map((value) => Number(value) || 0);
+            const safeSpentSeries = spendingSeries.some((value) => value > 0) ? spendingSeries : [20, 28, 22, 30, 25, 32];
+
+            const sparklineConfigs = [
+                {
+                    selector: '#purchasesSparkline',
+                    color: '#4f46e5',
+                    data: safeSpentSeries.map((value, index) => Math.max(1, Math.round((value / 300) + (index + 1))))
+                },
+                {
+                    selector: '#pendingSparkline',
+                    color: '#d97706',
+                    data: [
+                        statusSeries[0] ?? 0,
+                        statusSeries[1] ?? 0,
+                        statusSeries[2] ?? 0,
+                        statusSeries[2] ?? 0,
+                        statusSeries[1] ?? 0,
+                        statusSeries[0] ?? 0,
+                    ]
+                },
+                {
+                    selector: '#deliveredSparkline',
+                    color: '#059669',
+                    data: [
+                        0,
+                        statusSeries[3] ?? 0,
+                        statusSeries[3] ?? 0,
+                        statusSeries[4] ?? 0,
+                        statusSeries[4] ?? 0,
+                        statusSeries[4] ?? 0,
+                    ]
+                },
+                {
+                    selector: '#spentSparkline',
+                    color: '#c026d3',
+                    data: safeSpentSeries
+                },
+            ];
+
+            sparklineConfigs.forEach(function (config) {
+                const el = document.querySelector(config.selector);
+                if (!el) return;
+
+                const hasValue = config.data.some((value) => Number(value) > 0);
+                const normalizedData = hasValue ? config.data : [1, 1, 1, 1, 1, 1];
+                const chart = new ApexCharts(el, {
+                    chart: {
+                        type: 'line',
+                        height: 40,
+                        sparkline: { enabled: true },
+                        toolbar: { show: false },
+                    },
+                    series: [{ data: normalizedData }],
+                    stroke: { curve: 'smooth', width: 2.3 },
+                    colors: [config.color],
+                    tooltip: { enabled: false },
+                });
+                chart.render();
+            });
+
+            const spendingEl = document.getElementById('spendingTrendChart');
+            if (spendingEl) {
+                const spendingChart = new ApexCharts(spendingEl, {
+                    chart: {
+                        type: 'area',
+                        height: '100%',
+                        toolbar: { show: false },
+                        zoom: { enabled: false }
+                    },
+                    stroke: { curve: 'smooth', width: 3 },
+                    series: [{
+                        name: 'Spent (PHP)',
+                        data: @json($spendingChartData)
+                    }],
+                    xaxis: {
+                        categories: @json($spendingChartLabels),
+                        labels: { style: { colors: '#6b7280', fontSize: '11px' } }
+                    },
+                    yaxis: {
+                        labels: {
+                            formatter: function (val) {
+                                return 'PHP ' + Number(val).toLocaleString();
+                            }
+                        }
+                    },
+                    dataLabels: { enabled: false },
+                    colors: ['#f59e0b'],
+                    fill: {
+                        type: 'gradient',
+                        gradient: { shadeIntensity: 1, opacityFrom: 0.35, opacityTo: 0.05 }
+                    },
+                    grid: { borderColor: '#f1f5f9', strokeDashArray: 4 },
+                    tooltip: {
+                        y: {
+                            formatter: function (val) {
+                                return 'PHP ' + Number(val).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                            }
+                        }
+                    }
+                });
+                spendingChart.render();
+            }
+
+            const statusEl = document.getElementById('statusBreakdownChart');
+            if (statusEl) {
+                const statusChart = new ApexCharts(statusEl, {
+                    chart: {
+                        type: 'bar',
+                        height: '100%',
+                        toolbar: { show: false }
+                    },
+                    series: [{
+                        name: 'Orders',
+                        data: @json($statusChartData)
+                    }],
+                    xaxis: {
+                        categories: @json($statusLabels),
+                        labels: { style: { colors: '#6b7280', fontSize: '11px' } }
+                    },
+                    plotOptions: {
+                        bar: { borderRadius: 6, columnWidth: '45%' }
+                    },
+                    yaxis: {
+                        min: 0,
+                        labels: {
+                            formatter: function (val) {
+                                return Number(val).toFixed(0);
+                            }
+                        }
+                    },
+                    dataLabels: { enabled: false },
+                    colors: ['#2563eb'],
+                    grid: { borderColor: '#f1f5f9', strokeDashArray: 4 },
+                    tooltip: {
+                        y: {
+                            formatter: function (val) {
+                                return Number(val).toFixed(0) + ' order(s)';
+                            }
+                        }
+                    }
+                });
+                statusChart.render();
+            }
+        });
+    </script>
+@endpush

@@ -51,10 +51,10 @@
 
                     @auth
                         @php $isWishlisted = auth()->user()->wishlist()->where('product_id', $product->id)->exists(); @endphp
-                        <form action="{{ route('wishlist.toggle', $product) }}" method="POST" class="absolute top-5 right-5 z-10">
+                        <form action="{{ route('wishlist.toggle', $product) }}" method="POST" class="absolute top-5 right-5 z-10 js-wishlist-form">
                             @csrf
-                            <button type="submit" class="w-11 h-11 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-200">
-                                <svg class="w-6 h-6 transition-colors duration-200 {{ $isWishlisted ? 'text-red-500 fill-red-500' : 'text-gray-900 hover:text-red-500' }}" fill="{{ $isWishlisted ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <button type="submit" class="js-wishlist-btn w-11 h-11 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-200" data-wishlisted="{{ $isWishlisted ? '1' : '0' }}">
+                                <svg class="js-wishlist-icon w-6 h-6 transition-colors duration-200 {{ $isWishlisted ? 'text-red-500 fill-red-500' : 'text-gray-900 hover:text-red-500' }}" fill="{{ $isWishlisted ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                                 </svg>
                             </button>
@@ -108,7 +108,7 @@
 
                 <div class="flex flex-col gap-4 mb-8">
                     @if($inStock)
-                        <a href="{{ route('cart.add', $product->id) }}" class="w-full h-14 bg-amber-300 text-black font-bold text-lg rounded-xl hover:bg-amber-400 transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(252,211,77,0.15)] hover:shadow-[0_0_30px_rgba(252,211,77,0.3)] hover:-translate-y-0.5">
+                        <a href="{{ route('cart.add', $product->id) }}" class="js-add-to-cart-btn w-full h-14 bg-amber-300 text-black font-bold text-lg rounded-xl hover:bg-amber-400 transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(252,211,77,0.15)] hover:shadow-[0_0_30px_rgba(252,211,77,0.3)] hover:-translate-y-0.5">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                         </svg>
@@ -296,18 +296,130 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            const toast = document.getElementById('cartToast');
-            if (!toast) {
-                return;
+            function showActionToast(message, tone) {
+                let toast = document.getElementById('cartToast');
+                if (!toast) {
+                    toast = document.createElement('div');
+                    toast.id = 'cartToast';
+                    toast.className = 'fixed top-24 right-4 sm:right-6 z-50 max-w-sm w-[calc(100vw-2rem)] sm:w-auto px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 opacity-0 translate-y-2 pointer-events-none transition-all duration-300';
+                    toast.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                        </svg>
+                        <span class="text-sm font-semibold"></span>
+                    `;
+                    document.body.appendChild(toast);
+                }
+
+                toast.classList.remove('bg-emerald-500', 'bg-red-500', 'bg-amber-300', 'text-white', 'text-black');
+                if (tone === 'error') {
+                    toast.classList.add('bg-red-500', 'text-white');
+                } else if (tone === 'success') {
+                    toast.classList.add('bg-emerald-500', 'text-white');
+                } else {
+                    toast.classList.add('bg-amber-300', 'text-black');
+                }
+
+                const messageNode = toast.querySelector('span');
+                if (messageNode) {
+                    messageNode.textContent = message;
+                }
+
+                requestAnimationFrame(() => {
+                    toast.classList.remove('opacity-0', 'translate-y-2', 'pointer-events-none');
+                });
+
+                window.setTimeout(() => {
+                    toast.classList.add('opacity-0', 'translate-y-2', 'pointer-events-none');
+                }, 2400);
             }
 
-            requestAnimationFrame(() => {
-                toast.classList.remove('opacity-0', 'translate-y-2', 'pointer-events-none');
-            });
+            function updateNavbarCartCount(nextCount) {
+                const badge = document.getElementById('navbarCartCount');
+                if (!badge) return;
+                const parsed = Number(nextCount) || 0;
+                badge.textContent = String(parsed);
+                badge.classList.toggle('hidden', parsed <= 0);
+            }
 
-            window.setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2', 'pointer-events-none');
-            }, 2600);
+            const addToCartButton = document.querySelector('.js-add-to-cart-btn');
+            if (addToCartButton) {
+                addToCartButton.addEventListener('click', async function (event) {
+                    event.preventDefault();
+                    if (addToCartButton.dataset.loading === '1') return;
+                    addToCartButton.dataset.loading = '1';
+                    addToCartButton.classList.add('opacity-70', 'pointer-events-none');
+
+                    try {
+                        const response = await fetch(addToCartButton.href, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                        });
+                        const data = await response.json();
+                        if (!response.ok || !data.success) {
+                            throw new Error(data.message || 'Failed to add to cart');
+                        }
+
+                        updateNavbarCartCount(data.cart_count);
+                        showActionToast(data.message || 'Added to cart!', 'success');
+                    } catch (error) {
+                        showActionToast('Failed to add to cart.', 'error');
+                    } finally {
+                        addToCartButton.classList.remove('opacity-70', 'pointer-events-none');
+                        addToCartButton.dataset.loading = '0';
+                    }
+                });
+            }
+
+            const wishlistForm = document.querySelector('.js-wishlist-form');
+            if (wishlistForm) {
+                wishlistForm.addEventListener('submit', async function (event) {
+                    event.preventDefault();
+
+                    const button = wishlistForm.querySelector('.js-wishlist-btn');
+                    const icon = wishlistForm.querySelector('.js-wishlist-icon');
+                    if (!button || !icon) return;
+                    if (button.dataset.loading === '1') return;
+
+                    button.dataset.loading = '1';
+                    button.classList.add('opacity-70', 'pointer-events-none');
+
+                    try {
+                        const response = await fetch(wishlistForm.action, {
+                            method: 'POST',
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                            body: new FormData(wishlistForm),
+                        });
+                        const data = await response.json();
+                        if (!response.ok || !data.success) {
+                            throw new Error(data.message || 'Failed to update wishlist');
+                        }
+
+                        const isAdded = Boolean(data.added);
+                        button.dataset.wishlisted = isAdded ? '1' : '0';
+                        icon.classList.toggle('text-red-500', isAdded);
+                        icon.classList.toggle('fill-red-500', isAdded);
+                        icon.classList.toggle('text-gray-900', !isAdded);
+                        icon.setAttribute('fill', isAdded ? 'currentColor' : 'none');
+
+                        showActionToast(data.message || 'Wishlist updated.', 'success');
+                    } catch (error) {
+                        showActionToast('Failed to update wishlist.', 'error');
+                    } finally {
+                        button.classList.remove('opacity-70', 'pointer-events-none');
+                        button.dataset.loading = '0';
+                    }
+                });
+            }
+
+            const existingToast = document.getElementById('cartToast');
+            if (existingToast) {
+                requestAnimationFrame(() => {
+                    existingToast.classList.remove('opacity-0', 'translate-y-2', 'pointer-events-none');
+                });
+                window.setTimeout(() => {
+                    existingToast.classList.add('opacity-0', 'translate-y-2', 'pointer-events-none');
+                }, 2600);
+            }
         });
     </script>
 

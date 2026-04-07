@@ -40,10 +40,7 @@
                 </button>
 
                 {{-- Dropdown Menu --}}
-                <div
-                    id="profileDropdownMenu"
-                    class="absolute right-0 mt-3 w-52 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 overflow-hidden opacity-0 scale-95 pointer-events-none transition-all duration-150 ease-out origin-top-right"
-                >
+                <div id="profileDropdownMenu" class="absolute right-0 mt-3 w-52 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 overflow-hidden opacity-0 scale-95 pointer-events-none transition-all duration-150 ease-out origin-top-right">
                     {{-- User info header --}}
                     <div class="px-4 py-3 border-b border-gray-100">
                         <p class="text-sm font-semibold text-gray-800">{{ Auth::user()->name ?? 'Admin' }}</p>
@@ -139,9 +136,7 @@
                 </div>
             </div>
             <p class="text-3xl font-bold text-gray-900">{{ $totalOrders }}</p>
-            <p class="mt-3 text-xs text-gray-500">
-                {{ $ordersByStatus['pending'] ?? 0 }} pending, {{ $ordersByStatus['processing'] ?? 0 }} processing
-            </p>
+            
         </div>
 
         <div class="bg-linear-to-br from-emerald-50 to-white border border-emerald-200/60 rounded-3xl p-6 relative overflow-hidden shadow-sm">
@@ -153,9 +148,6 @@
                 </div>
             </div>
             <p class="text-3xl font-bold text-gray-900">{{ $totalProducts }}</p>
-            <p class="mt-3 text-xs text-gray-500">
-                {{ $inventoryStatuses['in_stock'] ?? 0 }} in stock, {{ $inventoryStatuses['low_stock'] ?? 0 }} low stock
-            </p>
         </div>
 
         <div class="bg-linear-to-br from-violet-50 to-white border border-violet-200/60 rounded-3xl p-6 relative overflow-hidden shadow-sm">
@@ -167,9 +159,6 @@
                 </div>
             </div>
             <p class="text-3xl font-bold text-gray-900">{{ $totalUsers }}</p>
-            <p class="mt-3 text-xs text-gray-500">
-                {{ $staffUsers ?? 0 }} staff, {{ $customerUsers ?? 0 }} customers
-            </p>
         </div>
     </div>
 
@@ -179,21 +168,18 @@
         {{-- Inventory Status Chart --}}
         <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
             <h3 class="text-lg font-bold text-gray-900 mb-1">Inventory Status</h3>
-            <p class="text-xs text-gray-400 mb-2">{{ $inventoryStatuses['total'] ?? 0 }} total products</p>
             <div id="inventoryChart"></div>
         </div>
 
         {{-- Sales Status Chart --}}
         <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
             <h3 class="text-lg font-bold text-gray-900 mb-1">Sales Status</h3>
-            <p class="text-xs text-gray-400 mb-2">{{ array_sum($salesStatuses ?? []) }} total orders</p>
             <div id="salesStatusChart"></div>
         </div>
 
         {{-- Delivery Status Chart --}}
         <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
             <h3 class="text-lg font-bold text-gray-900 mb-1">Delivery Status</h3>
-            <p class="text-xs text-gray-400 mb-2">{{ array_sum($deliveryStatuses ?? []) }} total shipments</p>
             <div id="deliveryChart"></div>
         </div>
     </div>

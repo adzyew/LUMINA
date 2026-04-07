@@ -61,7 +61,7 @@
                                                     @csrf
                                                     <input type="hidden" name="id" value="{{ $id }}">
                                                     <input type="hidden" name="quantity" value="{{ max(0, $details['quantity'] - 1) }}">
-                                                    <button type="submit" class="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100">−</button>
+                                                    <button type="submit" data-direction="decrement" class="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100">−</button>
                                                 </form>
 
                                                 <div class="px-6 py-1 bg-amber-50 text-amber-700 font-bold qty-display" data-id="{{ $id }}">{{ $details['quantity'] }}</div>
@@ -70,7 +70,7 @@
                                                     @csrf
                                                     <input type="hidden" name="id" value="{{ $id }}">
                                                     <input type="hidden" name="quantity" value="{{ $details['quantity'] + 1 }}">
-                                                    <button type="submit" class="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100">+</button>
+                                                    <button type="submit" data-direction="increment" class="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100">+</button>
                                                 </form>
                                             </div>
                                         </td>
@@ -104,7 +104,7 @@
                         <div class="space-y-3 text-sm border-b border-gray-200 pb-6 mb-6">
                             <div class="flex justify-between text-gray-400">
                                 <span>Subtotal</span>
-                                <span class="text-gray-900 font-medium">₱{{ number_format($total, 2) }}</span>
+                                <span id="cartSubtotalValue" class="text-gray-900 font-medium">&#8369;{{ number_format($total, 2) }}</span>
                             </div>
                             <div class="flex justify-between text-gray-400">
                                 <span>Shipping</span>
@@ -114,7 +114,7 @@
 
                         <div class="flex justify-between items-end mb-6">
                             <span class="text-lg font-bold text-gray-900">Total</span>
-                            <span class="text-2xl font-playfair font-bold text-amber-600">₱{{ number_format($total, 2) }}</span>
+                            <span id="cartTotalValue" class="text-2xl font-playfair font-bold text-amber-600">&#8369;{{ number_format($total, 2) }}</span>
                         </div>
 
                         @auth
@@ -147,48 +147,169 @@
             </div>
         @endif
     </div>
+    <div id="removeConfirmModal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-black/50" data-modal-close></div>
+        <div class="relative min-h-full flex items-center justify-center p-4">
+            <div class="w-full max-w-md rounded-2xl bg-white shadow-2xl border border-gray-200 overflow-hidden">
+                <div class="px-6 pt-6 pb-2">
+                    <h3 class="text-xl font-bold text-gray-900">Remove Item</h3>
+                </div>
+                <div class="px-6 pb-6">
+                    <p id="removeConfirmMessage" class="text-gray-600">Are you sure you want to remove this item?</p>
+                </div>
+                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3">
+                    <button type="button" id="removeConfirmCancelBtn" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors">Cancel</button>
+                    <button type="button" id="removeConfirmOkBtn" class="px-4 py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition-colors">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="cartActionToast" class="fixed top-24 right-4 sm:right-6 z-[70] max-w-sm w-[calc(100vw-2rem)] sm:w-auto px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 opacity-0 translate-y-2 pointer-events-none transition-all duration-300 bg-emerald-500 text-white">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+        </svg>
+        <span id="cartActionToastMessage" class="text-sm font-semibold"></span>
+    </div>
 
     <script>
-        // Simple AJAX handlers for cart update/remove forms
-        (function(){
-            function csrfToken(){
-                const t = document.querySelector('meta[name="csrf-token"]');
-                return t ? t.getAttribute('content') : document.querySelector('input[name="_token"]').value;
+        (function () {
+            const removeModal = document.getElementById('removeConfirmModal');
+            const removeMessage = document.getElementById('removeConfirmMessage');
+            const removeOkBtn = document.getElementById('removeConfirmOkBtn');
+            const removeCancelBtn = document.getElementById('removeConfirmCancelBtn');
+            const toast = document.getElementById('cartActionToast');
+            const toastMessage = document.getElementById('cartActionToastMessage');
+            let modalResolver = null;
+            let toastTimer = null;
+
+            function updateNavbarCartCount(nextCount) {
+                const badge = document.getElementById('navbarCartCount');
+                if (!badge) return;
+                const parsed = Number(nextCount) || 0;
+                badge.textContent = String(parsed);
+                badge.classList.toggle('hidden', parsed <= 0);
             }
 
-            // Handle update forms
-            document.querySelectorAll('.cart-update-form').forEach(function(form){
-                form.addEventListener('submit', function(e){
-                    e.preventDefault();
+            function updateTotals(totalValue) {
+                const subtotalEl = document.getElementById('cartSubtotalValue');
+                const totalEl = document.getElementById('cartTotalValue');
+                if (subtotalEl) subtotalEl.textContent = '\u20B1' + totalValue;
+                if (totalEl) totalEl.textContent = '\u20B1' + totalValue;
+            }
+
+            function showToast(message, tone) {
+                if (!toast || !toastMessage) return;
+                toastMessage.textContent = message;
+                toast.classList.remove('bg-emerald-500', 'bg-red-500', 'text-white');
+                if (tone === 'error') {
+                    toast.classList.add('bg-red-500', 'text-white');
+                } else {
+                    toast.classList.add('bg-emerald-500', 'text-white');
+                }
+
+                requestAnimationFrame(function () {
+                    toast.classList.remove('opacity-0', 'translate-y-2', 'pointer-events-none');
+                });
+
+                if (toastTimer) {
+                    window.clearTimeout(toastTimer);
+                }
+                toastTimer = window.setTimeout(function () {
+                    toast.classList.add('opacity-0', 'translate-y-2', 'pointer-events-none');
+                }, 2200);
+            }
+
+            function closeRemoveModal(confirmed) {
+                if (!removeModal) return;
+                removeModal.classList.add('hidden');
+                if (modalResolver) {
+                    modalResolver(confirmed);
+                    modalResolver = null;
+                }
+            }
+
+            function askRemoveConfirmation(message) {
+                if (!removeModal || !removeMessage) {
+                    return Promise.resolve(window.confirm(message));
+                }
+                removeMessage.textContent = message || 'Are you sure you want to remove this item?';
+                removeModal.classList.remove('hidden');
+                return new Promise(function (resolve) {
+                    modalResolver = resolve;
+                });
+            }
+
+            if (removeOkBtn) {
+                removeOkBtn.addEventListener('click', function () {
+                    closeRemoveModal(true);
+                });
+            }
+
+            if (removeCancelBtn) {
+                removeCancelBtn.addEventListener('click', function () {
+                    closeRemoveModal(false);
+                });
+            }
+
+            if (removeModal) {
+                removeModal.querySelectorAll('[data-modal-close]').forEach(function (el) {
+                    el.addEventListener('click', function () {
+                        closeRemoveModal(false);
+                    });
+                });
+            }
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && removeModal && !removeModal.classList.contains('hidden')) {
+                    closeRemoveModal(false);
+                }
+            });
+
+            document.querySelectorAll('.cart-update-form').forEach(function (form) {
+                form.addEventListener('submit', async function (event) {
+                    event.preventDefault();
                     const fd = new FormData(form);
-                    fetch(form.action, {
-                        method: 'POST',
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                        body: fd
-                    }).then(r => r.json()).then(data => {
-                        if (!data.success) { alert(data.message || 'Failed to update cart'); return; }
+                    const nextQuantity = Number(fd.get('quantity')) || 0;
+
+                    if (nextQuantity <= 0) {
+                        const confirmed = await askRemoveConfirmation('Are you sure you want to remove this item?');
+                        if (!confirmed) return;
+                    }
+
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                            body: fd,
+                        });
+                        const data = await response.json();
+                        if (!response.ok || !data.success) {
+                            alert(data.message || 'Failed to update cart');
+                            return;
+                        }
+
                         const id = fd.get('id');
                         if (data.removed) {
                             const row = document.getElementById('cart-row-' + id);
                             if (row) row.remove();
+                            showToast(data.message || 'Item removed from cart.', 'success');
                         } else {
-                            // update quantity display and item subtotal
                             const qtyEl = document.querySelector('.qty-display[data-id="' + id + '"]');
                             if (qtyEl) qtyEl.textContent = data.quantity;
-                            const subEl = document.querySelector('.item-subtotal[data-id="' + id + '"]');
-                            if (subEl) subEl.textContent = '₱' + data.item_subtotal;
 
-                            // Keep the +/- hidden quantity inputs in sync with latest quantity.
+                            const subEl = document.querySelector('.item-subtotal[data-id="' + id + '"]');
+                            if (subEl) subEl.textContent = '\u20B1' + data.item_subtotal;
+
                             const row = document.getElementById('cart-row-' + id);
                             if (row) {
                                 const currentQty = Number(data.quantity) || 0;
-                                row.querySelectorAll('.cart-update-form').forEach(function(updateForm){
+                                row.querySelectorAll('.cart-update-form').forEach(function (updateForm) {
                                     const quantityInput = updateForm.querySelector('input[name="quantity"]');
                                     const submitBtn = updateForm.querySelector('button[type="submit"]');
                                     if (!quantityInput || !submitBtn) return;
 
-                                    const label = (submitBtn.textContent || '').trim();
-                                    if (label === '−' || label === '-') {
+                                    const direction = submitBtn.dataset.direction || '';
+                                    if (direction === 'decrement') {
                                         quantityInput.value = String(Math.max(0, currentQty - 1));
                                     } else {
                                         quantityInput.value = String(currentQty + 1);
@@ -196,38 +317,49 @@
                                 });
                             }
                         }
-                        // update total in summary
-                        document.querySelectorAll('.text-2xl.font-playfair.font-bold.text-amber-600, .text-gray-900.font-medium').forEach(function(el){
-                            if (el.textContent.trim().startsWith('₱')) {
-                                el.textContent = '₱' + data.total;
-                            }
-                        });
-                    }).catch(()=> alert('Failed to update cart'));
+
+                        updateTotals(data.total);
+                        if (typeof data.cart_count !== 'undefined') {
+                            updateNavbarCartCount(data.cart_count);
+                        }
+                    } catch (error) {
+                        showToast('Failed to update cart.', 'error');
+                    }
                 });
             });
 
-            // Handle remove forms
-            document.querySelectorAll('.cart-remove-form').forEach(function(form){
-                form.addEventListener('submit', function(e){
-                    e.preventDefault();
+            document.querySelectorAll('.cart-remove-form').forEach(function (form) {
+                form.addEventListener('submit', async function (event) {
+                    event.preventDefault();
+                    const confirmed = await askRemoveConfirmation('Are you sure you want to remove this item?');
+                    if (!confirmed) return;
+
                     const fd = new FormData(form);
-                    // respect _method=DELETE by sending POST with _method
-                    fetch(form.action, {
-                        method: 'POST',
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                        body: fd
-                    }).then(r => r.json()).then(data => {
-                        if (!data.success) { alert(data.message || 'Failed to remove item'); return; }
+
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                            body: fd,
+                        });
+                        const data = await response.json();
+                        if (!response.ok || !data.success) {
+                            alert(data.message || 'Failed to remove item');
+                            return;
+                        }
+
                         const id = fd.get('id');
                         const row = document.getElementById('cart-row-' + id);
                         if (row) row.remove();
-                        // update total in summary
-                        document.querySelectorAll('.text-2xl.font-playfair.font-bold.text-amber-600, .text-gray-900.font-medium').forEach(function(el){
-                            if (el.textContent.trim().startsWith('₱')) {
-                                el.textContent = '₱' + data.total;
-                            }
-                        });
-                    }).catch(()=> alert('Failed to remove item'));
+                        showToast(data.message || 'Item removed from cart.', 'success');
+
+                        updateTotals(data.total);
+                        if (typeof data.cart_count !== 'undefined') {
+                            updateNavbarCartCount(data.cart_count);
+                        }
+                    } catch (error) {
+                        showToast('Failed to remove item.', 'error');
+                    }
                 });
             });
         })();
@@ -237,3 +369,7 @@
 
 </body>
 </html>
+
+
+
+
