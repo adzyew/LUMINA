@@ -49,14 +49,21 @@
                     <p class="mt-4 text-white">Discover the finest handcrafted jewelry.</p>
                 </div>
 
-                <div class="mt-4 sm:mt-0 sm:ml-6 w-full sm:w-96">
+                <div class="mt-4 sm:mt-0 sm:ml-6 w-full sm:w-auto flex justify-start sm:justify-end items-center gap-3">
+                    <button type="button" id="searchToggleBtn" class="inline-flex items-center justify-center h-11 w-11 rounded-xl bg-white/90 border border-gray-200 text-gray-700 hover:text-amber-600 hover:border-amber-300 shadow-sm transition-colors" aria-expanded="{{ request('search') ? 'true' : 'false' }}" aria-controls="searchPanel" aria-label="Toggle search">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.05 6.05a7.5 7.5 0 0 0 10.6 10.6Z" />
+                        </svg>
+                    </button>
+                    <div id="searchPanel" class="w-full sm:w-96 transition-all duration-300 {{ request('search') ? '' : 'hidden' }}">
                     <form method="GET" action="{{ route('products.index') }}" class="flex items-center gap-2 w-full" id="productsSearchForm" data-products-async-form>
                         <input type="hidden" name="category" value="{{ request('category') }}">
                         <input type="hidden" name="min_price" value="{{ request('min_price') }}">
                         <input type="hidden" name="max_price" value="{{ request('max_price') }}">
-                        <input type="text" name="search" placeholder="Search products..." value="{{ request('search') }}"
+                        <input type="text" id="productsSearchInput" name="search" placeholder="Search products..." value="{{ request('search') }}"
                             class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-sm transition-all">
                     </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -548,6 +555,43 @@
                 }
 
                 function bindProductsAjaxUi() {
+                    const searchToggleBtn = document.getElementById('searchToggleBtn');
+                    const searchPanel = document.getElementById('searchPanel');
+                    const searchInput = document.getElementById('productsSearchInput');
+                    if (searchToggleBtn && searchPanel && !searchToggleBtn.dataset.bound) {
+                        const setSearchOpen = (isOpen) => {
+                            searchPanel.classList.toggle('hidden', !isOpen);
+                            searchToggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                            if (isOpen && searchInput) {
+                                window.setTimeout(() => searchInput.focus(), 100);
+                            }
+                        };
+
+                        searchToggleBtn.addEventListener('click', function () {
+                            setSearchOpen(searchPanel.classList.contains('hidden'));
+                        });
+
+                        document.addEventListener('click', function (event) {
+                            if (!searchPanel.classList.contains('hidden')) {
+                                const clickedInsidePanel = searchPanel.contains(event.target);
+                                const clickedToggle = searchToggleBtn.contains(event.target);
+                                if (!clickedInsidePanel && !clickedToggle) {
+                                    setSearchOpen(false);
+                                }
+                            }
+                        });
+
+                        if (searchInput) {
+                            searchInput.addEventListener('keydown', function (event) {
+                                if (event.key === 'Escape') {
+                                    setSearchOpen(false);
+                                }
+                            });
+                        }
+
+                        searchToggleBtn.dataset.bound = '1';
+                    }
+
                     const searchForm = document.getElementById('productsSearchForm');
                     if (searchForm && !searchForm.dataset.ajaxBound) {
                         searchForm.addEventListener('submit', function (event) {

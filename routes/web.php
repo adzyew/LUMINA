@@ -19,28 +19,32 @@ Route::get('/auth/{provider}/callback', ProviderCallbackController::class)->name
 Route::post('/webhooks/paymongo', [PaymentController::class, 'paymongoWebhook'])->name('webhooks.paymongo');
 
 // OTP verification routes (session-based, no auth required)
-Route::middleware('throttle:10,1')->group(function () {
-    Route::get('/verify-sms', [AuthController::class, 'showVerifySms'])->name('verify-sms');
-    Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])->name('verify.otp');
-    Route::post('/resend-otp', [AuthController::class, 'resendOtp'])->name('otp.resend');
-});
+Route::get('/verify-sms', [AuthController::class, 'showVerifySms'])
+    ->middleware('throttle:otp-view')
+    ->name('verify-sms');
+Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])
+    ->middleware('throttle:otp-verify')
+    ->name('verify.otp');
+Route::post('/resend-otp', [AuthController::class, 'resendOtp'])
+    ->middleware('throttle:otp-resend')
+    ->name('otp.resend');
 
 // --- GUEST ROUTES ---
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'loginPost'])->middleware('throttle:5,1')->name('login.post');
+    Route::post('/login', [AuthController::class, 'loginPost'])->middleware('throttle:auth-login')->name('login.post');
 
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register.form');
-    Route::post('/register', [AuthController::class, 'registerPost'])->middleware('throttle:5,5')->name('register.post');
+    Route::post('/register', [AuthController::class, 'registerPost'])->middleware('throttle:auth-register')->name('register.post');
 
     // Forgot password with OTP
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
-    Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:5,5')->name('password.email');
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:password-otp-send')->name('password.email');
     Route::get('/forgot-password/verify', [AuthController::class, 'showVerifyPasswordReset'])->name('password.verify');
-    Route::post('/forgot-password/verify', [AuthController::class, 'verifyPasswordResetOtp'])->middleware('throttle:10,1')->name('password.verify-otp');
-    Route::post('/forgot-password/resend-otp', [AuthController::class, 'resendPasswordResetOtp'])->middleware('throttle:5,5')->name('password.resend-otp');
+    Route::post('/forgot-password/verify', [AuthController::class, 'verifyPasswordResetOtp'])->middleware('throttle:password-otp-verify')->name('password.verify-otp');
+    Route::post('/forgot-password/resend-otp', [AuthController::class, 'resendPasswordResetOtp'])->middleware('throttle:password-otp-resend')->name('password.resend-otp');
     Route::get('/reset-password', [AuthController::class, 'showResetPassword'])->name('password.reset');
-    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:5,1')->name('password.update');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:password-update')->name('password.update');
 });
 
 // --- CUSTOMER ROUTES (guests allowed, but admin/staff are redirected to their dashboard) ---
