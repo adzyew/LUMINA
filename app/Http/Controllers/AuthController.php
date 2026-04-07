@@ -171,8 +171,12 @@ class AuthController extends Controller
 
         $resendAvailableAt = Cache::get('otp_resend_available_at_' . $email);
         $remainingSeconds = $this->secondsUntil($resendAvailableAt);
+        $otpExpiresAt = Cache::get('otp_expires_' . $email);
+        $otpExpiresAtTs = $otpExpiresAt ? Carbon::parse((string) $otpExpiresAt)->getTimestamp() : 0;
 
         $lockRemainingSeconds = $this->getOtpLockRemainingSeconds('otp_lock_until_' . $email);
+        $lockUntil = Cache::get('otp_lock_until_' . $email);
+        $lockExpiresAtTs = $lockUntil ? Carbon::parse((string) $lockUntil)->getTimestamp() : 0;
 
         $attemptsUsed = (int) Cache::get('otp_attempts_' . $email, 0);
         $attemptsRemaining = max(0, self::OTP_MAX_ATTEMPTS - $attemptsUsed);
@@ -180,7 +184,7 @@ class AuthController extends Controller
             $attemptsRemaining = 0;
         }
 
-        return view('auth.verify-sms', compact('remainingSeconds', 'lockRemainingSeconds', 'attemptsRemaining'));
+        return view('auth.verify-sms', compact('remainingSeconds', 'lockRemainingSeconds', 'attemptsRemaining', 'otpExpiresAtTs', 'lockExpiresAtTs'));
     }
 
     public function showRegister()
@@ -920,10 +924,12 @@ class AuthController extends Controller
         $email = session('password_reset_email');
         $expiresAt = Cache::get('password_reset_expires_' . $email);
         $remainingSeconds = $this->secondsUntil($expiresAt);
+        $otpExpiresAtTs = $expiresAt ? Carbon::parse((string) $expiresAt)->getTimestamp() : 0;
         $lockUntil = Cache::get('password_reset_lock_until_' . $email);
         $lockRemainingSeconds = $this->secondsUntil($lockUntil);
+        $lockExpiresAtTs = $lockUntil ? Carbon::parse((string) $lockUntil)->getTimestamp() : 0;
 
-        return view('auth.verify-password-reset', compact('remainingSeconds', 'lockRemainingSeconds'));
+        return view('auth.verify-password-reset', compact('remainingSeconds', 'lockRemainingSeconds', 'otpExpiresAtTs', 'lockExpiresAtTs'));
     }
 
     public function verifyPasswordResetOtp(Request $request)
@@ -1056,5 +1062,4 @@ class AuthController extends Controller
         return redirect()->route('login')->with('success', 'Your password has been reset. You can now log in.');
     }
 }
-
 

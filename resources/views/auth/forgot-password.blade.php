@@ -48,7 +48,7 @@
                         class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                         placeholder="you@example.com">
                 </div>
-                <button type="submit" class="w-full py-4 bg-amber-300 text-black font-bold rounded-xl hover:bg-amber-400 transition-colors">
+                <button type="submit" class="w-full py-4 bg-amber-300 text-black font-medium rounded-xl hover:bg-amber-400 transition-colors">
                     Send OTP to Email
                 </button>
             </form>

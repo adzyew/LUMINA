@@ -34,6 +34,20 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->render(function (HttpExceptionInterface $exception, Request $request) {
+            if ($exception->getStatusCode() !== 429) {
+                return null;
+            }
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Too many requests. Please wait a moment and try again.',
+                ], 429);
+            }
+
+            return redirect()->back()->with('error', 'Too many requests. Please wait a moment before trying again.');
+        });
+
         $renderAdminStatus = static function (Request $request, int $statusCode, ?string $exceptionMessage = null) {
             if (! $request->is('admin') && ! $request->is('admin/*')) {
                 return null;

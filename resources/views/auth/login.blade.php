@@ -345,7 +345,7 @@
                                 <!-- Phone -->
                                 <div class="phone-floating-group relative">
                                     <span class="phone-prefix ">+63</span>
-                                    <input id="register-phone" pattern="[0-9]*" type="tel" name="phone" value="{{ old('phone') }}" placeholder=" " class="floating-input phone-input w-full py-3">
+                                    <input id="register-phone" pattern="[0-9]*" type="tel" name="phone" value="{{ old('phone') }}" placeholder=" " class="floating-input phone-input w-full py-3" inputmode="numeric" maxlength="11">
                                     <label for="register-phone" class="phone-floating-label pt-1 pb-1 py-4">
                                         Phone Number
                                     </label>
@@ -355,6 +355,7 @@
                                             <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
                                         @endif
                                     @enderror
+                                    <p id="register-phone-validity" class="hidden text-xs mt-2"></p>
                                 </div>
 
                                 <!-- Password -->
@@ -549,9 +550,42 @@
             const registerPassword = document.getElementById('register-password');
             const registerPasswordConfirm = document.getElementById('register-password-confirm');
             const registerPhone = document.getElementById('register-phone');
+            const phoneValidityLabel = document.getElementById('register-phone-validity');
             const strengthLabel = document.getElementById('register-password-strength');
             const rulesLabel = document.getElementById('register-password-rules');
             const matchLabel = document.getElementById('register-password-match');
+
+            const normalizeAndLimitPhilippineMobile = (value) => {
+                const normalized = normalizePhilippineMobile(value || '');
+                const digitsOnly = normalized.replace(/\D/g, '');
+                return digitsOnly.slice(0, 11);
+            };
+
+            function updatePhoneValidityState() {
+                if (!registerPhone || !phoneValidityLabel) {
+                    return false;
+                }
+
+                const phoneValue = registerPhone.value || '';
+                if (phoneValue.length === 0) {
+                    phoneValidityLabel.className = 'hidden text-xs mt-2';
+                    phoneValidityLabel.textContent = '';
+                    return false;
+                }
+
+                const isValid = /^09\d{9}$/.test(phoneValue);
+                phoneValidityLabel.classList.remove('hidden');
+
+                if (isValid) {
+                    phoneValidityLabel.textContent = 'Valid Philippine number.';
+                    phoneValidityLabel.className = 'text-xs mt-2 text-green-600';
+                } else {
+                    phoneValidityLabel.textContent = 'Use exactly 11 digits: 09XXXXXXXXX.';
+                    phoneValidityLabel.className = 'text-xs mt-2 text-red-500';
+                }
+
+                return isValid;
+            }
 
             function updateSignupButtonState() {
                 if (!signupBtn) {
@@ -562,8 +596,9 @@
                 const password = registerPassword ? (registerPassword.value || '') : '';
                 const confirmPassword = registerPasswordConfirm ? (registerPasswordConfirm.value || '') : '';
                 const passwordsMatch = password.length > 0 && confirmPassword.length > 0 && password === confirmPassword;
+                const phoneValid = registerPhone ? /^09\d{9}$/.test(registerPhone.value || '') : false;
 
-                signupBtn.disabled = !(termsAccepted && passwordsMatch);
+                signupBtn.disabled = !(termsAccepted && passwordsMatch && phoneValid);
             }
 
             function updateRegisterPasswordStrength() {
@@ -652,17 +687,28 @@
             updateSignupButtonState();
 
             if (registerPhone) {
+                registerPhone.addEventListener('input', function () {
+                    registerPhone.value = normalizeAndLimitPhilippineMobile(registerPhone.value);
+                    updatePhoneValidityState();
+                    updateSignupButtonState();
+                });
+
                 registerPhone.addEventListener('blur', function () {
-                    registerPhone.value = normalizePhilippineMobile(registerPhone.value);
+                    registerPhone.value = normalizeAndLimitPhilippineMobile(registerPhone.value);
+                    updatePhoneValidityState();
+                    updateSignupButtonState();
                 });
 
                 const registerForm = registerPhone.closest('form');
                 if (registerForm) {
                     registerForm.addEventListener('submit', function () {
-                        registerPhone.value = normalizePhilippineMobile(registerPhone.value);
+                        registerPhone.value = normalizeAndLimitPhilippineMobile(registerPhone.value);
                     });
                 }
             }
+
+            updatePhoneValidityState();
+            updateSignupButtonState();
         });
 
                 document.addEventListener('DOMContentLoaded', function () {

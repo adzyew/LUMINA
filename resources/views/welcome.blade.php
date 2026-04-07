@@ -156,35 +156,25 @@
                 </div>
     </section>
 
-    {{-- Featured Collections --}}
-    <section  class="py-20 bg-gray-50 scroll-fade-in">
+    {{-- New Arrivals --}}
+    @if(isset($latestProducts) && $latestProducts->isNotEmpty())
+    <section class="py-20 bg-gray-50 scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10 scroll-slide-left">
-                <h2 class="text-3xl font-playfair font-bold text-gray-900">Featured Collections</h2>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10 scroll-slide-right">
+                <h2 class="text-3xl font-playfair font-bold text-gray-900">New Arrivals</h2>
                 <a href="{{ route('products.index') }}" class="text-amber-600 hover:text-amber-700 font-semibold flex items-center gap-2">
                     View All <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </a>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-                @foreach($featuredProducts ?? [] as $product)
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                @foreach($latestProducts->take(8) as $product)
                     <a href="{{ route('products.show', $product) }}" class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300 hover:-translate-y-1">
                         <div class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
                             <img src="{{ $product->image_url ?? asset('IMAGES/Bracelet.jpg') }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         </div>
                         <div class="p-5">
-                            <h3 class="font-playfair font-semibold text-gray-900 mb-1 group-hover:text-amber-600 transition-colors">{{ $product->name }}</h3>
-                            @if($product->description ?? null)
-                        @php
-                            $features = explode('•', $product->description);
-                        @endphp
-                        <ul class="text-sm text-gray-500 mb-6 line-clamp-2 leading-relaxed">
-                            @foreach($features as $feature)
-                                @if(trim($feature) !== '')
-                                    <li>{{ trim($feature) }}</li>
-                                @endif
-                            @endforeach
-                        </ul>
-                    @endif
+                            <p class="text-xs text-amber-600 uppercase tracking-wider mb-1">{{ $product->category ?? 'Jewelry' }}</p>
+                            <h3 class="font-playfair font-semibold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors">{{ $product->name }}</h3>
                             @php
                                 $avgRating = (float) ($product->reviews_avg_rating ?? 0);
                                 $reviewCount = (int) ($product->reviews_count ?? 0);
@@ -201,12 +191,14 @@
                                 <span class="text-xs text-gray-500">{{ number_format($avgRating, 1) }} ({{ $reviewCount }})</span>
                             </div>
                             <p class="text-xl font-bold text-amber-600">₱{{ number_format($product->price ?? 0, 0) }}</p>
-                </div>
+                        </div>
                     </a>
                 @endforeach
             </div>
         </div>
     </section>
+    @endif
+    
 
     {{-- Shop by Category --}}
     <section class="py-20 bg-white scroll-fade-in">
@@ -298,48 +290,7 @@
         </div>
     </section>
 
-    {{-- New Arrivals --}}
-    @if(isset($latestProducts) && $latestProducts->isNotEmpty())
-    <section class="py-20 bg-gray-50 scroll-fade-in">
-        <div class="container mx-auto px-4 sm:px-6">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10 scroll-slide-right">
-                <h2 class="text-3xl font-playfair font-bold text-gray-900">New Arrivals</h2>
-                <a href="{{ route('products.index') }}" class="text-amber-600 hover:text-amber-700 font-semibold flex items-center gap-2">
-                    View All <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </a>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                @foreach($latestProducts->take(8) as $product)
-                    <a href="{{ route('products.show', $product) }}" class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300 hover:-translate-y-1">
-                        <div class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
-                            <img src="{{ $product->image_url ?? asset('IMAGES/Bracelet.jpg') }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        </div>
-                        <div class="p-5">
-                            <p class="text-xs text-amber-600 uppercase tracking-wider mb-1">{{ $product->category ?? 'Jewelry' }}</p>
-                            <h3 class="font-playfair font-semibold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors">{{ $product->name }}</h3>
-                            @php
-                                $avgRating = (float) ($product->reviews_avg_rating ?? 0);
-                                $reviewCount = (int) ($product->reviews_count ?? 0);
-                                $filledStars = (int) round($avgRating);
-                            @endphp
-                            <div class="flex items-center gap-2 mb-3">
-                                <div class="flex items-center gap-0.5">
-                                    @for($star = 1; $star <= 5; $star++)
-                                        <svg class="w-4 h-4 {{ $star <= $filledStars ? 'text-amber-400' : 'text-gray-300' }}" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.95a1 1 0 00.95.69h4.154c.969 0 1.371 1.24.588 1.81l-3.36 2.441a1 1 0 00-.364 1.118l1.285 3.95c.3.922-.755 1.688-1.538 1.118l-3.36-2.44a1 1 0 00-1.175 0l-3.36 2.44c-.783.57-1.838-.196-1.539-1.118l1.286-3.95a1 1 0 00-.364-1.118L2.07 9.377c-.783-.57-.38-1.81.588-1.81h4.154a1 1 0 00.95-.69l1.287-3.95z" />
-                                        </svg>
-                                    @endfor
-                                </div>
-                                <span class="text-xs text-gray-500">{{ number_format($avgRating, 1) }} ({{ $reviewCount }})</span>
-                            </div>
-                            <p class="text-xl font-bold text-amber-600">₱{{ number_format($product->price ?? 0, 0) }}</p>
-                        </div>
-                    </a>
-                @endforeach
-            </div>
-        </div>
-    </section>
-    @endif
+    
 
     {{-- How It Works --}}
     <section class="py-20 bg-white scroll-fade-in">
@@ -446,57 +397,6 @@
             </div>
         </div>
     </section>
-
-    {{-- Browse More Products --}}
-    @if(isset($browseProducts) && $browseProducts->isNotEmpty())
-    <section class="py-20 bg-gray-50 scroll-fade-in">
-        <div class="container mx-auto px-4 sm:px-6">
-            <div class="text-center mb-12 scroll-scale">
-                <h2 class="text-3xl font-playfair font-bold text-gray-900 mb-4">Explore Our Complete Collection</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">Discover our full range of handcrafted jewelry. From statement necklaces to delicate earrings, find the perfect piece for every occasion.</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                @foreach($browseProducts->take(8) as $product)
-                    <a href="{{ route('products.show', $product) }}" class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300 hover:-translate-y-1">
-                        <div class="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
-                            <img src="{{ $product->image_url ?? asset('IMAGES/Bracelet.jpg') }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        </div>
-                        <div class="p-5">
-                            <p class="text-xs text-amber-600 uppercase tracking-wider mb-1">{{ $product->category ?? 'Jewelry' }}</p>
-                            <h3 class="font-playfair font-semibold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors line-clamp-2">{{ $product->name }}</h3>
-                            <p class="text-gray-500 text-sm mb-3 line-clamp-2">{{ Str::limit($product->description ?? '', 60) }}</p>
-                            @php
-                                $avgRating = (float) ($product->reviews_avg_rating ?? 0);
-                                $reviewCount = (int) ($product->reviews_count ?? 0);
-                                $filledStars = (int) round($avgRating);
-                            @endphp
-                            <div class="flex items-center gap-2 mb-3">
-                                <div class="flex items-center gap-0.5">
-                                    @for($star = 1; $star <= 5; $star++)
-                                        <svg class="w-4 h-4 {{ $star <= $filledStars ? 'text-amber-400' : 'text-gray-300' }}" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.95a1 1 0 00.95.69h4.154c.969 0 1.371 1.24.588 1.81l-3.36 2.441a1 1 0 00-.364 1.118l1.285 3.95c.3.922-.755 1.688-1.538 1.118l-3.36-2.44a1 1 0 00-1.175 0l-3.36 2.44c-.783.57-1.838-.196-1.539-1.118l1.286-3.95a1 1 0 00-.364-1.118L2.07 9.377c-.783-.57-.38-1.81.588-1.81h4.154a1 1 0 00.95-.69l1.287-3.95z" />
-                                        </svg>
-                                    @endfor
-                                </div>
-                                <span class="text-xs text-gray-500">{{ number_format($avgRating, 1) }} ({{ $reviewCount }})</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <p class="text-xl font-bold text-amber-600">₱{{ number_format($product->price ?? 0, 0) }}</p>
-                                <span class="text-sm text-amber-600 font-medium group-hover:underline">View →</span>
-                            </div>
-                        </div>
-                    </a>
-                @endforeach
-            </div>
-            <div class="text-center mt-12">
-                <a href="{{ route('products.index') }}" class="inline-flex items-center gap-2 px-10 py-4 bg-amber-300 text-gray-900 font-bold rounded-lg hover:bg-amber-400 transition-colors">
-                    View All Products
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </a>
-            </div>
-        </div>
-    </section>
-    @endif
 
     {{-- Newsletter / Subscribe --}}
     <section class="py-20 bg-white border-t border-gray-100 scroll-fade-in">

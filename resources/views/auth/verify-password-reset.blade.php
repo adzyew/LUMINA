@@ -38,13 +38,6 @@
                 <p class="text-gray-600 text-sm">We've sent a 6-digit OTP to<br><span class="text-gray-700 font-medium">{{ session('password_reset_email') }}</span></p>
             </div>
 
-            @if($errors->any())
-                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">{{ $errors->first() }}</div>
-            @endif
-            @if(session('success'))
-                <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm">{{ session('success') }}</div>
-            @endif
-
             <form method="POST" action="{{ route('password.verify-otp') }}" id="otpForm">
                 @csrf
                 <div class="flex justify-between gap-2 mb-8">
@@ -54,7 +47,7 @@
                 </div>
                 <p id="lock-timer" class="hidden text-center text-sm text-red-600 mb-3"></p>
                 <p id="otp-timer" class="text-center text-sm text-gray-600 mb-6"></p>
-                <button id="verifyBtn" type="submit" class="w-full py-4 bg-amber-300 text-black font-bold rounded-xl hover:bg-amber-400 transition-colors mb-6">Verify & Reset Password</button>
+                <button id="verifyBtn" type="submit" class="w-full py-4 bg-amber-300 text-black font-medium rounded-xl hover:bg-amber-400 transition-colors mb-6">Verify & Reset Password</button>
             </form>
 
             <div class="text-center">
@@ -68,6 +61,24 @@
         </div>
     </div>
 
+    @php
+        $toastMessage = session('success') ?: ($errors->any() ? $errors->first() : null);
+        $toastType = session('success') ? 'success' : 'error';
+        $toastClasses = $toastType === 'success'
+            ? 'border-green-200 bg-green-50 text-green-700'
+            : 'border-red-200 bg-red-50 text-red-600';
+    @endphp
+    @if($toastMessage)
+        <div id="otpResetToast" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-2rem)] max-w-md p-3 rounded-xl border text-sm shadow-xl opacity-0 translate-y-2 pointer-events-none transition-all duration-300 {{ $toastClasses }}">
+            <div class="flex items-center justify-between gap-3">
+                <span>{{ $toastMessage }}</span>
+                <button id="otpResetToastClose" type="button" class="shrink-0 opacity-70 hover:opacity-100 transition-opacity" aria-label="Close">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+        </div>
+    @endif
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const inputs = document.querySelectorAll('.otp-input');
@@ -76,8 +87,52 @@
             const resendBtn = document.getElementById('resendBtn');
             const resendHint = document.getElementById('resendHint');
             const verifyBtn = document.getElementById('verifyBtn');
+            const otpForm = document.getElementById('otpForm');
+            const resendForm = document.getElementById('resendForm');
+            const resetEmail = @json((string) session('password_reset_email', 'guest'));
+            const serverOtpExpiresAtTs = Number(@json((int) ($otpExpiresAtTs ?? 0)));
+            const serverLockExpiresAtTs = Number(@json((int) ($lockExpiresAtTs ?? 0)));
             let otpRemaining = {{ (int) ($remainingSeconds ?? 0) }};
             let lockRemaining = {{ (int) ($lockRemainingSeconds ?? 0) }};
+
+            const otpStorageKey = `otp_reset_expires_at_${resetEmail}`;
+            const lockStorageKey = `otp_reset_lock_expires_at_${resetEmail}`;
+            const nowMs = Date.now();
+
+            const serverOtpEndsAt = serverOtpExpiresAtTs > 0 ? serverOtpExpiresAtTs * 1000 : (otpRemaining > 0 ? nowMs + (otpRemaining * 1000) : 0);
+            const serverLockEndsAt = serverLockExpiresAtTs > 0 ? serverLockExpiresAtTs * 1000 : (lockRemaining > 0 ? nowMs + (lockRemaining * 1000) : 0);
+            const storedOtpEndsAt = Number(localStorage.getItem(otpStorageKey) || 0);
+            const storedLockEndsAt = Number(localStorage.getItem(lockStorageKey) || 0);
+
+            let otpEndsAtMs = 0;
+            if (serverOtpEndsAt > 0 && storedOtpEndsAt > nowMs) {
+                otpEndsAtMs = Math.min(serverOtpEndsAt, storedOtpEndsAt);
+            } else if (serverOtpEndsAt > 0) {
+                otpEndsAtMs = serverOtpEndsAt;
+            } else if (storedOtpEndsAt > nowMs) {
+                otpEndsAtMs = storedOtpEndsAt;
+            }
+
+            let lockEndsAtMs = 0;
+            if (serverLockEndsAt > 0 && storedLockEndsAt > nowMs) {
+                lockEndsAtMs = Math.min(serverLockEndsAt, storedLockEndsAt);
+            } else if (serverLockEndsAt > 0) {
+                lockEndsAtMs = serverLockEndsAt;
+            } else if (storedLockEndsAt > nowMs) {
+                lockEndsAtMs = storedLockEndsAt;
+            }
+
+            if (otpEndsAtMs > 0) {
+                localStorage.setItem(otpStorageKey, String(otpEndsAtMs));
+            } else {
+                localStorage.removeItem(otpStorageKey);
+            }
+
+            if (lockEndsAtMs > 0) {
+                localStorage.setItem(lockStorageKey, String(lockEndsAtMs));
+            } else {
+                localStorage.removeItem(lockStorageKey);
+            }
 
             const formatClock = (seconds) => {
                 const m = Math.floor(seconds / 60);
@@ -93,6 +148,9 @@
             };
 
             const updateResendState = () => {
+                if (!resendBtn || !resendHint) {
+                    return;
+                }
                 if (lockRemaining > 0) {
                     resendBtn.disabled = true;
                     resendHint.textContent = `Resend available after lock: ${formatClock(lockRemaining)}`;
@@ -109,6 +167,9 @@
             };
 
             const updateTimerText = () => {
+                if (!timerEl || !lockEl || !verifyBtn) {
+                    return;
+                }
                 if (lockRemaining > 0) {
                     lockEl.classList.remove('hidden');
                     lockEl.textContent = `Too many attempts. Try again in ${formatClock(lockRemaining)}.`;
@@ -145,16 +206,55 @@
             updateTimerText();
             updateResendState();
 
-            setInterval(() => {
-                if (lockRemaining > 0) {
-                    lockRemaining--;
-                } else if (otpRemaining > 0) {
-                    otpRemaining--;
+            if (otpForm) {
+                otpForm.addEventListener('submit', () => {
+                    verifyBtn.disabled = true;
+                    verifyBtn.classList.add('opacity-60', 'cursor-not-allowed');
+                    verifyBtn.textContent = 'Verifying...';
+                });
+            }
+
+            if (resendForm) {
+                resendForm.addEventListener('submit', () => {
+                    resendBtn.disabled = true;
+                    resendBtn.classList.add('opacity-60', 'cursor-not-allowed');
+                    resendBtn.textContent = 'Sending...';
+                });
+            }
+
+            const syncCountdown = () => {
+                lockRemaining = Math.max(0, Math.ceil((lockEndsAtMs - Date.now()) / 1000));
+                otpRemaining = Math.max(0, Math.ceil((otpEndsAtMs - Date.now()) / 1000));
+
+                if (lockRemaining <= 0) {
+                    localStorage.removeItem(lockStorageKey);
+                }
+                if (otpRemaining <= 0) {
+                    localStorage.removeItem(otpStorageKey);
                 }
 
                 updateTimerText();
                 updateResendState();
-            }, 1000);
+            };
+
+            syncCountdown();
+            setInterval(syncCountdown, 1000);
+            document.addEventListener('visibilitychange', syncCountdown);
+
+            const pageToast = document.getElementById('otpResetToast');
+            if (pageToast) {
+                const dismissToast = () => {
+                    pageToast.classList.add('opacity-0', 'translate-y-2', 'pointer-events-none');
+                };
+                requestAnimationFrame(() => {
+                    pageToast.classList.remove('opacity-0', 'translate-y-2', 'pointer-events-none');
+                });
+                const closeBtn = document.getElementById('otpResetToastClose');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', dismissToast);
+                }
+                window.setTimeout(dismissToast, 3200);
+            }
         });
     </script>
 </body>
