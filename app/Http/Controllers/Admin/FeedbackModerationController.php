@@ -16,7 +16,7 @@ class FeedbackModerationController extends Controller
         $query = Review::query()->with(['user:id,name,email', 'product:id,name', 'moderator:id,name']);
 
         if ($request->filled('status')) {
-            $allowedStatuses = ['pending', 'approved', 'rejected', 'removed'];
+            $allowedStatuses = ['pending', 'approved', 'rejected'];
             if (in_array($request->string('status')->toString(), $allowedStatuses, true)) {
                 $query->where('status', $request->string('status')->toString());
             }
@@ -152,9 +152,15 @@ class FeedbackModerationController extends Controller
             'reason' => 'required|string|max:500',
         ]);
 
-        $this->moderate($review, 'removed', $request->input('reason'));
+        $reason = $request->input('reason');
 
-        return back()->with('success', 'Review removed from public listing.');
+        $this->logAction($review, 'removed', $reason);
+        $review->delete();
+
+        return back()->with([
+            'toast_type' => 'success',
+            'toast_message' => 'Review deleted successfully.',
+        ]);
     }
 
     public function flag(Request $request, Review $review)

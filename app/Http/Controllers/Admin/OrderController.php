@@ -151,6 +151,9 @@ class OrderController extends Controller
         $order->delete();
 
         return redirect()->route('admin.orders.index')
-            ->with('success', "Order #{$orderId} deleted successfully.");
+            ->with([
+                'toast_type' => 'success',
+                'toast_message' => "Order #{$orderId} deleted successfully.",
+            ]);
     }
 }

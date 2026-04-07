@@ -6,7 +6,7 @@
 
     <div
         id="globalToast"
-        class="fixed top-6 left-1/2 z-[300] hidden -translate-x-1/2 items-center gap-3 rounded-xl border px-5 py-3.5 text-sm font-medium shadow-lg transition-all duration-300 {{ $isError ? 'bg-red-50 border-red-200 text-red-800' : 'bg-green-50 border-green-200 text-green-800' }}"
+        class="fixed top-6 left-1/2 z-[300] hidden -translate-x-1/2 items-center gap-3 rounded-xl border px-5 py-3.5 text-sm font-medium shadow-lg transition-all duration-300 {{ $isError ? 'bg-red-50 border-red-200 text-red-800' : 'bg-green-100 border-green-200 text-green-800' }}"
         role="status"
         aria-live="polite"
     >

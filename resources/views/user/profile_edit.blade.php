@@ -192,6 +192,7 @@
         <form id="deactivateAccountForm" method="POST" action="{{ route('account.deactivate') }}" class="hidden">
             @csrf
         </form>
+
     </div>
 @endsection
 

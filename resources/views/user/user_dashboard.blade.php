@@ -14,7 +14,7 @@
             <div>
                 <h1 class="text-2xl md:text-4xl font-playfair font-medium text-gray-900 mb-2">Dashboard</h1>
             </div>
-            <a href="{{ route('products.index') }}" class="mt-4 md:mt-0 text-amber-600 hover:text-amber-700 transition-colors text-sm font-semibold flex items-center gap-1">
+            <a href="{{ route('products.index') }}" class="mt-4 md:mt-0 text-amber-500 hover:text-amber-600 transition-colors text-sm font-semibold flex items-center gap-1">
                 Continue Shopping &rarr;
             </a>
         </div>
@@ -23,57 +23,53 @@
 
             <div class="lg:col-span-2 space-y-8">
                 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-                    <div class="bg-white rounded-2xl border border-gray-200 border-t-4 border-t-indigo-500 shadow-sm p-5">
+                    <div class="bg-white rounded-2xl border border-gray-200 border-t-4 border-t-amber-500 shadow-sm p-5">
                         <div class="flex items-center justify-between">
-                            <p class="text-xs font-semibold tracking-wide uppercase text-gray-500">Total Purchases</p>
-                            <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"></path></svg>
+                            <p class="text-xs font-semibold tracking-wide uppercase text-black">Total Purchases</p>
+                            <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg  text-amber-500">
+                                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"></path></svg>
                             </span>
                         </div>
-                        <p class="mt-4 text-3xl font-bold text-gray-900">{{ $totalPurchases }}</p>
+                        <p class="mt-4 text-3xl font-bold text-black">{{ $totalPurchases }}</p>
                         <div id="purchasesSparkline" class="mt-2 h-10"></div>
-                        <p class="text-[11px] text-gray-400">All-time order count</p>
                     </div>
                     <div class="bg-white rounded-2xl border border-gray-200 border-t-4 border-t-amber-500 shadow-sm p-5">
                         <div class="flex items-center justify-between">
-                            <p class="text-xs font-semibold tracking-wide uppercase text-gray-500">Pending Orders</p>
-                            <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v6l4 2m6-2a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z"></path></svg>
+                            <p class="text-xs font-semibold tracking-wide uppercase text-black">Pending Orders</p>
+                            <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg  text-amber-500">
+                                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v6l4 2m6-2a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z"></path></svg>
                             </span>
                         </div>
-                        <p class="mt-4 text-3xl font-bold text-amber-600">{{ $pendingPurchases }}</p>
+                        <p class="mt-4 text-3xl font-bold text-black">{{ $pendingPurchases }}</p>
                         <div id="pendingSparkline" class="mt-2 h-10"></div>
-                        <p class="text-[11px] text-gray-400">Orders waiting fulfillment</p>
                     </div>
-                    <div class="bg-white rounded-2xl border border-gray-200 border-t-4 border-t-emerald-500 shadow-sm p-5">
+                    <div class="bg-white rounded-2xl border border-gray-200 border-t-4 border-t-amber-500 shadow-sm p-5">
                         <div class="flex items-center justify-between">
-                            <p class="text-xs font-semibold tracking-wide uppercase text-gray-500">Delivered</p>
-                            <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-green-50 text-green-600">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m4.5 12.75 6 6 9-13.5"></path></svg>
+                            <p class="text-xs font-semibold tracking-wide uppercase text-black">Delivered</p>
+                            <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg  text-amber-500">
+                                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m4.5 12.75 6 6 9-13.5"></path></svg>
                             </span>
                         </div>
-                        <p class="mt-4 text-3xl font-bold text-green-700">{{ $completedPurchases }}</p>
+                        <p class="mt-4 text-3xl font-bold text-black">{{ $completedPurchases }}</p>
                         <div id="deliveredSparkline" class="mt-2 h-10"></div>
-                        <p class="text-[11px] text-gray-400">Successfully completed</p>
                     </div>
-                    <div class="bg-white rounded-2xl border border-gray-200 border-t-4 border-t-fuchsia-500 shadow-sm p-5">
+                    <div class="bg-white rounded-2xl border border-gray-200 border-t-4 border-t-amber-500 shadow-sm p-5">
                         <div class="flex items-center justify-between">
-                            <p class="text-xs font-semibold tracking-wide uppercase text-gray-500">Total Spent</p>
-                            <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v12m3-9H9m9 9a9 9 0 1 0-12 0h12Z"></path></svg>
-                            </span>
+                            <p class="text-xs font-semibold tracking-wide uppercase text-black">Total Spent</p>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-10 text-amber-500">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
+                            </svg>
                         </div>
-                        <p class="mt-2 text-2xl font-bold text-gray-900">PHP {{ number_format($totalSpent, 2) }}</p>
+                        <p class="mt-2 text-2xl font-bold text-black">PHP {{ number_format($totalSpent, 2) }}</p>
                         <div id="spentSparkline" class="mt-2 h-10"></div>
-                        <p class="mt-1 text-xs text-gray-500">{{ $recentPurchases }} purchase(s) in last 30 days</p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
                         <h3 class="text-lg font-bold text-gray-900 mb-1 flex items-center gap-2">
-                            <span class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.75 15.75 8.25 11.25l3 3 5.25-6"></path></svg>
+                            <span class="inline-flex h-7 w-7 items-center justify-center rounded-lg  text-amber-500">
+                                <svg class="w-20 h-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.75 15.75 8.25 11.25l3 3 5.25-6"></path></svg>
                             </span>
                             Total Spent
                         </h3>
@@ -83,8 +79,8 @@
                     </div>
                     <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
                         <h3 class="text-lg font-bold text-gray-900 mb-1 flex items-center gap-2">
-                            <span class="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.75 3v18h18M7.5 13.5V9.75m4.5 3.75V6.75m4.5 6.75V11.25"></path></svg>
+                            <span class="inline-flex h-7 w-7 items-center justify-center rounded-lg  text-amber-500">
+                                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.75 3v18h18M7.5 13.5V9.75m4.5 3.75V6.75m4.5 6.75V11.25"></path></svg>
                             </span>
                             Order Status Breakdown
                         </h3>
@@ -241,12 +237,12 @@
             const sparklineConfigs = [
                 {
                     selector: '#purchasesSparkline',
-                    color: '#4f46e5',
+                    color: '#f59e0b',
                     data: safeSpentSeries.map((value, index) => Math.max(1, Math.round((value / 300) + (index + 1))))
                 },
                 {
                     selector: '#pendingSparkline',
-                    color: '#d97706',
+                    color: '#f59e0b',
                     data: [
                         statusSeries[0] ?? 0,
                         statusSeries[1] ?? 0,
@@ -258,7 +254,7 @@
                 },
                 {
                     selector: '#deliveredSparkline',
-                    color: '#059669',
+                    color: '#f59e0b',
                     data: [
                         0,
                         statusSeries[3] ?? 0,
@@ -270,7 +266,7 @@
                 },
                 {
                     selector: '#spentSparkline',
-                    color: '#c026d3',
+                    color: '#f59e0b',
                     data: safeSpentSeries
                 },
             ];
@@ -367,7 +363,7 @@
                         }
                     },
                     dataLabels: { enabled: false },
-                    colors: ['#2563eb'],
+                    colors: ['#f59e0b'],
                     grid: { borderColor: '#f1f5f9', strokeDashArray: 4 },
                     tooltip: {
                         y: {

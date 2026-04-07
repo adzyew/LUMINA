@@ -24,12 +24,6 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                         </svg>
                     </a>
-                @else
-                    <a href="{{ route('login') }}" class="relative p-2 rounded-lg text-amber-400 hover:text-amber-500 transition-colors group" aria-label="Wishlist">
-                        <svg class="w-6 h-6 sm:w-7 sm:h-7 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                        </svg>
-                    </a>
                 @endauth
                 @if(!request()->routeIs('login')&& !request()->routeIs('register'))
                 <a href="{{ route('cart.index') }}" class="relative p-2 rounded-lg text-amber-400 hover:text-amber-500 transition-colors group">
@@ -104,7 +98,7 @@
                 @else
                     @if(!($authPage ?? false))
                         <a href="{{ route('login') }}" class="hidden md:inline-flex px-4 py-2 text-base font-semibold text-amber-500 hover:text-amber-600 hover:bg-amber-600/10transition-colors border border-amber-500 rounded-lg transform hover:scale-105">Log In</a>
-                        <a href="{{ route('register.form') }}" class="hidden md:inline-flex px-4 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-500 hover:text-white transition-colors text-base transform hover:scale-105">Sign Up</a>
+                        <a href="{{ route('register.form') }}" class="hidden md:inline-flex px-4 py-2 bg-amber-300 text-amber-500 font-bold rounded-lg hover:bg-amber-500 hover:text-white transition-colors text-base transform hover:scale-105">Sign Up</a>
                     @endif
                 @endauth
 
@@ -306,4 +300,3 @@
     });
 
 </script>
-
