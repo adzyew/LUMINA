@@ -98,7 +98,7 @@
                 @else
                     @if(!($authPage ?? false))
                         <a href="{{ route('login') }}" class="hidden md:inline-flex px-4 py-2 text-base font-semibold text-amber-500 hover:text-amber-600 hover:bg-amber-600/10transition-colors border border-amber-500 rounded-lg transform hover:scale-105">Log In</a>
-                        <a href="{{ route('register.form') }}" class="hidden md:inline-flex px-4 py-2 bg-amber-300 text-amber-500 font-bold rounded-lg hover:bg-amber-500 hover:text-white transition-colors text-base transform hover:scale-105">Sign Up</a>
+                        <a href="{{ route('register.form') }}" class="hidden md:inline-flex px-4 py-2 bg-amber-400 text-white font-bold rounded-lg hover:bg-amber-500 hover:text-white transition-colors text-base transform hover:scale-105">Sign Up</a>
                     @endif
                 @endauth
 

@@ -2,13 +2,14 @@
     <div class="container mx-auto px-4 sm:px-6">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
 
-            <div class="space-y-4">
+            <div class="space-y-2">
                 <div class="flex items-center">
-                    <img src="{{ asset('IMAGES/Lumina (1).svg') }}" alt="Lumina" class="h-10 w-auto">
+                    <img src="{{ asset('IMAGES/Lumina (1).svg') }}" alt="Lumina" class="h-20 w-auto">
                 </div>
                 <p class="text-amber-900/80 text-sm leading-relaxed max-w-xs">
                     Crafting dreams into reality, one jewel at a time. Experience the difference of true luxury with our handcrafted collections.
                 </p>
+                
 
             </div>
 

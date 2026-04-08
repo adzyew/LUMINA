@@ -9,6 +9,14 @@ use Illuminate\Support\Facades\Auth;
 
 class ReviewController extends Controller
 {
+    private const REVIEWABLE_ORDER_STATUSES = [
+        'pending',
+        'confirmed',
+        'processing',
+        'shipped',
+        'delivered',
+    ];
+
     private const FLAG_TERMS = [
         'spam',
         'scam',
@@ -21,7 +29,17 @@ class ReviewController extends Controller
     public function store(Request $request, Product $product)
     {
         if (!Auth::check()) {
-            return redirect()->route('login')->with('info', 'Please login to submit a review.');
+            return redirect()->route('login')->with([
+                'toast_type' => 'error',
+                'toast_message' => 'Please login to submit a review.',
+            ]);
+        }
+
+        if (!$this->hasPurchasedProduct($product->id)) {
+            return back()->with([
+                'toast_type' => 'error',
+                'toast_message' => 'You can review this product only after purchasing it.',
+            ]);
         }
 
         $request->validate([
@@ -53,7 +71,10 @@ class ReviewController extends Controller
             ]
         );
 
-        return back()->with('success', 'Thank you for your review! It is pending moderation.');
+        return back()->with([
+            'toast_type' => 'success',
+            'toast_message' => 'Thank you for your review! It is pending moderation.',
+        ]);
     }
 
     private function detectFlaggedTerm(string $comment): ?string
@@ -67,5 +88,20 @@ class ReviewController extends Controller
         }
 
         return null;
+    }
+
+    private function hasPurchasedProduct(int $productId): bool
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return false;
+        }
+
+        return $user->orders()
+            ->whereIn('status', self::REVIEWABLE_ORDER_STATUSES)
+            ->whereHas('items', function ($query) use ($productId) {
+                $query->where('product_id', $productId);
+            })
+            ->exists();
     }
 }

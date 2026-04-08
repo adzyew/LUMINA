@@ -351,8 +351,26 @@ class CartController extends Controller
             // the order isn't deleted!)
             try {
                 $order->load(['user', 'items.product']);
+                Log::info('Order confirmation email send attempt (COD)', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->display_order_number,
+                    'user_id' => $order->user?->id,
+                    'recipient' => $order->user?->email,
+                    'payment_method' => $order->payment_method,
+                ]);
                 Mail::to($order->user->email)->send(new OrderPlacedMail($order));
+                Log::info('Order confirmation email sent (COD)', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->display_order_number,
+                    'recipient' => $order->user?->email,
+                ]);
             } catch (\Throwable $e) {
+                Log::error('Order confirmation email failed (COD)', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->display_order_number,
+                    'recipient' => $order->user?->email,
+                    'error' => $e->getMessage(),
+                ]);
                 report($e);
             }
 

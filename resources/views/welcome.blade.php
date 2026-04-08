@@ -249,7 +249,7 @@
                         <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
                     </div>
                     <h3 class="font-playfair font-bold text-gray-900 mb-2">Premium Materials</h3>
-                    <p class="text-gray-600 text-sm">We use only the finest metals and gemstones, sourced ethically from trusted suppliers worldwide.</p>
+                    <p class="text-gray-600 text-sm">We use only the finest metals and gemstones, sourced ethically from trusted suppliers locally.</p>
                 </div>
                 <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors transform hover:scale-103">
                     <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -270,7 +270,7 @@
                         <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
                     <h3 class="font-playfair font-bold text-gray-900 mb-2">Fast & Secure Shipping</h3>
-                    <p class="text-gray-600 text-sm">Free worldwide shipping with secure packaging and insurance on every order. Track your package in real-time.</p>
+                    <p class="text-gray-600 text-sm">Free Metro Manila-wide shipping with secure packaging and insurance on every order. Track your package in real-time.</p>
                 </div>
                 <div class="text-center p-6 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors transform hover:scale-103">
                     <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
