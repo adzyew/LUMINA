@@ -2,6 +2,9 @@
     <nav role="navigation" aria-label="{{ __('Pagination Navigation') }}" class="w-full">
         <div class="mx-auto flex w-full justify-center  rounded-xl  p-2">
         <div class="inline-flex items-stretch overflow-hidden rounded-xl gap-5 p-1 ">
+            <p class="text-sm font-medium text-black self-center">
+                Showing <b>{{ $paginator->firstItem() }}</b> to <b>{{ $paginator->lastItem() }}</b> of <b>{{ $paginator->total() }}</b> results
+            </p>
             @if ($paginator->onFirstPage())
                 <span class="inline-flex h-14 min-w-16 items-center justify-center rounded-lg border border-transparent px-4 text-amber-800 bg-white" aria-disabled="true" aria-label="{{ __('Previous') }}">
                     <svg viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5" aria-hidden="true">
