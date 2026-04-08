@@ -8,6 +8,14 @@ use Illuminate\Support\Facades\Auth;
 
 class ProductsController extends Controller
 {
+    private const REVIEWABLE_ORDER_STATUSES = [
+        'pending',
+        'confirmed',
+        'processing',
+        'shipped',
+        'delivered',
+    ];
+
     public function index(Request $request)
     {
         $request->validate([
@@ -65,6 +73,14 @@ class ProductsController extends Controller
         /** @var \App\Models\User|null $currentUser */
         $currentUser = Auth::user();
         $isWishlisted = $currentUser ? $currentUser->wishlist()->where('product_id', $product->id)->exists() : false;
+        $canReview = $currentUser
+            ? $currentUser->orders()
+                ->whereIn('status', self::REVIEWABLE_ORDER_STATUSES)
+                ->whereHas('items', function ($query) use ($product) {
+                    $query->where('product_id', $product->id);
+                })
+                ->exists()
+            : false;
 
         $relatedProducts = Product::query()
             ->where('id', '!=', $product->id)
@@ -98,6 +114,6 @@ class ProductsController extends Controller
             $relatedProducts = $relatedProducts->concat($fallback);
         }
 
-        return view('products.show', compact('product', 'reviews', 'averageRating', 'isWishlisted', 'relatedProducts'));
+        return view('products.show', compact('product', 'reviews', 'averageRating', 'isWishlisted', 'relatedProducts', 'canReview'));
     }
 }

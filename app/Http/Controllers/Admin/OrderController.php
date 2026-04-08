@@ -116,10 +116,32 @@ class OrderController extends Controller
 
         if ($request->status !== $previousStatus && $order->user) {
             try {
+                \Log::info('Order status email send attempt', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->display_order_number,
+                    'user_id' => $order->user?->id,
+                    'recipient' => $order->user?->email,
+                    'previous_status' => $previousStatus,
+                    'new_status' => $order->status,
+                ]);
                 Mail::to($order->user->email)->send(
                     new OrderStatusUpdatedMail($order->fresh(['user', 'items.product']), $previousStatus)
                 );
+                \Log::info('Order status email sent', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->display_order_number,
+                    'recipient' => $order->user?->email,
+                    'new_status' => $order->status,
+                ]);
             } catch (\Throwable $e) {
+                \Log::error('Order status email failed', [
+                    'order_id' => $order->id,
+                    'order_number' => $order->display_order_number,
+                    'recipient' => $order->user?->email,
+                    'previous_status' => $previousStatus,
+                    'new_status' => $order->status,
+                    'error' => $e->getMessage(),
+                ]);
                 report($e);
             }
         }

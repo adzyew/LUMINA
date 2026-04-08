@@ -223,11 +223,11 @@
                                 </ul>
                             @endif
                         </p>
-                        <div class="flex flex-wrap gap-2 mb-3">
-                            <span class="px-3 py-1 rounded-full border border-amber-200 bg-amber-50 text-xs font-medium text-amber-700 capitalize">
+                        <div class="flex flex-wrap gap-1 mb-3">
+                            <span class="px-3 py-1 rounded border border-amber-200 bg-amber-50 text-xs font-medium text-amber-700 capitalize">
                                 {{ $product->category ?? 'Jewelry' }}
                             </span>
-                            <span class="px-3 py-1 rounded-full text-xs font-medium border {{ ($product->stock_quantity ?? 0) > 0 ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200' }}">
+                            <span class="px-3 py-1 rounded text-xs font-medium border {{ ($product->stock_quantity ?? 0) > 0 ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200' }}">
                                 {{ ($product->stock_quantity ?? 0) > 0 ? 'In Stock' : 'Sold Out' }}
                             </span>
                         </div>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderPlacedMail;
 use App\Models\InventoryLog;
 use App\Models\Order;
 use App\Models\Product;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 
@@ -32,18 +34,13 @@ class PaymentController extends Controller
         if ($order->payment_status !== 'paid' && $order->paymongo_checkout_session_id) {
             try {
                 $checkoutSession = $paymongoService->getCheckoutSession((string) $order->paymongo_checkout_session_id);
-                $payments = data_get($checkoutSession, 'attributes.payments', []);
+                $firstPaidPayment = $this->extractSuccessfulPaymentFromCheckoutSession($checkoutSession);
 
-                if (is_array($payments) && isset($payments[0])) {
-                    $firstPayment = $payments[0];
-                    $paymentStatus = (string) (data_get($firstPayment, 'attributes.status') ?? data_get($firstPayment, 'status', ''));
-
-                    if ($paymentStatus === '' || in_array($paymentStatus, ['paid', 'succeeded', 'captured'], true)) {
-                        $paymentId = (string) (data_get($firstPayment, 'id') ?? '');
-                        $paymentChannel = $this->resolvePaymentChannel(is_array($firstPayment) ? $firstPayment : []);
-                        $this->finalizePaidOrder($order, $paymentId, $paymentChannel);
-                        $order->refresh();
-                    }
+                if ($firstPaidPayment !== null) {
+                    $paymentId = (string) (data_get($firstPaidPayment, 'id') ?? '');
+                    $paymentChannel = $this->resolvePaymentChannel($firstPaidPayment);
+                    $this->finalizePaidOrder($order, $paymentId, $paymentChannel);
+                    $order->refresh();
                 }
             } catch (\Throwable $e) {
                 Log::warning('PayMongo success fallback sync failed', [
@@ -99,16 +96,49 @@ class PaymentController extends Controller
     {
         $payload = $request->getContent();
         $signature = $request->header('Paymongo-Signature') ?? $request->header('paymongo-signature');
-
-        if (!$paymongoService->isValidWebhookSignature($payload, $signature)) {
-            Log::warning('Invalid PayMongo webhook signature.');
-            return response()->json(['message' => 'Invalid signature'], 401);
-        }
-
         /** @var array<string,mixed> $event */
         $event = $request->json()->all();
         $eventType = (string) data_get($event, 'data.attributes.type', '');
         $checkoutSessionId = (string) data_get($event, 'data.attributes.data.id', '');
+
+        $signatureValid = $paymongoService->isValidWebhookSignature($payload, $signature);
+        if (!$signatureValid) {
+            Log::warning('Invalid PayMongo webhook signature. Attempting checkout-session verification fallback.', [
+                'event_type' => $eventType,
+                'checkout_session_id' => $checkoutSessionId,
+            ]);
+
+            if ($checkoutSessionId === '') {
+                return response()->json(['message' => 'Invalid signature'], 401);
+            }
+
+            $order = Order::where('paymongo_checkout_session_id', $checkoutSessionId)->first();
+            if (!$order) {
+                return response()->json(['message' => 'Order not found'], 202);
+            }
+
+            try {
+                $checkoutSession = $paymongoService->getCheckoutSession($checkoutSessionId);
+                $firstPaidPayment = $this->extractSuccessfulPaymentFromCheckoutSession($checkoutSession);
+
+                if ($firstPaidPayment === null) {
+                    return response()->json(['message' => 'Checkout session not yet paid'], 202);
+                }
+
+                $paymentId = (string) (data_get($firstPaidPayment, 'id') ?? '');
+                $paymentChannel = $this->resolvePaymentChannel($firstPaidPayment);
+                $this->finalizePaidOrder($order, $paymentId, $paymentChannel);
+
+                return response()->json(['message' => 'Webhook fallback verified and processed'], 200);
+            } catch (\Throwable $e) {
+                Log::error('PayMongo webhook fallback verification failed', [
+                    'checkout_session_id' => $checkoutSessionId,
+                    'message' => $e->getMessage(),
+                ]);
+
+                return response()->json(['message' => 'Invalid signature'], 401);
+            }
+        }
 
         if ($checkoutSessionId === '') {
             return response()->json(['message' => 'No checkout session id in payload'], 202);
@@ -155,6 +185,8 @@ class PaymentController extends Controller
 
     private function finalizePaidOrder(Order $order, string $paymentIntentId, string $paymentChannel = 'online'): void
     {
+        $wasAlreadyPaid = $order->payment_status === 'paid';
+
         DB::transaction(function () use ($order, $paymentIntentId, $paymentChannel): void {
             $order->loadMissing('items.product');
 
@@ -201,6 +233,38 @@ class PaymentController extends Controller
 
             $order->update($updateData);
         });
+
+        // Send confirmation email once when payment becomes paid.
+        if (!$wasAlreadyPaid) {
+            $order->refresh()->loadMissing(['user', 'items.product']);
+
+            if ($order->user) {
+                try {
+                    Log::info('Order confirmation email send attempt (PayMongo paid)', [
+                        'order_id' => $order->id,
+                        'order_number' => $order->display_order_number,
+                        'user_id' => $order->user?->id,
+                        'recipient' => $order->user?->email,
+                        'payment_status' => $order->payment_status,
+                        'payment_channel' => $order->payment_channel,
+                    ]);
+                    Mail::to($order->user->email)->send(new OrderPlacedMail($order));
+                    Log::info('Order confirmation email sent (PayMongo paid)', [
+                        'order_id' => $order->id,
+                        'order_number' => $order->display_order_number,
+                        'recipient' => $order->user?->email,
+                    ]);
+                } catch (\Throwable $e) {
+                    Log::error('Order confirmation email failed (PayMongo paid)', [
+                        'order_id' => $order->id,
+                        'order_number' => $order->display_order_number,
+                        'recipient' => $order->user?->email,
+                        'error' => $e->getMessage(),
+                    ]);
+                    report($e);
+                }
+            }
+        }
     }
 
     /**
@@ -227,5 +291,30 @@ class PaymentController extends Controller
         $normalized = trim($normalized, '_');
 
         return $normalized !== '' ? $normalized : 'online';
+    }
+
+    /**
+     * @param array<string,mixed> $checkoutSession
+     * @return array<string,mixed>|null
+     */
+    private function extractSuccessfulPaymentFromCheckoutSession(array $checkoutSession): ?array
+    {
+        $payments = data_get($checkoutSession, 'attributes.payments', []);
+        if (!is_array($payments) || $payments === []) {
+            return null;
+        }
+
+        foreach ($payments as $payment) {
+            if (!is_array($payment)) {
+                continue;
+            }
+
+            $status = strtolower((string) (data_get($payment, 'attributes.status') ?? data_get($payment, 'status', '')));
+            if ($status === '' || in_array($status, ['paid', 'succeeded', 'captured', 'successful'], true)) {
+                return $payment;
+            }
+        }
+
+        return null;
     }
 }

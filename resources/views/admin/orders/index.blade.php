@@ -124,7 +124,6 @@
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
         <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
             <h2 class="text-xl font-playfair font-bold text-gray-900">Order <span id="order-view-number"></span></h2>
-            <button onclick="closeOrderViewModal()" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors text-xl leading-none">&times;</button>
         </div>
         <div class="p-6 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>

@@ -1,18 +1,13 @@
 @php
     $headerTitle = $emailHeaderTitle ?? null;
-    $headerPath = public_path('IMAGES/Lumina Email Header.png');
+    $headerFile = 'IMAGES/Lumina Email Header.png';
 
     if (!empty($emailHeaderImageUrl)) {
         $headerImage = $emailHeaderImageUrl;
-    } elseif (
-        isset($message) &&
-        is_object($message) &&
-        method_exists($message, 'embed') &&
-        file_exists($headerPath)
-    ) {
-        $headerImage = $message->embed($headerPath);
     } else {
-        $headerImage = asset('IMAGES/Lumina Email Header.png');
+        // Use an absolute public URL for maximum inbox compatibility.
+        $appUrl = rtrim((string) config('app.url'), '/');
+        $headerImage = $appUrl . '/' . str_replace(' ', '%20', ltrim($headerFile, '/'));
     }
 @endphp
 
