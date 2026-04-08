@@ -295,7 +295,7 @@
 
                                 <!-- First Name -->
                                 <div class="floating-group">
-                                    <input type="text" pattern="^[a-zA-Z ]+$"  name="first_name" id="first_name" value="{{ old('first_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30">
+                                    <input type="text" pattern="^[A-Za-z\s]+$" name="first_name" id="first_name" value="{{ old('first_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30" inputmode="text" autocomplete="given-name" title="First name must contain letters only.">
                                     <label for="first_name" class="floating-label no-icon">
                                         First Name
                                     </label>
@@ -309,7 +309,7 @@
 
                                 <!-- Last Name -->
                                 <div class="floating-group">
-                                    <input type="text" name="last_name" id="last_name" value="{{ old('last_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30">
+                                    <input type="text" pattern="^[A-Za-z\s]+$" name="last_name" id="last_name" value="{{ old('last_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30" inputmode="text" autocomplete="family-name" title="Last name must contain letters only.">
                                     <label for="last_name" class="floating-label no-icon">
                                         Last Name
                                     </label>
@@ -553,6 +553,8 @@
             const registerPassword = document.getElementById('register-password');
             const registerPasswordConfirm = document.getElementById('register-password-confirm');
             const registerPhone = document.getElementById('register-phone');
+            const firstNameInput = document.getElementById('first_name');
+            const lastNameInput = document.getElementById('last_name');
             const phoneValidityLabel = document.getElementById('register-phone-validity');
             const strengthLabel = document.getElementById('register-password-strength');
             const rulesLabel = document.getElementById('register-password-rules');
@@ -563,6 +565,10 @@
                 const digitsOnly = normalized.replace(/\D/g, '');
                 return digitsOnly.slice(0, 11);
             };
+
+            const sanitizeNameInput = (value) => (value || '')
+                .replace(/[^A-Za-z\s]/g, '')
+                .replace(/\s{2,}/g, ' ');
 
             function updatePhoneValidityState() {
                 if (!registerPhone || !phoneValidityLabel) {
@@ -689,6 +695,22 @@
 
             updateSignupButtonState();
 
+            [firstNameInput, lastNameInput].forEach(function (input) {
+                if (!input) return;
+
+                input.addEventListener('input', function () {
+                    const cursor = input.selectionStart;
+                    const cleaned = sanitizeNameInput(input.value);
+                    if (cleaned !== input.value) {
+                        input.value = cleaned;
+                        if (typeof cursor === 'number') {
+                            const nextPos = Math.max(0, cursor - 1);
+                            input.setSelectionRange(nextPos, nextPos);
+                        }
+                    }
+                });
+            });
+
             if (registerPhone) {
                 registerPhone.addEventListener('input', function () {
                     registerPhone.value = normalizeAndLimitPhilippineMobile(registerPhone.value);
@@ -705,6 +727,12 @@
                 const registerForm = registerPhone.closest('form');
                 if (registerForm) {
                     registerForm.addEventListener('submit', function () {
+                        if (firstNameInput) {
+                            firstNameInput.value = sanitizeNameInput(firstNameInput.value).trim();
+                        }
+                        if (lastNameInput) {
+                            lastNameInput.value = sanitizeNameInput(lastNameInput.value).trim();
+                        }
                         registerPhone.value = normalizeAndLimitPhilippineMobile(registerPhone.value);
                     });
                 }

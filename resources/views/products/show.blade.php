@@ -95,9 +95,18 @@
                     <p class="text-xl sm:text-2xl font-bold text-amber-500">₱ {{ number_format($product->price ?? 0, 2) }}</p>
                     @if($product->description ?? null)
                         @php
-                            $features = collect(preg_split('/(?:\r\n|\r|\n|•|â€¢)/u', (string) $product->description))
-                                ->map(fn ($line) => trim((string) $line))
-                                ->filter();
+                            $rawDescription = html_entity_decode((string) $product->description, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                            $rawDescription = preg_replace('/<br\s*\/?>/iu', "\n", $rawDescription) ?? $rawDescription;
+                            $rawDescription = strip_tags($rawDescription);
+
+                            $features = collect(preg_split('/(?:\r\n|\r|\n|•|â€¢)/u', $rawDescription))
+                                ->map(function ($line) {
+                                    $normalized = (string) $line;
+                                    $normalized = preg_replace('/[\x{00A0}\x{200B}\x{200C}\x{200D}\x{FEFF}]/u', ' ', $normalized) ?? $normalized;
+                                    $normalized = preg_replace('/\s+/u', ' ', $normalized) ?? $normalized;
+                                    return trim($normalized);
+                                })
+                                ->filter(fn ($line) => $line !== '' && preg_match('/[\pL\pN]/u', $line));
                         @endphp
                         <ul class="text-gray-800 leading-relaxed text-sm sm:text-base list-disc pl-5 space-y-1">
                             @foreach($features as $feature)
