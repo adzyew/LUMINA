@@ -158,9 +158,9 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                        <form method="POST" action="{{ route('logout') }}" class="m-0">
+                        <form id="adminLogoutForm" method="POST" action="{{ route('logout') }}" class="m-0">
                             @csrf
-                            <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto transition-colors">
+                            <button id="adminLogoutSubmitButton" type="submit" class="inline-flex w-full justify-center rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto transition-colors disabled:opacity-70 disabled:cursor-not-allowed">
                                 Confirm
                             </button>
                         </form>
@@ -249,6 +249,31 @@
             if (staffWrapper && !staffWrapper.contains(e.target)) {
                 closeStaffProfileDropdown();
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const logoutForm = document.getElementById('adminLogoutForm');
+            const logoutButton = document.getElementById('adminLogoutSubmitButton');
+            if (!logoutForm || !logoutButton) return;
+
+            logoutForm.addEventListener('submit', function (event) {
+                if (logoutForm.dataset.submitting === '1') {
+                    event.preventDefault();
+                    return;
+                }
+
+                logoutForm.dataset.submitting = '1';
+                logoutButton.disabled = true;
+                logoutButton.textContent = 'Logging out...';
+            });
+
+            const originalHideLogoutModal = hideLogoutModal;
+            hideLogoutModal = function () {
+                logoutForm.dataset.submitting = '0';
+                logoutButton.disabled = false;
+                logoutButton.textContent = 'Confirm';
+                originalHideLogoutModal();
+            };
         });
     </script>
 </body>
