@@ -86,7 +86,7 @@
                                 Settings
                             </a>
                             <div class="border-t border-gray-100 my-1"></div>
-                            <form method="POST" action="{{ route('logout') }}" >
+                            <form method="POST" action="{{ route('logout') }}" data-logout-form>
                                 @csrf
                                 <button type="button" onclick="showLogoutModal()" class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
@@ -136,7 +136,7 @@
                         <a href="{{ route('orders.index') }}" class="flex items-center gap-3 px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 rounded-lg transition-colors">Orders</a>
                         <a href="{{ route('wishlist.storefront') }}" class="flex items-center gap-3 px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 rounded-lg transition-colors">Wishlist</a>
                         <a href="{{ route('profile.show') }}" class="flex items-center gap-3 px-4 py-3 text-inherit hover:text-amber-500 hover:bg-gray-100 rounded-lg transition-colors">Settings</a>
-                            <form method="POST" action="{{ route('logout') }}" onsubmit="return confirm('Are you sure you want to logout?');">
+                            <form method="POST" action="{{ route('logout') }}" data-logout-form>
                                 @csrf
                                 <button type="button" onclick="showLogoutModal()" class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
@@ -177,9 +177,9 @@
                     </div>
                 </div>
                 <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <form method="POST" action="{{ route('logout') }}" class="m-0">
+                    <form method="POST" action="{{ route('logout') }}" class="m-0" data-logout-form>
                         @csrf
-                        <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto transition-colors">
+                        <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto transition-colors disabled:opacity-70 disabled:cursor-not-allowed">
                             Confirm
                         </button>
                     </form>
@@ -297,6 +297,24 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         updateActiveNav();
+
+        document.querySelectorAll('form[data-logout-form]').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (form.dataset.submitting === '1') {
+                    event.preventDefault();
+                    return;
+                }
+
+                form.dataset.submitting = '1';
+                form.querySelectorAll('button[type=\"submit\"], input[type=\"submit\"]').forEach(function (submitter) {
+                    submitter.disabled = true;
+                    if (submitter.tagName === 'BUTTON') {
+                        submitter.dataset.originalText = submitter.textContent;
+                        submitter.textContent = 'Logging out...';
+                    }
+                });
+            });
+        });
     });
 
 </script>

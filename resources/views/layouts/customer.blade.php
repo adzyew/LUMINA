@@ -116,7 +116,7 @@
             </div>
         </nav>
         <div class="mt-auto p-4 border-t border-gray-100">
-            <form method="POST" action="{{ route('logout') }}">
+            <form method="POST" action="{{ route('logout') }}" data-logout-form>
                 @csrf
                 <button type="button" onclick="showLogoutModal()" class="w-full px-4 py-2.5 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-colors text-sm font-semibold">
                     Logout
@@ -157,9 +157,9 @@
             </div>
             <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
                 <button type="button" onclick="hideLogoutModal()" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm font-medium transition-colors">Cancel</button>
-                <form method="POST" action="{{ route('logout') }}" class="m-0">
+                <form method="POST" action="{{ route('logout') }}" class="m-0" data-logout-form>
                     @csrf
-                    <button type="submit" class="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold text-sm hover:bg-red-500 transition-colors">Logout</button>
+                    <button type="submit" class="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold text-sm hover:bg-red-500 transition-colors disabled:opacity-70 disabled:cursor-not-allowed">Logout</button>
                 </form>
             </div>
         </div>
@@ -204,6 +204,26 @@
                 sidebar.classList.add('-translate-x-full');
             }
         }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('form[data-logout-form]').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (form.dataset.submitting === '1') {
+                    event.preventDefault();
+                    return;
+                }
+
+                form.dataset.submitting = '1';
+                form.querySelectorAll('button[type="submit"], input[type="submit"]').forEach(function (submitter) {
+                    submitter.disabled = true;
+                    if (submitter.tagName === 'BUTTON') {
+                        submitter.dataset.originalText = submitter.textContent;
+                        submitter.textContent = 'Logging out...';
+                    }
+                });
+            });
+        });
     });
 
 </script>
