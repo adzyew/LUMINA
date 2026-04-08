@@ -113,7 +113,12 @@
         }
         // mark the register terms checkbox and close
         const regTerms = document.getElementById('terms');
-        if(regTerms) regTerms.checked = true;
+        if (regTerms) {
+            regTerms.checked = true;
+            // Trigger the same listeners used by manual checkbox interaction.
+            regTerms.dispatchEvent(new Event('input', { bubbles: true }));
+            regTerms.dispatchEvent(new Event('change', { bubbles: true }));
+        }
         closeTermsModal();
     }
 </script>

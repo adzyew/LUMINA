@@ -129,7 +129,7 @@
                                     @csrf
                                     @method('PATCH')
                                     <input type="hidden" name="reason" value="Flag toggled by moderator">
-                                    <button class="h-12 min-w-[88px] shrink-0 inline-flex items-center justify-center gap-1 rounded-lg text-white px-3 py-2 text-xs font-semibold transition-colors {{ $review->is_flagged ? 'bg-red-600 hover:bg-red-500' : 'bg-blue-600 hover:bg-blue-500' }}" title="{{ $review->is_flagged  }}">{{ $review->is_flagged  }}
+                                    <button class="h-12 w-12 shrink-0 inline-flex items-center justify-center gap-1 rounded-lg text-white px-3 py-2 text-xs font-semibold transition-colors {{ $review->is_flagged ? 'bg-red-600 hover:bg-red-500' : 'bg-blue-600 hover:bg-blue-500' }}" title="{{ $review->is_flagged  }}">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
                                         </svg></button>
