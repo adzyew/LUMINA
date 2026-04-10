@@ -12,6 +12,43 @@ use Illuminate\Support\Str; // Add this!
 
 class StaffController extends Controller
 {
+    private function splitNameParts(?string $fullName): array
+    {
+        $normalized = trim(preg_replace('/\s+/u', ' ', (string) $fullName) ?? '');
+        if ($normalized === '') {
+            return [
+                'name' => '',
+                'first_name' => null,
+                'middle_name' => null,
+                'last_name' => null,
+                'suffix' => null,
+            ];
+        }
+
+        $tokens = preg_split('/\s+/u', $normalized) ?: [];
+        $suffix = null;
+        $knownSuffixes = ['jr', 'jr.', 'sr', 'sr.', 'ii', 'iii', 'iv', 'v', 'phd', 'md'];
+
+        if (count($tokens) > 1) {
+            $lastToken = strtolower((string) end($tokens));
+            if (in_array($lastToken, $knownSuffixes, true)) {
+                $suffix = (string) array_pop($tokens);
+            }
+        }
+
+        $first = array_shift($tokens);
+        $last = count($tokens) > 0 ? (string) array_pop($tokens) : null;
+        $middle = count($tokens) > 0 ? trim(implode(' ', $tokens)) : null;
+
+        return [
+            'name' => $normalized,
+            'first_name' => $first ?: null,
+            'middle_name' => $middle !== '' ? $middle : null,
+            'last_name' => $last ?: null,
+            'suffix' => $suffix ?: null,
+        ];
+    }
+
     public function index()
     {
         $this->authorizeAdmin();
@@ -54,8 +91,14 @@ class StaffController extends Controller
             'password.regex' => 'Password must include uppercase, lowercase, and a number.',
         ]);
 
+        $nameParts = $this->splitNameParts($data['name']);
+
         $user = User::create([
-            'name' => $data['name'],
+            'name' => $nameParts['name'],
+            'first_name' => $nameParts['first_name'],
+            'middle_name' => $nameParts['middle_name'],
+            'last_name' => $nameParts['last_name'],
+            'suffix' => $nameParts['suffix'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'is_admin' => false,
@@ -101,7 +144,13 @@ class StaffController extends Controller
             'password.regex' => 'Password must include uppercase, lowercase, and a number.',
         ]);
 
-        $user->name = $data['name'];
+        $nameParts = $this->splitNameParts($data['name']);
+
+        $user->name = $nameParts['name'];
+        $user->first_name = $nameParts['first_name'];
+        $user->middle_name = $nameParts['middle_name'];
+        $user->last_name = $nameParts['last_name'];
+        $user->suffix = $nameParts['suffix'];
         $user->email = $data['email'];
         if (!empty($data['password'])) {
             $user->password = Hash::make($data['password']);

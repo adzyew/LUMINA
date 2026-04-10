@@ -13,6 +13,8 @@ use App\Mail\TestMail;
 use App\Services\CloudinaryService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Carbon;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class AuthController extends Controller
 {
@@ -20,6 +22,18 @@ class AuthController extends Controller
     private const OTP_LOCK_MINUTES = 5;
     private const OTP_EXPIRES_MINUTES = 2;
     private const OTP_RESEND_COOLDOWN_MINUTES = 2;
+
+    private function buildFullName(?string $firstName, ?string $middleName, ?string $lastName, ?string $suffix): string
+    {
+        $parts = array_filter([
+            trim((string) $firstName),
+            trim((string) $middleName),
+            trim((string) $lastName),
+            trim((string) $suffix),
+        ], fn ($value) => $value !== '');
+
+        return trim(implode(' ', $parts));
+    }
 
     private function secondsUntil(mixed $value): int
     {
@@ -197,7 +211,9 @@ class AuthController extends Controller
     {
         $request->validate([
             'first_name' => ['required', 'string', 'max:30', 'regex:/^[\pL\s]+$/u'],
+            'middle_name' => ['nullable', 'string', 'max:30', 'regex:/^[\pL\s]+$/u'],
             'last_name' => ['required', 'string', 'max:30', 'regex:/^[\pL\s]+$/u'],
+            'suffix' => ['nullable', 'string', 'max:20', 'regex:/^[\pL\pN\s\.\-]+$/u'],
             'phone' => ['required', 'regex:/^09\\d{9}$/'],
             'email' => 'required|email|unique:users',
             'password' => [
@@ -212,18 +228,28 @@ class AuthController extends Controller
             'terms' => 'accepted',
         ], [
             'first_name.regex' => 'First name must contain letters only.',
+            'middle_name.regex' => 'Middle name must contain letters only.',
             'last_name.regex' => 'Last name must contain letters only.',
+            'suffix.regex' => 'Suffix contains invalid characters.',
             'password.min' => 'Password must be at least 8 characters.',
             'password.regex' => 'Password must include uppercase, lowercase, and a number.',
             'phone.regex' => 'Please enter a valid Philippine mobile number (e.g. 09171234567).',
         ]);
 
-        // Combine first and last name
-        $fullName = trim($request->first_name . ' ' . $request->last_name);
+        $fullName = $this->buildFullName(
+            $request->input('first_name'),
+            $request->input('middle_name'),
+            $request->input('last_name'),
+            $request->input('suffix')
+        );
 
         // 1) Store pending registration in cache (no DB record until OTP is verified)
         $pendingRegistration = [
             'name' => $fullName,
+            'first_name' => trim((string) $request->input('first_name')),
+            'middle_name' => trim((string) $request->input('middle_name')),
+            'last_name' => trim((string) $request->input('last_name')),
+            'suffix' => trim((string) $request->input('suffix')),
             'phone' => $request->phone,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -376,6 +402,34 @@ class AuthController extends Controller
         return view('user.order_detail', compact('order'));
     }
 
+    public function downloadOrderInvoice(Order $order)
+    {
+        $user = Auth::user();
+        if (!$user instanceof User || (int) $order->user_id !== (int) $user->id) {
+            abort(403);
+        }
+
+        $order->loadMissing(['items.product', 'user']);
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+        $options->set('defaultFont', 'DejaVu Sans');
+
+        $dompdf = new Dompdf($options);
+        $html = view('pdf.order_invoice', compact('order'))->render();
+
+        $dompdf->loadHtml($html, 'UTF-8');
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        $fileName = 'invoice-' . $order->display_order_number . '.pdf';
+
+        return response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        ]);
+    }
+
     public function showProfile()
     {
         return redirect()->route('profile.edit');
@@ -414,8 +468,10 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'active_tab' => 'nullable|string',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'first_name' => ['required', 'string', 'max:80', 'regex:/^[\pL\s]+$/u'],
+            'middle_name' => ['nullable', 'string', 'max:80', 'regex:/^[\pL\s]+$/u'],
+            'last_name' => ['required', 'string', 'max:80', 'regex:/^[\pL\s]+$/u'],
+            'suffix' => ['nullable', 'string', 'max:20', 'regex:/^[\pL\pN\s\.\-]+$/u'],
             'phone' => ['required', 'regex:/^09\\d{9}$/'],
             'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'current_password' => 'nullable|required_with:new_password|string|max:72',
@@ -439,6 +495,10 @@ class AuthController extends Controller
             'notify_promotions' => 'nullable|boolean',
             'notify_loyalty' => 'nullable|boolean',
         ], [
+            'first_name.regex' => 'First name must contain letters only.',
+            'middle_name.regex' => 'Middle name must contain letters only.',
+            'last_name.regex' => 'Last name must contain letters only.',
+            'suffix.regex' => 'Suffix contains invalid characters.',
             'phone.regex' => 'Please enter a valid Philippine mobile number (e.g. 09171234567).',
             'new_password.min' => 'Password must be at least 8 characters.',
             'new_password.max' => 'Password cannot exceed 72 characters.',
@@ -451,7 +511,16 @@ class AuthController extends Controller
             abort(403);
         }
 
-        $validated['name'] = trim(($validated['first_name'] ?? '') . ' ' . ($validated['last_name'] ?? ''));
+        $validated['first_name'] = trim((string) ($validated['first_name'] ?? ''));
+        $validated['middle_name'] = trim((string) ($validated['middle_name'] ?? ''));
+        $validated['last_name'] = trim((string) ($validated['last_name'] ?? ''));
+        $validated['suffix'] = trim((string) ($validated['suffix'] ?? ''));
+        $validated['name'] = $this->buildFullName(
+            $validated['first_name'],
+            $validated['middle_name'],
+            $validated['last_name'],
+            $validated['suffix']
+        );
         $validated['notify_order_updates'] = $request->boolean('notify_order_updates');
         $validated['notify_promotions'] = $request->boolean('notify_promotions');
         $validated['notify_loyalty'] = $request->boolean('notify_loyalty');
@@ -768,6 +837,10 @@ class AuthController extends Controller
     if (!$user && is_array($pendingRegistration)) {
         $user = User::create([
             'name' => $pendingRegistration['name'] ?? $email,
+            'first_name' => $pendingRegistration['first_name'] ?? null,
+            'middle_name' => $pendingRegistration['middle_name'] ?? null,
+            'last_name' => $pendingRegistration['last_name'] ?? null,
+            'suffix' => $pendingRegistration['suffix'] ?? null,
             'phone' => $pendingRegistration['phone'] ?? null,
             'email' => $pendingRegistration['email'] ?? $email,
             'password' => $pendingRegistration['password'] ?? Hash::make(str()->random(24)),

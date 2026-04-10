@@ -3,6 +3,13 @@
 @section('title', 'My Profile | Lumina')
 
 @section('content')
+@php
+    $nameParts = preg_split('/\s+/', trim($user->name ?? ''), 2);
+    $firstName = old('first_name', $user->first_name ?? ($nameParts[0] ?? ''));
+    $middleName = old('middle_name', $user->middle_name ?? '');
+    $lastName = old('last_name', $user->last_name ?? ($nameParts[1] ?? ''));
+    $suffix = old('suffix', $user->suffix ?? '');
+@endphp
 <div class="max-w-3xl mx-auto">
     <div class="mb-8">
         <h1 class="text-3xl font-playfair font-bold text-gray-900">Edit Profile</h1>
@@ -30,16 +37,54 @@
             @csrf
             @method('PUT')
 
-            <div>
-                <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
-                <input
-                    id="name"
-                    type="text"
-                    name="name"
-                    value="{{ old('name', $user->name) }}"
-                    required
-                    class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-amber-400"
-                >
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="first_name" class="block text-sm font-semibold text-gray-700 mb-2">First Name</label>
+                    <input
+                        id="first_name"
+                        type="text"
+                        name="first_name"
+                        value="{{ $firstName }}"
+                        required
+                        class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-amber-400"
+                    >
+                </div>
+
+                <div>
+                    <label for="middle_name" class="block text-sm font-semibold text-gray-700 mb-2">Middle Name (Optional)</label>
+                    <input
+                        id="middle_name"
+                        type="text"
+                        name="middle_name"
+                        value="{{ $middleName }}"
+                        class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-amber-400"
+                    >
+                </div>
+
+                <div>
+                    <label for="last_name" class="block text-sm font-semibold text-gray-700 mb-2">Last Name</label>
+                    <input
+                        id="last_name"
+                        type="text"
+                        name="last_name"
+                        value="{{ $lastName }}"
+                        required
+                        class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-amber-400"
+                    >
+                </div>
+
+                <div>
+                    <label for="suffix" class="block text-sm font-semibold text-gray-700 mb-2">Suffix (Optional)</label>
+                    <input
+                        id="suffix"
+                        type="text"
+                        name="suffix"
+                        value="{{ $suffix }}"
+                        maxlength="20"
+                        placeholder="Jr., Sr., III"
+                        class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-amber-400"
+                    >
+                </div>
             </div>
 
             <div>

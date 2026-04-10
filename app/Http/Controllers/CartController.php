@@ -208,6 +208,19 @@ class CartController extends Controller
         ]);
     }
 
+    public function confirmation(Order $order)
+    {
+        if ((int) $order->user_id !== (int) Auth::id()) {
+            abort(403);
+        }
+
+        $order->loadMissing(['items.product']);
+
+        return view('cart.confirmation', [
+            'order' => $order,
+        ]);
+    }
+
     public function placeOrder(Request $request, PaymongoService $paymongoService)
     {
         $cart = session()->get('cart', []);
@@ -374,7 +387,9 @@ class CartController extends Controller
                 report($e);
             }
 
-            return redirect()->route('dashboard')->with('success', 'Order #' . $order->display_order_number . ' placed successfully! Check your email for confirmation.');
+            return redirect()
+                ->route('checkout.confirmation', $order)
+                ->with('success', 'Order #' . $order->display_order_number . ' placed successfully! Check your email for confirmation.');
 
         } catch (\Exception $e) {
             // IF ANYTHING ABOVE FAILED, IT COMES HERE AND NOTHING IS SAVED!

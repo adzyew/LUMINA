@@ -307,6 +307,20 @@
                                     @enderror
                                 </div>
 
+                                <!-- Middle Name (Optional) -->
+                                <div class="floating-group">
+                                    <input type="text" pattern="^[A-Za-z\s]*$" name="middle_name" id="middle_name" value="{{ old('middle_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30" inputmode="text" autocomplete="additional-name" title="Middle name must contain letters only.">
+                                    <label for="middle_name" class="floating-label no-icon">
+                                        Middle Name (Optional)
+                                    </label>
+
+                                    @error('middle_name')
+                                        @if(($activeTab ?? 'login') === 'register')
+                                            <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                                        @endif
+                                    @enderror
+                                </div>
+
                                 <!-- Last Name -->
                                 <div class="floating-group">
                                     <input type="text" pattern="^[A-Za-z\s]+$" name="last_name" id="last_name" value="{{ old('last_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30" inputmode="text" autocomplete="family-name" title="Last name must contain letters only.">
@@ -315,6 +329,20 @@
                                     </label>
 
                                     @error('last_name')
+                                        @if(($activeTab ?? 'login') === 'register')
+                                            <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
+                                        @endif
+                                    @enderror
+                                </div>
+
+                                <!-- Suffix (Optional) -->
+                                <div class="floating-group">
+                                    <input type="text" pattern="^[A-Za-z0-9.\-\s]*$" name="suffix" id="suffix" value="{{ old('suffix') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="20" inputmode="text" autocomplete="honorific-suffix" title="Suffix can include letters, numbers, spaces, dots, and hyphens.">
+                                    <label for="suffix" class="floating-label no-icon">
+                                        Suffix (Optional)
+                                    </label>
+
+                                    @error('suffix')
                                         @if(($activeTab ?? 'login') === 'register')
                                             <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
                                         @endif
@@ -554,7 +582,9 @@
             const registerPasswordConfirm = document.getElementById('register-password-confirm');
             const registerPhone = document.getElementById('register-phone');
             const firstNameInput = document.getElementById('first_name');
+            const middleNameInput = document.getElementById('middle_name');
             const lastNameInput = document.getElementById('last_name');
+            const suffixInput = document.getElementById('suffix');
             const phoneValidityLabel = document.getElementById('register-phone-validity');
             const strengthLabel = document.getElementById('register-password-strength');
             const rulesLabel = document.getElementById('register-password-rules');
@@ -568,6 +598,10 @@
 
             const sanitizeNameInput = (value) => (value || '')
                 .replace(/[^A-Za-z\s]/g, '')
+                .replace(/\s{2,}/g, ' ');
+
+            const sanitizeSuffixInput = (value) => (value || '')
+                .replace(/[^A-Za-z0-9.\-\s]/g, '')
                 .replace(/\s{2,}/g, ' ');
 
             function updatePhoneValidityState() {
@@ -695,7 +729,7 @@
 
             updateSignupButtonState();
 
-            [firstNameInput, lastNameInput].forEach(function (input) {
+            [firstNameInput, middleNameInput, lastNameInput].forEach(function (input) {
                 if (!input) return;
 
                 input.addEventListener('input', function () {
@@ -710,6 +744,20 @@
                     }
                 });
             });
+
+            if (suffixInput) {
+                suffixInput.addEventListener('input', function () {
+                    const cursor = suffixInput.selectionStart;
+                    const cleaned = sanitizeSuffixInput(suffixInput.value);
+                    if (cleaned !== suffixInput.value) {
+                        suffixInput.value = cleaned;
+                        if (typeof cursor === 'number') {
+                            const nextPos = Math.max(0, cursor - 1);
+                            suffixInput.setSelectionRange(nextPos, nextPos);
+                        }
+                    }
+                });
+            }
 
             if (registerPhone) {
                 registerPhone.addEventListener('input', function () {
@@ -730,8 +778,14 @@
                         if (firstNameInput) {
                             firstNameInput.value = sanitizeNameInput(firstNameInput.value).trim();
                         }
+                        if (middleNameInput) {
+                            middleNameInput.value = sanitizeNameInput(middleNameInput.value).trim();
+                        }
                         if (lastNameInput) {
                             lastNameInput.value = sanitizeNameInput(lastNameInput.value).trim();
+                        }
+                        if (suffixInput) {
+                            suffixInput.value = sanitizeSuffixInput(suffixInput.value).trim();
                         }
                         registerPhone.value = normalizeAndLimitPhilippineMobile(registerPhone.value);
                     });

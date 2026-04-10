@@ -27,6 +27,17 @@
                 <p class="mt-1 text-gray-900 font-semibold">{{ $user->name }}</p>
             </div>
 
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+                    <p class="text-xs uppercase tracking-wide text-gray-500">Middle Name</p>
+                    <p class="mt-1 text-gray-700 font-semibold">{{ $user->middle_name ?: '—' }}</p>
+                </div>
+                <div class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+                    <p class="text-xs uppercase tracking-wide text-gray-500">Suffix</p>
+                    <p class="mt-1 text-gray-700 font-semibold">{{ $user->suffix ?: '—' }}</p>
+                </div>
+            </div>
+
             <div class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
                 <p class="text-xs uppercase tracking-wide text-gray-500">Email (Read-only)</p>
                 <p class="mt-1 text-gray-700 font-semibold">{{ $user->email }}</p>

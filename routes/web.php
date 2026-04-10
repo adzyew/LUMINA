@@ -68,6 +68,7 @@ Route::middleware('customer')->group(function () {
     // Authenticated customer-only routes
     Route::middleware('auth')->group(function () {
         Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
+        Route::get('/checkout/confirmation/{order}', [CartController::class, 'confirmation'])->name('checkout.confirmation');
         Route::post('/place-order', [CartController::class, 'placeOrder'])->name('place.order');
         Route::get('/payments/paymongo/success', [PaymentController::class, 'paymongoSuccess'])->name('payments.paymongo.success');
         Route::get('/payments/paymongo/cancel', [PaymentController::class, 'paymongoCancel'])->name('payments.paymongo.cancel');
@@ -80,6 +81,7 @@ Route::middleware('customer')->group(function () {
         Route::get('/dashboard', [AuthController::class, 'user_dashboard'])->name('dashboard');
         Route::get('/dashboard/orders', [AuthController::class, 'orders'])->name('orders.index');
         Route::get('/dashboard/orders/{order}', [AuthController::class, 'showOrder'])->name('orders.show');
+        Route::get('/dashboard/orders/{order}/invoice', [AuthController::class, 'downloadOrderInvoice'])->name('orders.invoice');
         Route::get('/dashboard/profile', [AuthController::class, 'showProfile'])->name('profile.show');
         Route::get('/dashboard/profile/edit', [AuthController::class, 'editProfile'])->name('profile.edit');
         Route::put('/dashboard/profile', [AuthController::class, 'updateProfile'])->name('profile.update');

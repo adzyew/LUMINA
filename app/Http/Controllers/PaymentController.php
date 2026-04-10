@@ -61,12 +61,9 @@ class PaymentController extends Controller
             }
         }
 
-        if ($order->status === 'awaiting_payment') {
-            return redirect()->route('orders.index')
-                ->with('info', 'Waiting for payment confirmation. The order will appear once payment is completed.');
-        }
-
-        return redirect()->route('orders.show', $order)->with('success', $message);
+        return redirect()
+            ->route('checkout.confirmation', $order)
+            ->with($order->payment_status === 'paid' ? 'success' : 'info', $message);
     }
 
     public function paymongoCancel(Request $request)
