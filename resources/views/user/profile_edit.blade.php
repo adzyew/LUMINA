@@ -5,8 +5,10 @@
 @section('content')
     @php
         $nameParts = preg_split('/\s+/', trim($user->name ?? ''), 2);
-        $firstName = old('first_name', $nameParts[0] ?? '');
-        $lastName = old('last_name', $nameParts[1] ?? '');
+        $firstName = old('first_name', $user->first_name ?? ($nameParts[0] ?? ''));
+        $middleName = old('middle_name', $user->middle_name ?? '');
+        $lastName = old('last_name', $user->last_name ?? ($nameParts[1] ?? ''));
+        $suffix = old('suffix', $user->suffix ?? '');
     @endphp
 
     <div class="container mx-auto px-4 sm:px-6 lg:px-4 py-10 max-w-7xl">
@@ -43,8 +45,16 @@
                                 <input type="text" name="first_name" value="{{ $firstName }}" required class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
                             </div>
                             <div>
+                                <label class="block text-sm font-medium text-gray-600 mb-2">Middle Name (Optional)</label>
+                                <input type="text" name="middle_name" value="{{ $middleName }}" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                            </div>
+                            <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-2">Last Name</label>
                                 <input type="text" name="last_name" value="{{ $lastName }}" required class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600 mb-2">Suffix (Optional)</label>
+                                <input type="text" name="suffix" value="{{ $suffix }}" maxlength="20" placeholder="Jr., Sr., III" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
                             </div>
                         </div>
 
@@ -236,6 +246,18 @@ function togglePasswordField(inputId, eyeOpenId, eyeClosedId) {
     const editOnlyEls = document.querySelectorAll('[data-edit-only]');
 
     const phoneInput = document.getElementById('phone');
+    const firstNameInput = form?.querySelector('input[name="first_name"]');
+    const middleNameInput = form?.querySelector('input[name="middle_name"]');
+    const lastNameInput = form?.querySelector('input[name="last_name"]');
+    const suffixInput = form?.querySelector('input[name="suffix"]');
+
+    const sanitizeNameInput = (value) => (value || '')
+        .replace(/[^A-Za-z\s]/g, '')
+        .replace(/\s{2,}/g, ' ');
+
+    const sanitizeSuffixInput = (value) => (value || '')
+        .replace(/[^A-Za-z0-9.\-\s]/g, '')
+        .replace(/\s{2,}/g, ' ');
     if (phoneInput && window.intlTelInput) {
         window.intlTelInput(phoneInput, {
             initialCountry: 'ph',
@@ -275,6 +297,10 @@ function togglePasswordField(inputId, eyeOpenId, eyeClosedId) {
     });
 
     form?.addEventListener('submit', function () {
+        if (firstNameInput) firstNameInput.value = sanitizeNameInput(firstNameInput.value).trim();
+        if (middleNameInput) middleNameInput.value = sanitizeNameInput(middleNameInput.value).trim();
+        if (lastNameInput) lastNameInput.value = sanitizeNameInput(lastNameInput.value).trim();
+        if (suffixInput) suffixInput.value = sanitizeSuffixInput(suffixInput.value).trim();
         if (phoneInput) {
             phoneInput.value = normalizePhilippineMobile(phoneInput.value);
         }

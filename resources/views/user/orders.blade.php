@@ -170,9 +170,14 @@
                                 </div>
 
                                 <div class="flex justify-end">
-                                    <a href="{{ route('orders.show', $order) }}" class="inline-flex items-center px-4 py-2 rounded-lg bg-amber-300 text-black font-semibold hover:bg-amber-400 transition-colors">
+                                    <div class="flex items-center gap-2">
+                                        <a href="{{ route('orders.invoice', $order) }}" class="inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 font-semibold hover:bg-gray-100 transition-colors">
+                                            Download Invoice
+                                        </a>
+                                        <a href="{{ route('orders.show', $order) }}" class="inline-flex items-center px-4 py-2 rounded-lg bg-amber-300 text-black font-semibold hover:bg-amber-400 transition-colors">
                                         Open Full Details
-                                    </a>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>

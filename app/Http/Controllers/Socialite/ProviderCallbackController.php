@@ -11,9 +11,25 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 
 class ProviderCallbackController extends Controller
 {
+    private function splitName(string $fullName): array
+    {
+        $normalized = trim(preg_replace('/\s+/u', ' ', $fullName) ?? '');
+        if ($normalized === '') {
+            return ['first_name' => null, 'last_name' => null];
+        }
+
+        $parts = preg_split('/\s+/', $normalized, 2) ?: [];
+
+        return [
+            'first_name' => $parts[0] ?? null,
+            'last_name' => $parts[1] ?? null,
+        ];
+    }
+
     public function __invoke(string $provider)
     {
         if (!in_array($provider, ['google', 'facebook', 'github'])) {
@@ -28,6 +44,7 @@ class ProviderCallbackController extends Controller
 
         $socialEmail = (string) ($socialUser->getEmail() ?? '');
         $socialName = (string) ($socialUser->getName() ?? '');
+        $splitName = $this->splitName($socialName);
         $providerId = (string) ($socialUser->getId() ?? '');
         $providerToken = null;
         $providerRefreshToken = null;
@@ -45,16 +62,22 @@ class ProviderCallbackController extends Controller
         }
 
         // 2. Create or update OAuth details after archive check passes
-        $user = User::updateOrCreate(
-            ['email' => $socialEmail],
-            [
-                'name'                   => $socialName,
-                'provider_id'            => $providerId,
-                'provider_name'          => $provider,
-                'provider_token'         => $providerToken,
-                'provider_refresh_token' => $providerRefreshToken,
-            ]
-        );
+        $payload = [
+            'name'                   => $socialName,
+            'provider_id'            => $providerId,
+            'provider_name'          => $provider,
+            'provider_token'         => $providerToken,
+            'provider_refresh_token' => $providerRefreshToken,
+        ];
+
+        if (Schema::hasColumn('users', 'first_name')) {
+            $payload['first_name'] = $splitName['first_name'];
+        }
+        if (Schema::hasColumn('users', 'last_name')) {
+            $payload['last_name'] = $splitName['last_name'];
+        }
+
+        $user = User::updateOrCreate(['email' => $socialEmail], $payload);
 
         if ($user->is_verified) {
             Auth::login($user);
