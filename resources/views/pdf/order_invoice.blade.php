@@ -6,7 +6,7 @@
     <style>
         body { font-family: DejaVu Sans, sans-serif; color: #111827; font-size: 12px; margin: 0; }
         .page { padding: 28px; }
-        .title { font-size: 24px; font-weight: 700; margin-bottom: 6px; color: #1f2937; }
+        .title { font-size: 24px; font-weight: 700; margin-bottom: 7px; color: #1f2937; }
         .muted { color: #6b7280; }
         .section { margin-top: 20px; border: 1px solid #e5e7eb; border-radius: 8px; }
         .section-header { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px; font-weight: 700; background: #f9fafb; }
