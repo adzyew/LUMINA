@@ -13,6 +13,7 @@ use App\Mail\TestMail;
 use App\Services\CloudinaryService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Http;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
@@ -33,6 +34,144 @@ class AuthController extends Controller
         ], fn ($value) => $value !== '');
 
         return trim(implode(' ', $parts));
+    }
+
+    private function normalizeToPhE164(?string $phone): ?string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $phone) ?? '';
+        if ($digits === '') {
+            return null;
+        }
+
+        if (preg_match('/^09\d{9}$/', $digits)) {
+            return '+63' . substr($digits, 1);
+        }
+
+        if (preg_match('/^9\d{9}$/', $digits)) {
+            return '+63' . $digits;
+        }
+
+        if (preg_match('/^639\d{9}$/', $digits)) {
+            return '+' . $digits;
+        }
+
+        return null;
+    }
+
+    private function maskPhone(?string $e164): string
+    {
+        $value = (string) $e164;
+        if ($value === '') {
+            return 'your mobile number';
+        }
+
+        $tail = strlen($value) > 4 ? substr($value, -4) : $value;
+        return '******' . $tail;
+    }
+
+    private function resolveOtpPhoneForEmail(string $email): ?string
+    {
+        $pending = Cache::get('pending_registration_' . $email);
+        if (is_array($pending) && !empty($pending['phone'])) {
+            return $this->normalizeToPhE164((string) $pending['phone']);
+        }
+
+        $user = User::where('email', $email)->first();
+        if ($user) {
+            return $this->normalizeToPhE164($user->phone);
+        }
+
+        return null;
+    }
+
+    private function sendOtpByEmail(string $email, int $otp): bool
+    {
+        try {
+            Mail::to($email)->send(new TestMail($otp));
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('OTP email failed', [
+                'email' => $email,
+                'message' => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
+    private function isFirebaseSmsConfigured(): bool
+    {
+        return (string) config('services.firebase.api_key') !== ''
+            && (string) config('services.firebase.auth_domain') !== ''
+            && (string) config('services.firebase.project_id') !== ''
+            && (string) config('services.firebase.app_id') !== '';
+    }
+
+    private function dispatchOtp(string $email, int $otp, string $channel = 'email'): array
+    {
+        $channel = 'email';
+        $emailOk = $this->sendOtpByEmail($email, $otp);
+        return [
+            'success' => $emailOk,
+            'channel' => $channel,
+            'recipient' => $email,
+            'message' => $emailOk ? 'OTP sent via email.' : 'Unable to send OTP email right now.',
+        ];
+    }
+
+    private function getFirebaseClientConfig(): array
+    {
+        return [
+            'apiKey' => (string) config('services.firebase.api_key'),
+            'authDomain' => (string) config('services.firebase.auth_domain'),
+            'projectId' => (string) config('services.firebase.project_id'),
+            'appId' => (string) config('services.firebase.app_id'),
+            'messagingSenderId' => (string) config('services.firebase.messaging_sender_id'),
+            'appCheckSiteKey' => (string) config('services.firebase.app_check_site_key'),
+            'appCheckDebugToken' => (string) config('services.firebase.app_check_debug_token'),
+            'enableAppCheck' => (bool) config('services.firebase.enable_app_check'),
+        ];
+    }
+
+    private function prepareSmsVerificationSession(string $email): array
+    {
+        $cooldownKey = 'firebase_sms_init_cooldown_' . $email;
+        $remainingSeconds = $this->secondsUntil(Cache::get($cooldownKey));
+        if ($remainingSeconds > 0) {
+            $minutes = intdiv($remainingSeconds, 60);
+            $seconds = $remainingSeconds % 60;
+            return [
+                'success' => false,
+                'message' => 'Please wait ' . sprintf('%02d:%02d', $minutes, $seconds) . ' before requesting another SMS code.',
+            ];
+        }
+
+        $phone = $this->resolveOtpPhoneForEmail($email);
+        if (!$phone) {
+            return [
+                'success' => false,
+                'message' => 'No valid phone number found for SMS OTP.',
+            ];
+        }
+
+        if (!$this->isFirebaseSmsConfigured()) {
+            return [
+                'success' => false,
+                'message' => 'SMS verification is not configured yet. Please contact support.',
+            ];
+        }
+
+        session([
+            'email' => $email,
+            'otp_channel' => 'sms',
+            'otp_recipient' => $this->maskPhone($phone),
+            'firebase_phone_e164' => $phone,
+            'firebase_sms_nonce' => uniqid('sms_', true),
+        ]);
+
+        $cooldownUntil = now()->addMinutes(self::OTP_RESEND_COOLDOWN_MINUTES);
+        Cache::put($cooldownKey, $cooldownUntil, $cooldownUntil);
+
+        return ['success' => true];
     }
 
     private function secondsUntil(mixed $value): int
@@ -198,7 +337,31 @@ class AuthController extends Controller
             $attemptsRemaining = 0;
         }
 
-        return view('auth.verify-sms', compact('remainingSeconds', 'lockRemainingSeconds', 'attemptsRemaining', 'otpExpiresAtTs', 'lockExpiresAtTs'));
+        $otpChannel = (string) session('otp_channel', 'email');
+        $smsPhone = $this->resolveOtpPhoneForEmail($email);
+        $hasSmsRecipient = $smsPhone !== null;
+        $otpRecipient = $otpChannel === 'sms' && $hasSmsRecipient
+            ? $this->maskPhone($smsPhone)
+            : (string) $email;
+        $firebaseConfig = $this->getFirebaseClientConfig();
+        $firebasePhoneE164 = (string) session('firebase_phone_e164', $smsPhone ?? '');
+        $smsMode = $otpChannel === 'sms';
+        $firebaseSmsNonce = (string) session('firebase_sms_nonce', '');
+
+        return view('auth.verify-sms', compact(
+            'remainingSeconds',
+            'lockRemainingSeconds',
+            'attemptsRemaining',
+            'otpExpiresAtTs',
+            'lockExpiresAtTs',
+            'otpChannel',
+            'otpRecipient',
+            'hasSmsRecipient',
+            'firebaseConfig',
+            'firebasePhoneE164',
+            'smsMode',
+            'firebaseSmsNonce'
+        ));
     }
 
     public function showRegister()
@@ -214,8 +377,9 @@ class AuthController extends Controller
             'middle_name' => ['nullable', 'string', 'max:30', 'regex:/^[\pL\s]+$/u'],
             'last_name' => ['required', 'string', 'max:30', 'regex:/^[\pL\s]+$/u'],
             'suffix' => ['nullable', 'string', 'max:20', 'regex:/^[\pL\pN\s\.\-]+$/u'],
-            'phone' => ['required', 'regex:/^09\\d{9}$/'],
+            'phone' => ['required', 'regex:/^(?:\\+63|0)9\\d{9}$/'],
             'email' => 'required|email|unique:users',
+            'otp_channel' => 'nullable|in:email,sms',
             'password' => [
                 'required',
                 'string',
@@ -233,7 +397,7 @@ class AuthController extends Controller
             'suffix.regex' => 'Suffix contains invalid characters.',
             'password.min' => 'Password must be at least 8 characters.',
             'password.regex' => 'Password must include uppercase, lowercase, and a number.',
-            'phone.regex' => 'Please enter a valid Philippine mobile number (e.g. 09171234567).',
+            'phone.regex' => 'Please enter a valid Philippine mobile number (e.g. +639171234567 or 09171234567).',
         ]);
 
         $fullName = $this->buildFullName(
@@ -258,9 +422,26 @@ class AuthController extends Controller
         $pendingTtl = now()->addHours(2);
         Cache::put('pending_registration_' . $request->email, $pendingRegistration, $pendingTtl);
 
-        // 2) Generate OTP
-        $otp = rand(100000, 999999);
+        $selectedChannel = (string) $request->input('otp_channel', 'email');
 
+        if ($selectedChannel === 'sms') {
+            $smsSession = $this->prepareSmsVerificationSession($request->email);
+            if (!$smsSession['success']) {
+                return back()->withErrors([
+                    'phone' => (string) ($smsSession['message'] ?? 'Unable to start SMS verification.'),
+                ])->withInput();
+            }
+
+            Cache::forget('otp_' . $request->email);
+            Cache::forget('otp_expires_' . $request->email);
+            Cache::forget('otp_resend_available_at_' . $request->email);
+
+            return redirect()->route('verify-sms')
+                ->with('success', 'SMS verification started. Enter the code sent to your phone.');
+        }
+
+        // Email OTP path
+        $otp = rand(100000, 999999);
         $expiresAt = now()->addMinutes(self::OTP_EXPIRES_MINUTES);
         $resendAvailableAt = now()->addMinutes(self::OTP_RESEND_COOLDOWN_MINUTES);
 
@@ -268,16 +449,18 @@ class AuthController extends Controller
         Cache::put('otp_expires_' . $request->email, $expiresAt, $expiresAt);
         Cache::put('otp_resend_available_at_' . $request->email, $resendAvailableAt, $resendAvailableAt);
 
-        // 3) Send OTP email
-        try {
-            Mail::to($request->email)->send(new TestMail($otp));
-        } catch (\Exception $e) {
-            Log::error('Registration OTP email failed: ' . $e->getMessage());
+        $dispatch = $this->dispatchOtp($request->email, $otp, 'email');
+        if (!$dispatch['success']) {
+            return back()->withErrors([
+                'email' => (string) ($dispatch['message'] ?? 'Unable to send OTP right now. Please try again.'),
+            ])->withInput();
         }
 
-        // 4) Save email in session
         session([
             'email' => $request->email,
+            'otp_channel' => $dispatch['channel'] ?? 'email',
+            'otp_recipient' => $dispatch['recipient'] ?? $request->email,
+            'firebase_phone_e164' => null,
         ]);
 
         return redirect()->route('verify-sms');
@@ -472,7 +655,7 @@ class AuthController extends Controller
             'middle_name' => ['nullable', 'string', 'max:80', 'regex:/^[\pL\s]+$/u'],
             'last_name' => ['required', 'string', 'max:80', 'regex:/^[\pL\s]+$/u'],
             'suffix' => ['nullable', 'string', 'max:20', 'regex:/^[\pL\pN\s\.\-]+$/u'],
-            'phone' => ['required', 'regex:/^09\\d{9}$/'],
+            'phone' => ['required', 'regex:/^(?:\\+63|0)9\\d{9}$/'],
             'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'current_password' => 'nullable|required_with:new_password|string|max:72',
             'new_password' => [
@@ -499,7 +682,7 @@ class AuthController extends Controller
             'middle_name.regex' => 'Middle name must contain letters only.',
             'last_name.regex' => 'Last name must contain letters only.',
             'suffix.regex' => 'Suffix contains invalid characters.',
-            'phone.regex' => 'Please enter a valid Philippine mobile number (e.g. 09171234567).',
+            'phone.regex' => 'Please enter a valid Philippine mobile number (e.g. +639171234567 or 09171234567).',
             'new_password.min' => 'Password must be at least 8 characters.',
             'new_password.max' => 'Password cannot exceed 72 characters.',
             'current_password.max' => 'Current password cannot exceed 72 characters.',
@@ -682,7 +865,8 @@ class AuthController extends Controller
     // 1. Validate Input
     $request->validate([
         "email" => "required|email",
-        "password" => "required"
+        "password" => "required",
+        "otp_channel" => "nullable|in:email,sms",
     ]);
 
     // 2. Find the User
@@ -733,8 +917,26 @@ class AuthController extends Controller
     }
 
     // 5. IF NOT VERIFIED: Send OTP
-    session(['email' => $user->email]);
+    $selectedChannel = (string) $request->input('otp_channel', 'email');
 
+    if ($selectedChannel === 'sms') {
+        $smsSession = $this->prepareSmsVerificationSession($user->email);
+        if (!$smsSession['success']) {
+            return back()->withErrors([
+                'email' => (string) ($smsSession['message'] ?? 'Unable to start SMS verification.'),
+            ]);
+        }
+
+        Cache::forget('otp_' . $user->email);
+        Cache::forget('otp_expires_' . $user->email);
+        Cache::forget('otp_resend_available_at_' . $user->email);
+        Cache::forget('otp_attempts_' . $user->email);
+
+        return redirect()->route('verify-sms')
+            ->with('info', 'Your account is not verified. Enter the SMS code sent to your phone.');
+    }
+
+    session(['email' => $user->email]);
     $otp = rand(100000, 999999);
     $expiresAt = now()->addMinutes(self::OTP_EXPIRES_MINUTES);
     $resendAvailableAt = now()->addMinutes(self::OTP_RESEND_COOLDOWN_MINUTES);
@@ -743,11 +945,18 @@ class AuthController extends Controller
     Cache::put('otp_expires_' . $user->email, $expiresAt, $expiresAt);
     Cache::put('otp_resend_available_at_' . $user->email, $resendAvailableAt, $resendAvailableAt);
 
-    try {
-        Mail::to($user->email)->send(new TestMail($otp));
-    } catch (\Exception $e) {
-        // Ignore email errors to prevent crashing
+    $dispatch = $this->dispatchOtp($user->email, $otp, 'email');
+    if (!$dispatch['success']) {
+        return back()->withErrors([
+            'email' => (string) ($dispatch['message'] ?? 'Unable to send OTP right now. Please try again.'),
+        ]);
     }
+
+    session([
+        'otp_channel' => $dispatch['channel'] ?? 'email',
+        'otp_recipient' => $dispatch['recipient'] ?? $user->email,
+        'firebase_phone_e164' => null,
+    ]);
 
     return redirect()->route('verify-sms')
         ->with('info', 'Your account is not verified. Please enter the code sent to your email.');
@@ -759,6 +968,7 @@ class AuthController extends Controller
 
         $request->validate([
             'email' => 'required|email',
+            'channel' => 'nullable|in:email',
         ]);
 
         $otp = rand(100000, 999999); // Generate a random 6-digit OTP
@@ -770,13 +980,18 @@ class AuthController extends Controller
         Cache::put('otp_expires_' . $request->email, $expiresAt, $expiresAt);
         Cache::put('otp_resend_available_at_' . $request->email, $resendAvailableAt, $resendAvailableAt);
 
-        try {
-            Mail::to($request->email)->send(new TestMail($otp));
-        } catch (\Exception $e) {
-            Log::error('sendOtp email failed: ' . $e->getMessage());
+        $dispatch = $this->dispatchOtp($request->email, $otp, 'email');
+
+        if (!$dispatch['success']) {
+            return back()->with('error', (string) ($dispatch['message'] ?? 'Failed to send OTP.'));
         }
 
-        return redirect()->route('verify-sms')->with('success', 'OTP sent to your email!');
+        session([
+            'otp_channel' => $dispatch['channel'] ?? 'email',
+            'otp_recipient' => $dispatch['recipient'] ?? $request->email,
+        ]);
+
+        return redirect()->route('verify-sms')->with('success', (string) ($dispatch['message'] ?? 'OTP sent.'));
     }
 
     public function verifyOtp(Request $request)
@@ -792,6 +1007,11 @@ class AuthController extends Controller
     $email = session('email');
     if (!$email) {
         return redirect()->route('login')->with('error', 'Session expired.');
+    }
+    if ((string) session('otp_channel') === 'sms') {
+        return back()->withErrors([
+            'otp' => 'Use the SMS verification flow for this account.',
+        ]);
     }
 
     $attemptsKey = 'otp_attempts_' . $email;
@@ -877,7 +1097,7 @@ class AuthController extends Controller
         Cache::forget('pending_registration_' . $email);
         session(['otp_verified' => true]);
         // Clear the `email` session key used while verifying
-        $request->session()->forget('email');
+        $request->session()->forget(['email', 'otp_channel', 'otp_recipient', 'firebase_phone_e164', 'firebase_sms_nonce']);
 
         Log::info('verifyOtp success: user verified', ['email' => $email, 'user_id' => $user->id]);
 
@@ -894,6 +1114,108 @@ class AuthController extends Controller
 
     return back()->with('error', 'User not found.');
 }
+
+    public function verifyFirebaseSms(Request $request)
+    {
+        $request->validate([
+            'id_token' => 'required|string',
+        ]);
+
+        $email = (string) session('email');
+        if ($email === '') {
+            return redirect()->route('login')->with('error', 'Session expired.');
+        }
+
+        if ((string) session('otp_channel') !== 'sms') {
+            return back()->with('error', 'Invalid verification channel.');
+        }
+
+        $apiKey = (string) config('services.firebase.api_key');
+        if ($apiKey === '') {
+            return back()->with('error', 'Firebase SMS verification is not configured.');
+        }
+
+        $response = Http::asJson()->post(
+            'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' . $apiKey,
+            ['idToken' => (string) $request->input('id_token')]
+        );
+
+        if (!$response->successful()) {
+            Log::warning('Firebase token lookup failed', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+            return back()->with('error', 'Unable to verify SMS code. Please try again.');
+        }
+
+        $phoneFromToken = (string) data_get($response->json(), 'users.0.phoneNumber', '');
+        $expectedPhone = (string) session('firebase_phone_e164', $this->resolveOtpPhoneForEmail($email));
+        if ($phoneFromToken === '' || $expectedPhone === '') {
+            return back()->with('error', 'Missing phone number for SMS verification.');
+        }
+
+        $normalizedTokenPhone = $this->normalizeToPhE164($phoneFromToken);
+        $normalizedExpectedPhone = $this->normalizeToPhE164($expectedPhone);
+        if (!$normalizedTokenPhone || !$normalizedExpectedPhone || $normalizedTokenPhone !== $normalizedExpectedPhone) {
+            return back()->with('error', 'Verified phone number does not match your account.');
+        }
+
+        $pendingRegistration = Cache::get('pending_registration_' . $email);
+        $user = User::where('email', $email)->first();
+
+        if (!$user && is_array($pendingRegistration)) {
+            $user = User::create([
+                'name' => $pendingRegistration['name'] ?? $email,
+                'first_name' => $pendingRegistration['first_name'] ?? null,
+                'middle_name' => $pendingRegistration['middle_name'] ?? null,
+                'last_name' => $pendingRegistration['last_name'] ?? null,
+                'suffix' => $pendingRegistration['suffix'] ?? null,
+                'phone' => $pendingRegistration['phone'] ?? null,
+                'email' => $pendingRegistration['email'] ?? $email,
+                'password' => $pendingRegistration['password'] ?? Hash::make(str()->random(24)),
+                'is_verified' => true,
+                'email_verified_at' => now(),
+            ]);
+        }
+
+        if (!$user) {
+            return back()->with('error', 'User not found.');
+        }
+
+        $currentSessionId = $request->session()->getId();
+        if ($this->hasDifferentActiveSession($user, $currentSessionId)) {
+            return back()->withErrors([
+                'otp' => 'This account is already logged in on another browser or device.',
+            ]);
+        }
+
+        $user->is_verified = true;
+        $user->email_verified_at = now();
+        $user->save();
+
+        Auth::login($user);
+        $request->session()->regenerate();
+        $this->rememberActiveSession($user, $request->session()->getId());
+        $this->restoreCartAfterLogin($request, $user);
+
+        Cache::forget('otp_' . $email);
+        Cache::forget('otp_expires_' . $email);
+        Cache::forget('otp_resend_available_at_' . $email);
+        Cache::forget('otp_attempts_' . $email);
+        Cache::forget('otp_lock_until_' . $email);
+        Cache::forget('pending_registration_' . $email);
+        session(['otp_verified' => true]);
+        $request->session()->forget(['email', 'otp_channel', 'otp_recipient', 'firebase_phone_e164', 'firebase_sms_nonce']);
+
+        if (($user->is_admin ?? false) || $user->hasRole('admin')) {
+            return redirect()->route('admin.admin_dashboard')->with('success', 'Account verified!');
+        }
+        if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('deliveries.manage') || $user->can('reviews.moderate')) {
+            return redirect()->route('admin.staff.dashboard')->with('success', 'Account verified!');
+        }
+
+        return redirect()->route('dashboard')->with('success', 'Account verified!');
+    }
 
     private function incrementOtpAttempts(string $attemptsKey): int
     {
@@ -924,6 +1246,14 @@ class AuthController extends Controller
                 ->with('error', 'Session expired.');
         }
 
+        request()->validate([
+            'channel' => 'nullable|in:email',
+        ]);
+
+        if ((string) session('otp_channel') === 'sms') {
+            return back()->with('error', 'Use the SMS resend button on this page.');
+        }
+
         $lockKey = 'otp_lock_until_' . $email;
         $lockRemainingSeconds = $this->getOtpLockRemainingSeconds($lockKey);
         if ($lockRemainingSeconds > 0) {
@@ -947,13 +1277,57 @@ class AuthController extends Controller
         Cache::put('otp_resend_available_at_' . $email, $newResendAvailableAt, $newResendAvailableAt);
         Cache::forget('otp_attempts_' . $email);
 
-        try {
-            Mail::to($email)->send(new TestMail($otp));
-        } catch (\Exception $e) {
-            Log::error('Resend OTP email failed: ' . $e->getMessage());
+        $dispatch = $this->dispatchOtp($email, $otp, 'email');
+        if (!$dispatch['success']) {
+            return back()->with('error', (string) ($dispatch['message'] ?? 'Failed to resend OTP.'));
         }
 
-        return back()->with('success', 'A new OTP has been sent.');
+        session([
+            'otp_channel' => $dispatch['channel'] ?? 'email',
+            'otp_recipient' => $dispatch['recipient'] ?? $email,
+        ]);
+
+        return back()->with('success', (string) ($dispatch['message'] ?? 'A new OTP has been sent.'));
+    }
+
+    public function fallbackToEmailOtp(Request $request)
+    {
+        $email = (string) session('email');
+        if ($email === '') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Session expired.',
+            ], 422);
+        }
+
+        $otp = rand(100000, 999999);
+        $expiresAt = now()->addMinutes(self::OTP_EXPIRES_MINUTES);
+        $resendAvailableAt = now()->addMinutes(self::OTP_RESEND_COOLDOWN_MINUTES);
+
+        Cache::put('otp_' . $email, $otp, $expiresAt);
+        Cache::put('otp_expires_' . $email, $expiresAt, $expiresAt);
+        Cache::put('otp_resend_available_at_' . $email, $resendAvailableAt, $resendAvailableAt);
+        Cache::forget('otp_attempts_' . $email);
+
+        $dispatch = $this->dispatchOtp($email, $otp, 'email');
+        if (!$dispatch['success']) {
+            return response()->json([
+                'success' => false,
+                'message' => (string) ($dispatch['message'] ?? 'Unable to send email OTP right now.'),
+            ], 422);
+        }
+
+        session([
+            'otp_channel' => 'email',
+            'otp_recipient' => $email,
+            'firebase_phone_e164' => null,
+            'firebase_sms_nonce' => null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'SMS is temporarily limited. We sent your OTP to email instead.',
+        ]);
     }
 
     // --- Forgot Password with OTP ---

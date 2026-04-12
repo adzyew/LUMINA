@@ -100,7 +100,7 @@
         .phone-floating-group .floating-input.phone-input {
             width: 100%;
             padding-bottom: 0.75rem;
-            padding-left: 4rem;
+            padding-left: 1rem;
             padding-right: 1rem;
             background-color: white;
             border: 1px solid rgb(229 231 235);
@@ -115,21 +115,9 @@
             box-shadow: 0 0 0 1px #f59e0b;
         }
 
-        .phone-prefix {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: rgb(55 65 81);
-            font-weight: 600;
-            line-height: 1;
-            z-index: 15;
-            pointer-events: none;
-        }
-
         .phone-floating-label {
             position: absolute;
-            left: 4rem;
+            left: 1rem;
             top: 50%;
             transform: translateY(-50%);
             color: rgb(156 163 175);
@@ -235,6 +223,8 @@
                                         @endif
                                     @enderror
                                 </div>
+
+                                
 
                                 <!-- Remember & Forgot -->
                                 <div class="flex items-center justify-between">
@@ -374,8 +364,7 @@
                                 <!-- Phone -->
                                 <div class="phone-floating-group relative">
                                     <div class="relative">
-                                        <span class="phone-prefix">+63</span>
-                                        <input id="register-phone" pattern="[0-9]*" type="tel" name="phone" value="{{ old('phone') }}" placeholder=" " class="floating-input phone-input w-full py-3 leading-tight" inputmode="numeric" maxlength="11">
+                                        <input id="register-phone" pattern="^\+639\d{9}$" type="tel" name="phone" value="{{ old('phone') }}" placeholder=" " class="floating-input phone-input w-full py-3 leading-tight" inputmode="tel" maxlength="13">
                                         <label for="register-phone" class="phone-floating-label pt-1 pb-1 py-4">
                                             Phone Number
                                         </label>
@@ -448,6 +437,20 @@
                                     <p id="register-password-match" class="hidden text-xs mt-2">Passwords match.</p>
                                 </div>
 
+                                <div>
+                                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Verification</p>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <label class="flex items-center gap-2 rounded-xl border border-gray-200 px-3 py-2 cursor-pointer hover:border-amber-300 transition-colors">
+                                            <input type="radio" name="otp_channel" value="email" class="text-amber-500 focus:ring-amber-500" {{ old('otp_channel', 'email') !== 'sms' ? 'checked' : '' }}>
+                                            <span class="text-sm text-gray-700">Email OTP</span>
+                                        </label>
+                                        <label class="flex items-center gap-2 rounded-xl border border-gray-200 px-3 py-2 cursor-pointer hover:border-amber-300 transition-colors">
+                                            <input type="radio" name="otp_channel" value="sms" class="text-amber-500 focus:ring-amber-500" {{ old('otp_channel') === 'sms' ? 'checked' : '' }}>
+                                            <span class="text-sm text-gray-700">SMS OTP</span>
+                                        </label>
+                                    </div>
+                                </div>
+
                                 <!-- Terms -->
                                 <div class="flex items-start gap-3">
                                     <input type="checkbox" name="terms" id="terms" class="w-4 h-4 mt-0.5 rounded border-gray-300 text-amber-400 focus:ring-amber-500">
@@ -504,21 +507,31 @@
         const activeTab = '{{ $activeTab ?? 'login' }}';
 
         function normalizePhilippineMobile(value) {
-            const digits = (value || '').replace(/\D/g, '');
+            const raw = (value || '').trim();
+            const hasPlus = raw.startsWith('+');
+            const digits = raw.replace(/\D/g, '');
+
+            if (/^639\d{9}$/.test(digits)) {
+                return `+${digits}`;
+            }
 
             if (/^09\d{9}$/.test(digits)) {
-                return digits;
+                return `+63${digits.slice(1)}`;
             }
 
             if (/^9\d{9}$/.test(digits)) {
-                return `0${digits}`;
+                return `+63${digits}`;
             }
 
-            if (/^639\d{9}$/.test(digits)) {
-                return `0${digits.slice(2)}`;
+            if (/^63\d{0,10}$/.test(digits)) {
+                return `+${digits}`;
             }
 
-            return digits;
+            if (hasPlus) {
+                return `+${digits.slice(0, 12)}`;
+            }
+
+            return digits.slice(0, 12);
         }
 
         function showTab(tab) {
@@ -592,8 +605,10 @@
 
             const normalizeAndLimitPhilippineMobile = (value) => {
                 const normalized = normalizePhilippineMobile(value || '');
-                const digitsOnly = normalized.replace(/\D/g, '');
-                return digitsOnly.slice(0, 11);
+                if (normalized.startsWith('+')) {
+                    return `+${normalized.replace(/\D/g, '').slice(0, 12)}`;
+                }
+                return normalized.replace(/\D/g, '').slice(0, 12);
             };
 
             const sanitizeNameInput = (value) => (value || '')
@@ -616,14 +631,14 @@
                     return false;
                 }
 
-                const isValid = /^09\d{9}$/.test(phoneValue);
+                const isValid = /^\+639\d{9}$/.test(phoneValue);
                 phoneValidityLabel.classList.remove('hidden');
 
                 if (isValid) {
                     phoneValidityLabel.textContent = 'Valid Philippine number.';
                     phoneValidityLabel.className = 'text-xs mt-2 text-green-600';
                 } else {
-                    phoneValidityLabel.textContent = 'Use exactly 11 digits: 09XXXXXXXXX.';
+                    phoneValidityLabel.textContent = 'Use +639XXXXXXXXX.';
                     phoneValidityLabel.className = 'text-xs mt-2 text-red-500';
                 }
 
@@ -639,7 +654,7 @@
                 const password = registerPassword ? (registerPassword.value || '') : '';
                 const confirmPassword = registerPasswordConfirm ? (registerPasswordConfirm.value || '') : '';
                 const passwordsMatch = password.length > 0 && confirmPassword.length > 0 && password === confirmPassword;
-                const phoneValid = registerPhone ? /^09\d{9}$/.test(registerPhone.value || '') : false;
+                const phoneValid = registerPhone ? /^\+639\d{9}$/.test(registerPhone.value || '') : false;
 
                 signupBtn.disabled = !(termsAccepted && passwordsMatch && phoneValid);
             }

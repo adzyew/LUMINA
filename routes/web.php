@@ -25,9 +25,15 @@ Route::get('/verify-sms', [AuthController::class, 'showVerifySms'])
 Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])
     ->middleware('throttle:otp-verify')
     ->name('verify.otp');
+Route::post('/verify-firebase-sms', [AuthController::class, 'verifyFirebaseSms'])
+    ->middleware('throttle:otp-verify')
+    ->name('verify.firebase.sms');
 Route::post('/resend-otp', [AuthController::class, 'resendOtp'])
     ->middleware('throttle:otp-resend')
     ->name('otp.resend');
+Route::post('/otp/fallback-email', [AuthController::class, 'fallbackToEmailOtp'])
+    ->middleware('throttle:otp-resend')
+    ->name('otp.fallback.email');
 
 // --- GUEST ROUTES ---
 Route::middleware('guest')->group(function () {
