@@ -59,6 +59,17 @@ return [
             explode(',', (string) env('PAYMONGO_PAYMENT_METHOD_TYPES', 'card,gcash'))
         ))),
     ],
+
+    'firebase' => [
+        'api_key' => env('FIREBASE_API_KEY'),
+        'auth_domain' => env('FIREBASE_AUTH_DOMAIN'),
+        'project_id' => env('FIREBASE_PROJECT_ID'),
+        'app_id' => env('FIREBASE_APP_ID'),
+        'messaging_sender_id' => env('FIREBASE_MESSAGING_SENDER_ID'),
+        'app_check_site_key' => env('FIREBASE_APP_CHECK_SITE_KEY'),
+        'app_check_debug_token' => env('FIREBASE_APP_CHECK_DEBUG_TOKEN'),
+        'enable_app_check' => env('FIREBASE_ENABLE_APP_CHECK', false),
+    ],
     
 
 ];
