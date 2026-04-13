@@ -182,7 +182,10 @@ class UserManagementController extends Controller
         $user->syncRoles([$request->role]);
 
         return redirect()->route('admin.users.index', ['filter' => 'staff'])
-            ->with('success', "'{$user->name}' has been updated successfully.");
+            ->with([
+                'toast_type' => 'success',
+                'toast_message' => "'{$user->name}' has been updated successfully.",
+            ]);
     }
 
     /**
@@ -242,7 +245,8 @@ class UserManagementController extends Controller
         $tab = request('tab', 'active');
         $activeRoles = Role::with('permissions')->whereNull('archived_at')->get();
         $archivedRoles = Role::with('permissions')->whereNotNull('archived_at')->get();
-        return view('admin.roles.index', compact('activeRoles', 'archivedRoles', 'tab'));
+        $permissions = Permission::query()->orderBy('name')->get();
+        return view('admin.roles.index', compact('activeRoles', 'archivedRoles', 'tab', 'permissions'));
     }
     public function storeRole(Request $request)
     {
@@ -255,7 +259,10 @@ class UserManagementController extends Controller
 
         Role::create(['name' => $formattedName]);
 
-        return redirect()->back()->with('success', 'New role created successfully!');
+        return redirect()->back()->with([
+            'toast_type' => 'success',
+            'toast_message' => 'New role created successfully!',
+        ]);
     }
 
     public function destroyRole($id)
@@ -264,18 +271,27 @@ class UserManagementController extends Controller
 
         // 1. SAFETY CHECK: Prevent deleting core system roles
         if (in_array(strtolower($role->name), ['admin'])) {
-            return redirect()->back()->with('error', 'System protection: You cannot delete the core Admin role.');
+            return redirect()->back()->with([
+                'toast_type' => 'error',
+                'toast_message' => 'System protection: You cannot delete the core Admin role.',
+            ]);
         }
 
         // 2. SAFETY CHECK: Prevent deleting roles that users are still using
         if ($role->users()->count() > 0) {
-            return redirect()->back()->with('error', 'Cannot delete this role because there are staff members currently assigned to it. Please reassign those users first.');
+            return redirect()->back()->with([
+                'toast_type' => 'error',
+                'toast_message' => 'Cannot delete this role because staff are still assigned to it.',
+            ]);
         }
 
         // 3. Safe to delete!
         $role->delete();
 
-        return redirect()->back()->with('success', Str::headline($role->name) . ' role was successfully deleted!');
+        return redirect()->back()->with([
+            'toast_type' => 'success',
+            'toast_message' => Str::headline($role->name) . ' role was successfully deleted!',
+        ]);
     }
 
     /**
@@ -295,7 +311,10 @@ class UserManagementController extends Controller
     {
         $role->syncPermissions($request->permissions ?? []);
         return redirect()->route('admin.roles.index')
-            ->with('success', 'Permissions updated successfully.');
+            ->with([
+                'toast_type' => 'success',
+                'toast_message' => 'Permissions updated successfully.',
+            ]);
     }
 
     public function showRole(Role $role)
@@ -307,18 +326,27 @@ class UserManagementController extends Controller
     public function archiveRole(Role $role)
     {
         if (in_array(strtolower($role->name), ['admin'])) {
-            return redirect()->back()->with('error', 'The Admin role cannot be archived.');
+            return redirect()->back()->with([
+                'toast_type' => 'error',
+                'toast_message' => 'The Admin role cannot be archived.',
+            ]);
         }
         $role->archived_at = Carbon::now();
         $role->save();
-        return redirect()->back()->with('success', Str::headline($role->name) . ' role has been archived.');
+        return redirect()->back()->with([
+            'toast_type' => 'success',
+            'toast_message' => Str::headline($role->name) . ' role has been archived.',
+        ]);
     }
 
     public function restoreRole(Role $role)
     {
         $role->archived_at = null;
         $role->save();
-        return redirect()->back()->with('success', Str::headline($role->name) . ' role has been restored.');
+        return redirect()->back()->with([
+            'toast_type' => 'success',
+            'toast_message' => Str::headline($role->name) . ' role has been restored.',
+        ]);
     }
 
     /**

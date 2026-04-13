@@ -70,16 +70,91 @@
     </div>
 </div>
 
-@if(session('success'))
-    <div class="mb-6 bg-green-100 text-green-800 p-4 rounded-lg border border-green-200">
-        {{ session('success') }}
+{{-- View Role Modal --}}
+<div id="viewRoleModal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen px-4 py-8">
+        <div class="fixed inset-0 bg-black/75" onclick="hideViewRoleModal()"></div>
+        <div class="relative z-10 bg-white border border-gray-200 rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h3 id="viewRoleTitle" class="text-2xl font-bold text-gray-900">Role</h3>
+                    <p class="text-sm text-gray-500">Role details and assigned permissions.</p>
+                </div>
+                <button type="button" onclick="hideViewRoleModal()" class="w-9 h-9 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors" title="Close">
+                    <span class="text-lg leading-none">&times;</span>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
+                <div class="bg-white rounded-2xl border border-gray-200 p-5">
+                    <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Role Info</h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-gray-500 text-sm">System Name</span>
+                            <span id="viewRoleSystemName" class="font-mono text-gray-900 text-sm"></span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-gray-500 text-sm">Display Name</span>
+                            <span id="viewRoleDisplayName" class="font-bold text-gray-900"></span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-gray-500 text-sm">Status</span>
+                            <span id="viewRoleStatusBadge" class="px-3 py-1 rounded-full text-xs font-bold"></span>
+                        </div>
+                        <div class="flex justify-between items-center py-2">
+                            <span class="text-gray-500 text-sm">Users Assigned</span>
+                            <span id="viewRoleUsersCount" class="font-bold text-gray-900"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-gray-200 p-5">
+                    <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
+                        Permissions
+                        <span id="viewRolePermissionCount" class="ml-2 px-2 py-0.5 bg-amber-500/20 text-amber-400 text-xs rounded-full font-semibold">0</span>
+                    </h4>
+                    <div id="viewRolePermissions" class="flex flex-wrap gap-2"></div>
+                    <p id="viewRoleNoPermissions" class="text-gray-500 text-sm hidden">No permissions assigned to this role.</p>
+                </div>
+            </div>
+        </div>
     </div>
-@endif
-@if(session('error'))
-    <div class="mb-6 bg-red-100 text-red-800 p-4 rounded-lg border border-red-200">
-        {{ session('error') }}
+</div>
+
+{{-- Edit Role Modal --}}
+<div id="editRoleModal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen px-4 py-8">
+        <div class="fixed inset-0 bg-black/75"></div>
+        <div class="relative z-10 bg-white border border-gray-200 rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h3 id="editRoleTitle" class="text-2xl font-bold text-gray-900">Edit Permissions</h3>
+                    <p class="text-sm text-gray-500">Update assigned permissions for this role.</p>
+                </div>
+            </div>
+            <form id="editRoleForm" method="POST" class="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+                @csrf
+                @method('PUT')
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    @foreach($permissions as $permission)
+                        <label class="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
+                            <input type="checkbox" name="permissions[]" value="{{ $permission->name }}" data-role-permission class="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-400">
+                            <span>{{ $permission->name }}</span>
+                        </label>
+                    @endforeach
+                </div>
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="hideEditRoleModal()" class="px-5 py-2.5 bg-gray-100 border border-gray-300 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors font-medium">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-xl transition-colors shadow-lg">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-@endif
+</div>
 
 {{-- Filter Tabs --}}
 <div class="flex gap-2 mb-6">
@@ -113,6 +188,9 @@
         </thead>
         <tbody class="divide-y divide-gray-200">
             @forelse($roles as $role)
+                @php
+                    $roleUsersCount = $role->users()->count();
+                @endphp
                 <tr class="hover:bg-amber-300/5 transition duration-300">
                     <td class="p-4">
                         <span class="font-bold text-gray-900 capitalize">{{ Str::headline($role->name) }}</span>
@@ -136,25 +214,36 @@
                         <div class="flex items-center justify-center gap-2">
 
                             {{-- VIEW --}}
-                            <a href="{{ route('admin.roles.show', $role->id) }}"
+                            <button type="button"
                                title="View Role"
+                               onclick="showViewRoleModal({
+                                   name: @js($role->name),
+                                   display_name: @js(Str::headline($role->name)),
+                                   archived: {{ $role->archived_at ? 'true' : 'false' }},
+                                   users_count: {{ $roleUsersCount }},
+                                   permissions: @js($role->permissions->pluck('name')->values())
+                               })"
                                class="w-10 h-10 flex items-center justify-center rounded-xl bg-amber-400/10 hover:bg-amber-400 text-amber-400 hover:text-black transition-all duration-200">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.641 0-8.578-3.007-9.964-7.178z"/>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
-                            </a>
+                            </button>
 
                             @if($tab !== 'archived')
                                 {{-- EDIT (active, non-admin only) --}}
                                 @if(strtolower($role->name) !== 'admin')
-                                <a href="{{ route('admin.roles.edit', $role->id) }}"
+                                <button type="button" onclick="showEditRoleModal({
+                                       id: {{ $role->id }},
+                                       display_name: @js(Str::headline($role->name)),
+                                       permissions: @js($role->permissions->pluck('name')->values())
+                                   })"
                                    title="Edit Permissions"
                                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-500/10 hover:bg-blue-500 text-blue-400 hover:text-white transition-all duration-200">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                                     </svg>
-                                </a>
+                                </button>
                                 @endif
 
                                 {{-- ARCHIVE (active, non-admin only) --}}
@@ -218,6 +307,7 @@
 
 <script>
     let pendingDeleteFormId = null;
+    const roleUpdateUrlTemplate = @js(url('admin/roles/__ROLE__'));
 
     function showDeleteModal(roleId, roleName) {
         pendingDeleteFormId = 'delete-role-form-' + roleId;
@@ -234,6 +324,74 @@
         if (pendingDeleteFormId) {
             document.getElementById(pendingDeleteFormId).submit();
         }
+    }
+
+    function showViewRoleModal(role) {
+        const title = document.getElementById('viewRoleTitle');
+        const systemName = document.getElementById('viewRoleSystemName');
+        const displayName = document.getElementById('viewRoleDisplayName');
+        const statusBadge = document.getElementById('viewRoleStatusBadge');
+        const usersCount = document.getElementById('viewRoleUsersCount');
+        const permissionCount = document.getElementById('viewRolePermissionCount');
+        const permissionsWrap = document.getElementById('viewRolePermissions');
+        const noPermissions = document.getElementById('viewRoleNoPermissions');
+        const modal = document.getElementById('viewRoleModal');
+
+        title.textContent = role.display_name || 'Role';
+        systemName.textContent = role.name || '';
+        displayName.textContent = role.display_name || role.name || '';
+        usersCount.textContent = role.users_count ?? 0;
+
+        if (role.archived) {
+            statusBadge.textContent = 'Archived';
+            statusBadge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-gray-500/10 text-gray-500 border border-gray-500/20';
+        } else {
+            statusBadge.textContent = 'Active';
+            statusBadge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-green-500/10 text-green-600 border border-green-500/20';
+        }
+
+        const permissions = Array.isArray(role.permissions) ? role.permissions : [];
+        permissionCount.textContent = permissions.length;
+        permissionsWrap.innerHTML = '';
+
+        if (permissions.length === 0) {
+            noPermissions.classList.remove('hidden');
+        } else {
+            noPermissions.classList.add('hidden');
+            permissions.forEach((permission) => {
+                const chip = document.createElement('span');
+                chip.className = 'inline-flex px-3 py-1.5 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300 border border-amber-500/10';
+                chip.textContent = permission;
+                permissionsWrap.appendChild(chip);
+            });
+        }
+
+        modal.classList.remove('hidden');
+    }
+
+    function hideViewRoleModal() {
+        document.getElementById('viewRoleModal').classList.add('hidden');
+    }
+
+    function showEditRoleModal(role) {
+        const modal = document.getElementById('editRoleModal');
+        const form = document.getElementById('editRoleForm');
+        const title = document.getElementById('editRoleTitle');
+        const checkboxes = document.querySelectorAll('[data-role-permission]');
+
+        title.textContent = 'Edit Permissions - ' + (role.display_name || 'Role');
+        form.action = roleUpdateUrlTemplate.replace('__ROLE__', String(role.id));
+
+        const currentPermissions = new Set(Array.isArray(role.permissions) ? role.permissions : []);
+        checkboxes.forEach((checkbox) => {
+            checkbox.checked = currentPermissions.has(checkbox.value);
+        });
+
+        modal.classList.remove('hidden');
+    }
+
+    function hideEditRoleModal() {
+        document.getElementById('editRoleModal').classList.add('hidden');
     }
 </script>
 @endsection
