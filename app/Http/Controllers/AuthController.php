@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Order;
+use App\Models\ReturnRequest;
+use App\Models\CourierFeedback;
 use App\Mail\TestMail;
 use App\Services\CloudinaryService;
 use Illuminate\Support\Facades\Log;
@@ -582,7 +584,17 @@ class AuthController extends Controller
 
         $order->load('items.product');
 
-        return view('user.order_detail', compact('order'));
+        $refundRequest = ReturnRequest::where('order_id', $order->id)
+            ->where('user_id', $user->id)
+            ->latest()
+            ->first();
+
+        $courierFeedback = CourierFeedback::where('order_id', $order->id)
+            ->where('user_id', $user->id)
+            ->latest()
+            ->first();
+
+        return view('user.order_detail', compact('order', 'refundRequest', 'courierFeedback'));
     }
 
     public function downloadOrderInvoice(Order $order)
@@ -905,7 +917,7 @@ class AuthController extends Controller
         if ($user->is_admin || $user->hasRole('admin')) {
             return redirect()->route('admin.admin_dashboard'); // Go to Admin Panel
         }
-        if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('deliveries.manage') || $user->can('reviews.moderate')) {
+        if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('returns.manage') || $user->can('deliveries.manage') || $user->can('reviews.moderate')) {
             return redirect()->route('admin.staff.dashboard'); // Staff dashboard
         }
 
@@ -1105,7 +1117,7 @@ class AuthController extends Controller
         if (($user->is_admin ?? false) || $user->hasRole('admin')) {
             return redirect()->route('admin.admin_dashboard')->with('success', 'Account verified!');
         }
-        if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('deliveries.manage') || $user->can('reviews.moderate')) {
+        if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('returns.manage') || $user->can('deliveries.manage') || $user->can('reviews.moderate')) {
             return redirect()->route('admin.staff.dashboard')->with('success', 'Account verified!');
         }
 
@@ -1210,7 +1222,7 @@ class AuthController extends Controller
         if (($user->is_admin ?? false) || $user->hasRole('admin')) {
             return redirect()->route('admin.admin_dashboard')->with('success', 'Account verified!');
         }
-        if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('deliveries.manage') || $user->can('reviews.moderate')) {
+        if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('returns.manage') || $user->can('deliveries.manage') || $user->can('reviews.moderate')) {
             return redirect()->route('admin.staff.dashboard')->with('success', 'Account verified!');
         }
 

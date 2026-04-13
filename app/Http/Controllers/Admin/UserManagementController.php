@@ -392,5 +392,6 @@ class UserManagementController extends Controller
     protected function ensureArchivePermissionExists(): void
     {
         Permission::firstOrCreate(['name' => 'inventory.archive']);
+        Permission::firstOrCreate(['name' => 'returns.manage']);
     }
 }

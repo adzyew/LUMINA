@@ -171,6 +171,11 @@
 
                                 <div class="flex justify-end">
                                     <div class="flex items-center gap-2">
+                                        @if($order->status === 'delivered')
+                                            <a href="{{ route('orders.refund', $order) }}" class="inline-flex items-center px-4 py-2 rounded-lg border border-amber-300 bg-amber-50 text-amber-700 font-semibold hover:bg-amber-100 transition-colors">
+                                                Request Refund
+                                            </a>
+                                        @endif
                                         <a href="{{ route('orders.invoice', $order) }}" class="inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 font-semibold hover:bg-gray-100 transition-colors">
                                             Download Invoice
                                         </a>

@@ -273,7 +273,7 @@
                 <p class="text-gray-600 text-sm leading-relaxed mb-4">Roles define what sections a staff member can access. Each role is a department (e.g. <em>Inventory Manager</em>, <em>Sales Staff</em>) with a specific set of permissions.</p>
                 <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Available Permissions</p>
                 <div class="flex flex-wrap gap-2 mb-4">
-                    @foreach(['inventory.view', 'inventory.create', 'inventory.edit', 'inventory.delete', 'sales.view', 'deliveries.manage', 'reviews.moderate'] as $perm)
+                    @foreach(['inventory.view', 'inventory.create', 'inventory.edit', 'inventory.delete', 'sales.view', 'returns.manage', 'deliveries.manage', 'reviews.moderate'] as $perm)
                         <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-600">{{ $perm }}</span>
                     @endforeach
                 </div>

@@ -26,6 +26,7 @@ class RedirectIfStaffOrAdmin
                 $user->hasRole('staff') ||
                 $user->can('inventory.view') ||
                 $user->can('sales.view') ||
+                $user->can('returns.manage') ||
                 $user->can('deliveries.manage') ||
                 $user->can('reviews.moderate')
             ) {

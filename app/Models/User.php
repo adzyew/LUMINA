@@ -98,6 +98,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(\App\Models\Review::class);
     }
 
+    public function returnRequests(): HasMany
+    {
+        return $this->hasMany(\App\Models\ReturnRequest::class);
+    }
+
+    public function courierFeedback(): HasMany
+    {
+        return $this->hasMany(\App\Models\CourierFeedback::class);
+    }
+
     public function isPrivilegedStaff(): bool
     {
         return (bool) ($this->is_admin ?? false)
@@ -105,6 +115,7 @@ class User extends Authenticatable implements MustVerifyEmail
             || $this->hasRole('staff')
             || $this->can('inventory.view')
             || $this->can('sales.view')
+            || $this->can('returns.manage')
             || $this->can('deliveries.manage')
             || $this->can('reviews.moderate');
     }

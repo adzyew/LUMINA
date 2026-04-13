@@ -69,6 +69,19 @@
         </a>
         @endcan
 
+        @can('returns.manage')
+        <a href="{{ route('admin.returns.index') }}" class="group bg-white rounded-4xl p-8 border border-gray-200 hover:border-amber-300/30 transition-all duration-300 hover:-translate-y-1 shadow-xl">
+            <div class="w-14 h-14 bg-amber-500/10 rounded-full flex items-center justify-center mb-6 border border-amber-500/20 group-hover:scale-110 transition-transform">
+                <svg class="w-7 h-7 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7.5h13.5m0 0L13.5 4.5m3 3-3 3m3 6h4.5m0 0-3-3m3 3-3 3M3 16.5h9"/></svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Returns & Refunds</h3>
+            <p class="text-gray-500 text-sm leading-relaxed mb-6">Review submitted return requests and approve or reject with admin notes.</p>
+            <span class="text-amber-300 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                Manage Returns <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+            </span>
+        </a>
+        @endcan
+
         @can('deliveries.manage')
         <a href="{{ route('admin.delivery.dashboard') }}" class="group bg-white rounded-4xl p-8 border border-gray-200 hover:border-amber-300/30 transition-all duration-300 hover:-translate-y-1 shadow-xl">
             <div class="w-14 h-14 bg-purple-500/10 rounded-full flex items-center justify-center mb-6 border border-purple-500/20 group-hover:scale-110 transition-transform">

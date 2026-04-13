@@ -24,6 +24,7 @@ class RolePermissionSeeder extends Seeder
             'inventory.archive',
             'inventory.delete',
             'sales.view',
+            'returns.manage',
             'deliveries.manage',
             'reviews.moderate',
         ];
@@ -58,8 +59,11 @@ class RolePermissionSeeder extends Seeder
             'inventory.delete',
         ]);
 
-        // Sales Staff - sales and orders
-        $salesStaff->syncPermissions(['sales.view']);
+        // Sales Staff - sales, orders, and returns
+        $salesStaff->syncPermissions([
+            'sales.view',
+            'returns.manage',
+        ]);
 
         // Delivery Staff - manage shipments
         $deliveryStaff->syncPermissions(['deliveries.manage']);
@@ -73,4 +77,3 @@ class RolePermissionSeeder extends Seeder
         });
     }
 }
-

@@ -25,7 +25,7 @@
             if (!$isAdmin) {
                 if (auth()->user()->hasRole('inventory_manager') || auth()->user()->can('inventory.view')) {
                     $staffDepartment = 'Inventory';
-                } elseif (auth()->user()->hasRole('sales_staff') || auth()->user()->can('sales.view')) {
+                } elseif (auth()->user()->hasRole('sales_staff') || auth()->user()->can('sales.view') || auth()->user()->can('returns.manage')) {
                     $staffDepartment = 'Sales';
                 } elseif (auth()->user()->hasRole('delivery_staff') || auth()->user()->can('deliveries.manage')) {
                     $staffDepartment = 'Delivery';
@@ -82,6 +82,12 @@
             <a href="{{ route('admin.sales.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.sales.index') ? 'bg-amber-300 text-black font-bold' : 'text-black hover:text-amber-600 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 Sales
+            </a>
+            @endcan
+            @can('returns.manage')
+            <a href="{{ route('admin.returns.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.returns.*') ? 'bg-amber-300 text-black font-bold' : 'text-black hover:text-amber-600 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7.5h13.5m0 0L13.5 4.5m3 3-3 3m3 6h4.5m0 0-3-3m3 3-3 3M3 16.5h9"></path></svg>
+                Returns
             </a>
             @endcan
             @endif
