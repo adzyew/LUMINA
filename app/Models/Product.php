@@ -21,11 +21,13 @@ class Product extends Model
         'is_featured',
         'image_url',
         'image_public_id',
+        'specifications',
         'archived_at',
     ];
 
     protected $casts = [
         'archived_at' => 'datetime',
+        'specifications' => 'array',
     ];
 
     protected static function booted()

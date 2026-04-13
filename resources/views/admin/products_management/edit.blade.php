@@ -65,6 +65,22 @@
                 <textarea name="description" rows="4" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 outline-none">{{ old('description', $product->description) }}</textarea>
         </div>
 
+        @php
+            $specifications = is_array($product->specifications) ? $product->specifications : [];
+            $sizeSpec = old('size_spec', (string) ($specifications['size'] ?? ''));
+            $specDetails = old('specification_details', implode("\n", collect($specifications['details'] ?? [])->filter()->all()));
+        @endphp
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-2">Product Size / Fit</label>
+                <input type="text" name="size_spec" value="{{ $sizeSpec }}" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 outline-none" placeholder="e.g. Adjustable ring, 16-18cm, 40mm case">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-2">Specification Details</label>
+                <textarea name="specification_details" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 outline-none" placeholder="One detail per line (e.g. Material: Stainless Steel)">{{ $specDetails }}</textarea>
+            </div>
+        </div>
+
         <div>
                 <label class="block text-sm font-medium text-gray-500 mb-2">Current Image</label>
             @if ($product->image_url)
@@ -84,6 +100,25 @@
                 <label class="block text-sm font-medium text-gray-500 mb-2">Add More Gallery Images</label>
                 <input type="file" name="images[]" multiple accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-amber-300 file:text-black hover:file:bg-amber-400 cursor-pointer">
                 <p class="text-xs text-gray-500 mt-1">You can upload multiple photos. Max 5MB per image.</p>
+        </div>
+
+        <input type="hidden" name="manage_gallery" value="1">
+        <div>
+            <label class="block text-sm font-medium text-gray-500 mb-2">Current Gallery</label>
+            <p class="text-xs text-gray-500 mb-3">Drag to reorder. Click remove to delete an image.</p>
+            <div id="galleryManager" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                @foreach($product->images as $galleryImage)
+                    <div class="relative group rounded-lg border border-gray-200 bg-white overflow-hidden cursor-move" draggable="true" data-image-id="{{ $galleryImage->id }}">
+                        <input type="hidden" name="existing_gallery_ids[]" value="{{ $galleryImage->id }}">
+                        <img src="{{ $galleryImage->image_url }}" alt="Gallery image" class="h-28 w-full object-cover">
+                        <button type="button" class="js-remove-gallery-image absolute top-1.5 right-1.5 h-7 w-7 rounded-full bg-red-500 text-white text-xs font-bold opacity-95 hover:bg-red-600 transition-colors" title="Remove image">
+                            ×
+                        </button>
+                        <div class="absolute bottom-1.5 left-1.5 text-[10px] px-2 py-0.5 rounded bg-black/60 text-white">Drag</div>
+                    </div>
+                @endforeach
+            </div>
+            <p id="galleryEmptyText" class="text-sm text-gray-500 mt-2 {{ $product->images->isEmpty() ? '' : 'hidden' }}">No gallery images yet.</p>
         </div>
 
             <div class="flex items-center gap-2">
@@ -148,4 +183,57 @@
 </div>
     </div>
 </div>
+
+<script>
+    (function () {
+        const manager = document.getElementById('galleryManager');
+        const emptyText = document.getElementById('galleryEmptyText');
+        if (!manager) return;
+
+        let draggingCard = null;
+
+        const refreshEmptyState = () => {
+            if (!emptyText) return;
+            emptyText.classList.toggle('hidden', manager.children.length > 0);
+        };
+
+        manager.addEventListener('click', function (event) {
+            const removeButton = event.target.closest('.js-remove-gallery-image');
+            if (!removeButton) return;
+            const card = removeButton.closest('[data-image-id]');
+            if (!card) return;
+            card.remove();
+            refreshEmptyState();
+        });
+
+        manager.addEventListener('dragstart', function (event) {
+            const card = event.target.closest('[data-image-id]');
+            if (!card) return;
+            draggingCard = card;
+            card.classList.add('opacity-60');
+            event.dataTransfer.effectAllowed = 'move';
+        });
+
+        manager.addEventListener('dragend', function () {
+            if (!draggingCard) return;
+            draggingCard.classList.remove('opacity-60');
+            draggingCard = null;
+        });
+
+        manager.addEventListener('dragover', function (event) {
+            event.preventDefault();
+            if (!draggingCard) return;
+            const targetCard = event.target.closest('[data-image-id]');
+            if (!targetCard || targetCard === draggingCard) return;
+
+            const targetRect = targetCard.getBoundingClientRect();
+            const shouldInsertAfter = event.clientY > targetRect.top + targetRect.height / 2;
+            if (shouldInsertAfter) {
+                targetCard.after(draggingCard);
+            } else {
+                targetCard.before(draggingCard);
+            }
+        });
+    })();
+</script>
 @endsection

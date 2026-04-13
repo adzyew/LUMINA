@@ -24,21 +24,29 @@
             Back to Collection
         </a>
 
-        <div class="mt-5 rounded-2xl border border-white/70 bg-white/55 backdrop-blur-sm shadow-[0_10px_30px_rgba(0,0,0,0.05)] p-4 sm:p-5 lg:p-6 lg:h-[calc(100dvh-9.5rem)]">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-7 h-full lg:items-stretch">
+        <div class="mt-5 rounded-2xl border border-white/70 bg-white/55 backdrop-blur-sm shadow-[0_10px_30px_rgba(0,0,0,0.05)] p-4 sm:p-5 lg:p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-7 items-start">
 
             {{-- LEFT COL: Product Images (Gallery) --}}
             @php
-                $gallery = collect($product->images ?? [])->pluck('image_url')->filter()->values();
-                if ($gallery->isEmpty() && ($product->image_url ?? null)) {
-                    $gallery = collect([$product->image_url]);
+                $gallery = collect();
+                if (!empty($product->image_url)) {
+                    $gallery->push($product->image_url);
                 }
+                $gallery = $gallery
+                    ->merge(collect($product->images ?? [])->pluck('image_url'))
+                    ->filter()
+                    ->unique()
+                    ->values();
                 $mainImg = $gallery->first();
+                $specifications = is_array($product->specifications) ? $product->specifications : [];
+                $sizeSpec = trim((string) ($specifications['size'] ?? ''));
+                $specDetails = collect($specifications['details'] ?? [])->map(fn ($line) => trim((string) $line))->filter()->values();
             @endphp
 
-            <div class="lg:sticky lg:top-20 h-max lg:h-full">
-                <div class="relative rounded-2xl border border-amber-100 bg-linear-to-b from-white to-stone-50 shadow-md overflow-hidden p-3 sm:p-4 h-max lg:h-full">
-                <div class="relative bg-white rounded-xl border border-gray-100 overflow-hidden flex items-center justify-center p-2.5 sm:p-3 aspect-[4/5] max-h-[70dvh] lg:aspect-auto lg:h-full group">
+            <div class="lg:sticky lg:top-20 h-max">
+                <div class="relative rounded-2xl border border-amber-100 bg-linear-to-b from-white to-stone-50 shadow-md overflow-hidden p-3 sm:p-4 h-max">
+                <div id="productImageStage" class="relative bg-white rounded-xl border border-gray-100 overflow-hidden flex items-center justify-center p-2.5 sm:p-3 aspect-4/5 max-h-[70dvh] group" style="touch-action: pan-y;">
                     @if($mainImg)
                         <img id="mainProductImage" src="{{ $mainImg }}" alt="{{ $product->name }}" class="w-full h-full object-cover rounded-xl transition-transform duration-700 group-hover:scale-[1.03]">
                     @else
@@ -49,6 +57,30 @@
 
                     @if($product->is_featured ?? false)
                         <span class="absolute top-4 left-4 px-3 py-1 bg-amber-300 text-black text-[10px] font-bold rounded-full uppercase tracking-wider shadow-md">Featured</span>
+                    @endif
+
+                    @if($gallery->count() > 1)
+                        <button type="button" onclick="prevProductImage()" class="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/90 text-gray-800 border border-gray-200 shadow hover:bg-white transition" aria-label="Previous photo">
+                            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        <button type="button" onclick="nextProductImage()" class="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/90 text-gray-800 border border-gray-200 shadow hover:bg-white transition" aria-label="Next photo">
+                            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                        <div id="productImageDots" class="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/40">
+                            @foreach($gallery as $dotIndex => $dotImage)
+                                <button
+                                    type="button"
+                                    onclick="goToProductImage({{ $dotIndex }})"
+                                    data-dot-index="{{ $dotIndex }}"
+                                    class="h-2.5 w-2.5 rounded-full transition-all {{ $dotIndex === 0 ? 'bg-white' : 'bg-white/45 hover:bg-white/80' }}"
+                                    aria-label="Go to image {{ $dotIndex + 1 }}"
+                                ></button>
+                            @endforeach
+                        </div>
                     @endif
 
                     @auth
@@ -63,21 +95,27 @@
                         </form>
                     @endauth
                 </div>
-                </div>
 
                 @if($gallery->count() > 1)
-                    <div class="mt-3 grid grid-cols-5 gap-2 overflow-x-auto pb-1">
-                        @foreach($gallery as $img)
-                            <button type="button" onclick="setMainProductImage('{{ $img }}')" class="bg-white rounded-xl border border-gray-200 hover:border-amber-400 overflow-hidden aspect-square transition-colors shadow-sm">
-                                <img src="{{ $img }}" alt="" class="w-full h-full object-cover">
+                    <div id="productImageThumbs" class="mt-3 flex items-center gap-2 overflow-x-auto pb-1">
+                        @foreach($gallery as $thumbIndex => $thumbImage)
+                            <button
+                                type="button"
+                                onclick="goToProductImage({{ $thumbIndex }})"
+                                data-thumb-index="{{ $thumbIndex }}"
+                                class="shrink-0 h-14 w-14 sm:h-16 sm:w-16 rounded-lg overflow-hidden border transition-all {{ $thumbIndex === 0 ? 'border-amber-400 ring-2 ring-amber-200' : 'border-gray-200 hover:border-amber-300' }}"
+                                aria-label="Preview image {{ $thumbIndex + 1 }}"
+                            >
+                                <img src="{{ $thumbImage }}" alt="" class="w-full h-full object-cover">
                             </button>
                         @endforeach
                     </div>
                 @endif
+                </div>
             </div>
 
             {{-- RIGHT COL: Product Details --}}
-            <div class="flex flex-col bg-white rounded-2xl border border-gray-100 shadow-md p-4 sm:p-5 lg:h-full lg:overflow-auto">
+            <div class="flex flex-col bg-white rounded-2xl border border-gray-100 shadow-md p-4 sm:p-5">
                 
                 <div class="flex flex-wrap gap-1 mb-4">
                     <span class="px-3 py-1 rounded border border-amber-500/80 text-[11px] font-semibold text-amber-700 uppercase tracking-widest bg-amber-50">
@@ -115,6 +153,22 @@
                         </ul>
                     @endif
                 </div>
+
+                @if($sizeSpec !== '' || $specDetails->isNotEmpty())
+                    <div class="mb-6 rounded-xl border border-gray-200 bg-stone-50 p-4">
+                        <p class="text-[11px] uppercase tracking-[0.18em] text-gray-500 font-semibold mb-3">Specifications</p>
+                        @if($sizeSpec !== '')
+                            <p class="text-sm text-gray-800 mb-2"><span class="font-semibold">Sizing:</span> {{ $sizeSpec }}</p>
+                        @endif
+                        @if($specDetails->isNotEmpty())
+                            <ul class="text-sm text-gray-700 list-disc pl-5 space-y-1">
+                                @foreach($specDetails as $specLine)
+                                    <li>{{ $specLine }}</li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </div>
+                @endif
 
                 <hr class="border-gray-200 mb-5">
 
@@ -300,9 +354,66 @@
     </main>
 
     <script>
+        const productGallery = @json($gallery->values());
+        let currentGalleryIndex = 0;
+
+        function updateImageDots() {
+            const dotsWrap = document.getElementById('productImageDots');
+            if (!dotsWrap || !productGallery.length) return;
+            const dots = dotsWrap.querySelectorAll('[data-dot-index]');
+            dots.forEach((dot, idx) => {
+                const active = idx === currentGalleryIndex;
+                dot.classList.toggle('bg-white', active);
+                dot.classList.toggle('w-4', active);
+                dot.classList.toggle('bg-white/45', !active);
+                dot.classList.toggle('hover:bg-white/80', !active);
+            });
+        }
+
+        function updateImageThumbs() {
+            const thumbsWrap = document.getElementById('productImageThumbs');
+            if (!thumbsWrap || !productGallery.length) return;
+            const thumbs = thumbsWrap.querySelectorAll('[data-thumb-index]');
+            thumbs.forEach((thumb, idx) => {
+                const active = idx === currentGalleryIndex;
+                thumb.classList.toggle('border-amber-400', active);
+                thumb.classList.toggle('ring-2', active);
+                thumb.classList.toggle('ring-amber-200', active);
+                thumb.classList.toggle('border-gray-200', !active);
+                thumb.classList.toggle('hover:border-amber-300', !active);
+            });
+        }
+
         function setMainProductImage(url) {
             const img = document.getElementById('mainProductImage');
-            if (img) img.src = url;
+            if (img) {
+                img.src = url;
+            }
+            const foundIndex = productGallery.indexOf(url);
+            if (foundIndex >= 0) {
+                currentGalleryIndex = foundIndex;
+                updateImageDots();
+                updateImageThumbs();
+            }
+        }
+
+        function goToProductImage(index) {
+            if (!productGallery.length) return;
+            if (index < 0 || index >= productGallery.length) return;
+            currentGalleryIndex = index;
+            setMainProductImage(productGallery[currentGalleryIndex]);
+        }
+
+        function prevProductImage() {
+            if (!productGallery.length) return;
+            currentGalleryIndex = (currentGalleryIndex - 1 + productGallery.length) % productGallery.length;
+            setMainProductImage(productGallery[currentGalleryIndex]);
+        }
+
+        function nextProductImage() {
+            if (!productGallery.length) return;
+            currentGalleryIndex = (currentGalleryIndex + 1) % productGallery.length;
+            setMainProductImage(productGallery[currentGalleryIndex]);
         }
 
         function setRating(rating) {
@@ -320,6 +431,45 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
+            if (productGallery.length > 1) {
+                updateImageDots();
+                updateImageThumbs();
+            }
+
+            const imageStage = document.getElementById('productImageStage');
+            let pointerStartX = 0;
+            let pointerStartY = 0;
+            let pointerTracking = false;
+            const swipeThreshold = 45;
+
+            if (imageStage && productGallery.length > 1) {
+                imageStage.addEventListener('pointerdown', function (event) {
+                    pointerTracking = true;
+                    pointerStartX = event.clientX;
+                    pointerStartY = event.clientY;
+                });
+
+                imageStage.addEventListener('pointerup', function (event) {
+                    if (!pointerTracking) return;
+                    pointerTracking = false;
+                    const dx = event.clientX - pointerStartX;
+                    const dy = event.clientY - pointerStartY;
+
+                    if (Math.abs(dx) < swipeThreshold) return;
+                    if (Math.abs(dx) <= Math.abs(dy)) return;
+
+                    if (dx < 0) {
+                        nextProductImage();
+                    } else {
+                        prevProductImage();
+                    }
+                });
+
+                imageStage.addEventListener('pointercancel', function () {
+                    pointerTracking = false;
+                });
+            }
+
             function showActionToast(message, tone) {
                 let toast = document.getElementById('cartToast');
                 if (!toast) {
@@ -460,8 +610,3 @@
     @include('partials.footer')
 </body>
 </html>
-
-
-
-
-

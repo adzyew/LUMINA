@@ -288,6 +288,12 @@
                     <p class="text-xs text-gray-400 mt-1">Leave empty to keep current image. Max 5MB.</p>
                 </div>
 
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-2">Add More Gallery Images</label>
+                    <input type="file" name="images[]" multiple accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-amber-300 file:text-black hover:file:bg-amber-400 cursor-pointer">
+                    <p class="text-xs text-gray-400 mt-1">Select multiple files to add more photos to this product.</p>
+                </div>
+
                 <div class="flex items-center gap-2">
                     <input type="checkbox" id="edit-is-featured" name="is_featured" value="1" class="w-4 h-4 rounded border-gray-400 bg-white text-amber-300 focus:ring-amber-300">
                     <label for="edit-is-featured" class="text-sm text-gray-700">Featured Product</label>
