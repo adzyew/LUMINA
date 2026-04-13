@@ -37,12 +37,6 @@
     </a>
 </div>
 
-@if(session('success'))
-    <div class="mb-6 bg-green-100 text-green-800 p-4 rounded-lg border border-green-200">
-        {{ session('success') }}
-    </div>
-@endif
-
 @if($filter === 'all')
 
     {{-- Staff & Admin Section --}}

@@ -9,6 +9,7 @@ use App\Models\ReturnRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class OrderExperienceController extends Controller
 {
@@ -37,6 +38,13 @@ class OrderExperienceController extends Controller
             ->latest()
             ->first();
 
+        if ($refundRequest && $refundRequest->status === 'pending') {
+            return redirect()
+                ->route('orders.show', $order)
+                ->with('toast_type', 'error')
+                ->with('toast_message', 'You already have a pending refund request. You can track its status in your order details.');
+        }
+
         return view('user.refund_request', compact('order', 'refundRequest'));
     }
 
@@ -51,10 +59,40 @@ class OrderExperienceController extends Controller
                 ->with('toast_message', 'Refund requests are available after the order is delivered.');
         }
 
+        $existingRequest = ReturnRequest::where('order_id', $order->id)
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->first();
+
+        if ($existingRequest && $existingRequest->status === 'pending') {
+            return redirect()
+                ->route('orders.show', $order)
+                ->with('toast_type', 'error')
+                ->with('toast_message', 'You already have a pending refund request for this order. Please wait for an update.');
+        }
+
         $validated = $request->validate([
             'reason' => 'required|string|max:120',
+            'other_reason' => 'required_if:reason,Other|nullable|string|max:120',
             'details' => 'nullable|string|max:2000',
+            'proof_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+        ], [
+            'other_reason.required_if' => 'Please specify the reason when selecting Others.',
+            'proof_image.max' => 'Proof image must not exceed 5MB.',
         ]);
+
+        $finalReason = $validated['reason'] === 'Other'
+            ? trim((string) ($validated['other_reason'] ?? ''))
+            : $validated['reason'];
+
+        $proofImagePath = $existingRequest?->proof_image_path;
+        if ($request->hasFile('proof_image')) {
+            if (!empty($proofImagePath)) {
+                Storage::disk('public')->delete($proofImagePath);
+            }
+
+            $proofImagePath = $request->file('proof_image')->store('refund-proofs', 'public');
+        }
 
         ReturnRequest::updateOrCreate(
             [
@@ -62,8 +100,9 @@ class OrderExperienceController extends Controller
                 'user_id' => Auth::id(),
             ],
             [
-                'reason' => $validated['reason'],
+                'reason' => $finalReason,
                 'details' => $validated['details'] ?? null,
+                'proof_image_path' => $proofImagePath,
                 'requested_amount' => $order->total_price,
                 'status' => 'pending',
                 'admin_notes' => null,
@@ -111,4 +150,3 @@ class OrderExperienceController extends Controller
             ->with('toast_message', 'Thanks for your courier feedback.');
     }
 }
-

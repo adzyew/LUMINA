@@ -13,6 +13,7 @@
         <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-gray-200 pb-6">
             <div>
                 <h1 class="text-2xl md:text-4xl font-playfair font-medium text-gray-900 mb-2">Dashboard</h1>
+                <p class="text-gray-600">Welcome back, {{ Auth::user()->first_name }}!</p>
             </div>
             <a href="{{ route('products.index') }}" class="mt-4 md:mt-0 text-amber-500 hover:text-amber-600 transition-colors text-sm font-semibold flex items-center gap-1">
                 Continue Shopping &rarr;

@@ -86,6 +86,11 @@
                             @if($refund->details)
                                 <p class="text-xs text-gray-600 mt-1 max-w-md line-clamp-3">{{ $refund->details }}</p>
                             @endif
+                            @if($refund->proof_image_path)
+                                <a href="{{ asset('storage/' . $refund->proof_image_path) }}" target="_blank" rel="noopener noreferrer" class="inline-block mt-2">
+                                    <img src="{{ asset('storage/' . $refund->proof_image_path) }}" alt="Refund proof photo" class="h-14 w-14 rounded-lg border border-gray-200 object-cover">
+                                </a>
+                            @endif
                             @if($refund->admin_notes)
                                 <p class="text-xs text-gray-500 mt-2"><span class="font-semibold">Admin note:</span> {{ $refund->admin_notes }}</p>
                             @endif
