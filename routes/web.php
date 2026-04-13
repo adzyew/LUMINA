@@ -11,6 +11,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Socialite\ProviderController;
 use App\Http\Controllers\Socialite\ProviderCallbackController;
+use App\Http\Controllers\Customers\OrderExperienceController;
 use App\Models\Feature;
 use App\Models\Product;
 
@@ -88,6 +89,9 @@ Route::middleware('customer')->group(function () {
         Route::get('/dashboard/orders', [AuthController::class, 'orders'])->name('orders.index');
         Route::get('/dashboard/orders/{order}', [AuthController::class, 'showOrder'])->name('orders.show');
         Route::get('/dashboard/orders/{order}/invoice', [AuthController::class, 'downloadOrderInvoice'])->name('orders.invoice');
+        Route::get('/dashboard/orders/{order}/refund', [OrderExperienceController::class, 'showRefundForm'])->name('orders.refund');
+        Route::post('/dashboard/orders/{order}/refund', [OrderExperienceController::class, 'storeRefund'])->name('orders.refund.store');
+        Route::post('/dashboard/orders/{order}/courier-feedback', [OrderExperienceController::class, 'storeCourierFeedback'])->name('orders.courier-feedback.store');
         Route::get('/dashboard/profile', [AuthController::class, 'showProfile'])->name('profile.show');
         Route::get('/dashboard/profile/edit', [AuthController::class, 'editProfile'])->name('profile.edit');
         Route::put('/dashboard/profile', [AuthController::class, 'updateProfile'])->name('profile.update');

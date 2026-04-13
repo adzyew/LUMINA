@@ -23,7 +23,7 @@ class StaffDashboardController extends Controller
         }
 
         $canInventory = $user->can('inventory.view');
-        $canSales = $user->can('sales.view');
+        $canSales = $user->can('sales.view') || $user->can('returns.manage');
         $canDelivery = $user->can('deliveries.manage');
         $canFeedback = $user->can('reviews.moderate');
 

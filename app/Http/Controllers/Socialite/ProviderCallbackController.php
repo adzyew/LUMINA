@@ -88,7 +88,7 @@ class ProviderCallbackController extends Controller
             if ($user->is_admin || $user->hasRole('admin')) {
                 return redirect()->route('admin.admin_dashboard'); 
             }
-            if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('deliveries.manage') || $user->can('reviews.moderate')) {
+            if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('returns.manage') || $user->can('deliveries.manage') || $user->can('reviews.moderate')) {
                 return redirect()->route('admin.staff.dashboard'); 
             }
 
