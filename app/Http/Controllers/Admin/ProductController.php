@@ -10,6 +10,27 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    private function normalizeSpecifications(Request $request): ?array
+    {
+        $size = trim((string) $request->input('size_spec', ''));
+        $detailsText = (string) $request->input('specification_details', '');
+
+        $details = collect(preg_split('/\r\n|\r|\n/', $detailsText) ?: [])
+            ->map(fn ($line) => trim((string) $line))
+            ->filter(fn ($line) => $line !== '')
+            ->values()
+            ->all();
+
+        if ($size === '' && empty($details)) {
+            return null;
+        }
+
+        return [
+            'size' => $size !== '' ? $size : null,
+            'details' => $details,
+        ];
+    }
+
     public function index(Request $request)
     {
         $filter   = $request->get('filter', 'all');
@@ -73,6 +94,8 @@ class ProductController extends Controller
      */
     public function showJson(Product $product)
     {
+        $specifications = is_array($product->specifications) ? $product->specifications : [];
+
         return response()->json([
             'id'             => $product->id,
             'name'           => $product->name,
@@ -82,6 +105,7 @@ class ProductController extends Controller
             'description'    => $product->description,
             'image_url'      => $product->image_url,
             'is_featured'    => (bool) $product->is_featured,
+            'specifications' => $specifications,
         ]);
     }
 
@@ -92,6 +116,7 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
+        $product->loadMissing('images');
         return view('admin.products_management.edit', compact('product'));
     }
 
@@ -104,6 +129,10 @@ class ProductController extends Controller
             'description'    => 'nullable|string',
             'stock_quantity' => 'required|integer|min:0',
             'image'          => 'required|image|max:10240',
+            'images'         => 'nullable|array|max:8',
+            'images.*'       => 'nullable|image|max:10240',
+            'size_spec'      => 'nullable|string|max:120',
+            'specification_details' => 'nullable|string|max:4000',
         ]);
 
         $file = $request->file('image');
@@ -115,7 +144,7 @@ class ProductController extends Controller
         try {
             $uploaded = $cloudinary->uploadImage($file->getRealPath());
 
-            Product::create([
+            $product = Product::create([
                 'name'            => $request->name,
                 'description'     => $request->description,
                 'price'           => $request->price,
@@ -124,7 +153,22 @@ class ProductController extends Controller
                 'is_featured'     => $request->boolean('is_featured'),
                 'image_url'       => $uploaded['url'],
                 'image_public_id' => $uploaded['public_id'],
+                'specifications'  => $this->normalizeSpecifications($request),
             ]);
+
+            if ($request->hasFile('images')) {
+                foreach (array_values($request->file('images')) as $offset => $extraImage) {
+                    if (!$extraImage || !$extraImage->isValid()) {
+                        continue;
+                    }
+                    $uploadedExtra = $cloudinary->uploadImage($extraImage->getRealPath());
+                    $product->images()->create([
+                        'image_url' => $uploadedExtra['url'],
+                        'image_public_id' => $uploadedExtra['public_id'],
+                        'sort_order' => $offset,
+                    ]);
+                }
+            }
 
             return redirect()->route('admin.products.index')->with('success', 'Product created successfully!');
 
@@ -142,8 +186,13 @@ class ProductController extends Controller
             'description'    => 'nullable|string',
             'stock_quantity' => 'required|integer|min:0',
             'image'          => 'nullable|image|max:5120',
-            'images'         => 'nullable|array',
+            'images'         => 'nullable|array|max:8',
             'images.*'       => 'nullable|image|max:5120',
+            'size_spec'      => 'nullable|string|max:120',
+            'specification_details' => 'nullable|string|max:4000',
+            'manage_gallery' => 'nullable|boolean',
+            'existing_gallery_ids' => 'nullable|array',
+            'existing_gallery_ids.*' => 'integer|exists:product_images,id',
         ]);
 
         if ($request->hasFile('image')) {
@@ -163,6 +212,32 @@ class ProductController extends Controller
                     'image_public_id' => $img['public_id'],
                     'sort_order'      => $start + $offset,
                 ]);
+            }
+        }
+
+        if ($request->boolean('manage_gallery')) {
+            $submittedIds = collect($request->input('existing_gallery_ids', []))
+                ->map(fn ($id) => (int) $id)
+                ->filter(fn ($id) => $id > 0)
+                ->values();
+
+            $currentImages = $product->images()->get();
+
+            $imagesToDelete = $currentImages->filter(
+                fn ($img) => !$submittedIds->contains((int) $img->id)
+            );
+
+            foreach ($imagesToDelete as $imageToDelete) {
+                if (!empty($imageToDelete->image_public_id)) {
+                    $cloudinary->deleteImage($imageToDelete->image_public_id);
+                }
+                $imageToDelete->delete();
+            }
+
+            foreach ($submittedIds as $index => $imageId) {
+                $product->images()
+                    ->where('id', $imageId)
+                    ->update(['sort_order' => $index]);
             }
         }
 
@@ -190,6 +265,7 @@ class ProductController extends Controller
             'category'       => $validated['category'] ?? null,
             'stock_quantity' => $validated['stock_quantity'],
             'is_featured'    => $request->boolean('is_featured'),
+            'specifications' => $this->normalizeSpecifications($request),
         ]);
 
         // AJAX request from the modal → return updated product as JSON

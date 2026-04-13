@@ -64,8 +64,19 @@
                 <textarea name="description" rows="4" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 outline-none" placeholder="Product details...">{{ old('description') }}</textarea>
             </div>
 
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-2">Product Size / Fit</label>
+                    <input type="text" name="size_spec" value="{{ old('size_spec') }}" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 outline-none" placeholder="e.g. Adjustable ring, 16-18cm, 40mm case">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-2">Specification Details</label>
+                    <textarea name="specification_details" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 outline-none" placeholder="One detail per line (e.g. Material: Stainless Steel)">{{ old('specification_details') }}</textarea>
+                </div>
+            </div>
+
             <div>
-                <label class="block text-sm font-medium text-gray-500 mb-2">Product Images (Gallery)</label>
+                <label class="block text-sm font-medium text-gray-500 mb-2">Primary Product Image</label>
                 <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-amber-300/50 transition-colors bg-gray-50">
                     <input type="file" name="image" required accept="image/*" onchange="previewImages(event)" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-300 file:text-black hover:file:bg-amber-400 cursor-pointer">
                     @error('image')
@@ -73,6 +84,21 @@
                     @enderror
                     <div id="previews" class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 hidden"></div>
                     <p class="text-xs text-gray-500 mt-2">Upload photo. Max 10MB per image.</p>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-500 mb-2">Additional Gallery Images (Optional)</label>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-amber-300/50 transition-colors bg-gray-50">
+                    <input type="file" name="images[]" multiple accept="image/*" onchange="previewExtraImages(event)" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-300 file:text-black hover:file:bg-amber-400 cursor-pointer">
+                    @error('images')
+                        <div class="text-red-400 mt-1 text-sm">{{ $message }}</div>
+                    @enderror
+                    @error('images.*')
+                        <div class="text-red-400 mt-1 text-sm">{{ $message }}</div>
+                    @enderror
+                    <div id="extraPreviews" class="mt-4 grid grid-cols-2 sm:grid-cols-5 gap-3 hidden"></div>
+                    <p class="text-xs text-gray-500 mt-2">Upload up to 8 extra images.</p>
                 </div>
             </div>
 
@@ -125,6 +151,43 @@ function previewImages(event) {
         img.onload = () => URL.revokeObjectURL(url);
         container.classList.remove('hidden');
         container.appendChild(img);
+    }
+
+    function previewExtraImages(event) {
+        const input = event.target;
+        const container = document.getElementById('extraPreviews');
+        container.innerHTML = '';
+
+        if (!input.files || input.files.length === 0) {
+            container.classList.add('hidden');
+            return;
+        }
+
+        const files = Array.from(input.files).slice(0, 8);
+
+        for (const file of files) {
+            if (!allowedTypes.includes(file.type)) {
+                alert(`"${file.name}" is not allowed. Only JPG, PNG, GIF, or WEBP images are accepted.`);
+                input.value = '';
+                container.classList.add('hidden');
+                return;
+            }
+            if (file.size > maxSize) {
+                alert(`"${file.name}" is too large. Max 10MB allowed.`);
+                input.value = '';
+                container.classList.add('hidden');
+                return;
+            }
+
+            const url = URL.createObjectURL(file);
+            const img = document.createElement('img');
+            img.src = url;
+            img.className = 'w-full h-28 object-cover rounded-lg border border-gray-200';
+            img.onload = () => URL.revokeObjectURL(url);
+            container.appendChild(img);
+        }
+
+        container.classList.remove('hidden');
     }
 </script>
 @endsection
