@@ -1,5 +1,17 @@
 <div class="mb-10 bg-white border border-gray-200 rounded-2xl px-6 py-3 shadow-sm">
     <div class="flex items-center justify-between gap-4">
+        @php
+            $currentUser = Auth::user();
+            $resolvedRoleLabel = $roleLabel ?? null;
+            if (!$resolvedRoleLabel && $currentUser) {
+                if ($currentUser->hasRole('admin')) {
+                    $resolvedRoleLabel = 'Administrator';
+                } else {
+                    $roleName = optional($currentUser->roles->first())->name;
+                    $resolvedRoleLabel = $roleName ? \Illuminate\Support\Str::headline($roleName) : 'Staff';
+                }
+            }
+        @endphp
         <header class="flex items-center gap-3 min-w-0">
     @include('partials.favicon')
             <h1 class="text-3xl font-playfair font-bold text-gray-900">{{ $title ?? 'Overview' }}</h1>
@@ -15,7 +27,7 @@
                 </div>
                 <div class="hidden sm:block text-left">
                     <p class="text-sm font-semibold text-gray-800 leading-tight">{{ Auth::user()->name ?? 'Staff' }}</p>
-                    <p class="text-xs text-gray-400 leading-tight">Staff</p>
+                    <p class="text-xs text-gray-400 leading-tight">{{ $resolvedRoleLabel ?? 'Staff' }}</p>
                 </div>
                 <svg id="staffProfileChevron" class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
