@@ -3,45 +3,41 @@
 @section('title', 'Feedback Moderation | Lumina')
 
 @section('content')
-<div class="max-w-7xl mx-auto">
-    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
-        <div>
-            <h1 class="text-3xl font-playfair font-bold text-gray-900">Feedback Moderation</h1>
-            <p class="text-sm text-gray-600 mt-1">Review, approve, reject, and remove customer product feedback.</p>
-        </div>
+<div class="max-w-7xl mx-auto space-y-6">
+    <header>
+        <h1 class="text-4xl font-playfair font-bold text-gray-900">Feedback Moderation</h1>
+        <p class="text-sm text-gray-600 mt-1">Review, approve, reject, and remove customer product feedback.</p>
+    </header>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+        <article class="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-4 shadow-sm">
+            <p class="text-xs uppercase tracking-wide text-blue-700 font-semibold">Total Reviews</p>
+            <p class="text-4xl font-bold text-blue-700 mt-2">{{ $totalReviews }}</p>
+        </article>
+        <article class="rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4 shadow-sm">
+            <p class="text-xs uppercase tracking-wide text-amber-700 font-semibold">Pending</p>
+            <p class="text-4xl font-bold text-amber-600 mt-2">{{ $pendingReviews }}</p>
+        </article>
+        <article class="rounded-3xl border border-rose-200 bg-gradient-to-br from-rose-50 to-white p-4 shadow-sm">
+            <p class="text-xs uppercase tracking-wide text-rose-700 font-semibold">Flagged</p>
+            <p class="text-4xl font-bold text-rose-600 mt-2">{{ $flaggedReviews }}</p>
+        </article>
+        <article class="rounded-3xl border border-green-200 bg-gradient-to-br from-green-50 to-white p-4 shadow-sm">
+            <p class="text-xs uppercase tracking-wide text-green-700 font-semibold">Approval Rate</p>
+            <p class="text-4xl font-bold text-green-600 mt-2">{{ number_format($approvalRate, 1) }}%</p>
+        </article>
+        <article class="rounded-3xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-4 shadow-sm">
+            <p class="text-xs uppercase tracking-wide text-indigo-700 font-semibold">Avg Rating</p>
+            <p class="text-4xl font-bold text-indigo-600 mt-2">{{ number_format($averageRating, 2) }}</p>
+        </article>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-        <div class="rounded-2xl border border-gray-200 bg-white p-4">
-            <p class="text-xs uppercase tracking-wide text-gray-500">Total Reviews</p>
-            <p class="text-2xl font-bold text-gray-900 mt-1">{{ $totalReviews }}</p>
-        </div>
-        <div class="rounded-2xl border border-amber-300/30 bg-amber-50 p-4">
-            <p class="text-xs uppercase tracking-wide text-amber-700">Pending</p>
-            <p class="text-2xl font-bold text-amber-800 mt-1">{{ $pendingReviews }}</p>
-        </div>
-        <div class="rounded-2xl border border-rose-300/30 bg-rose-50 p-4">
-            <p class="text-xs uppercase tracking-wide text-rose-700">Flagged</p>
-            <p class="text-2xl font-bold text-rose-800 mt-1">{{ $flaggedReviews }}</p>
-        </div>
-        <div class="rounded-2xl border border-green-300/30 bg-green-50 p-4">
-            <p class="text-xs uppercase tracking-wide text-green-700">Approval Rate</p>
-            <p class="text-2xl font-bold text-green-800 mt-1">{{ number_format($approvalRate, 1) }}%</p>
-        </div>
-        <div class="rounded-2xl border border-blue-300/30 bg-blue-50 p-4">
-            <p class="text-xs uppercase tracking-wide text-blue-700">Avg Rating</p>
-            <p class="text-2xl font-bold text-blue-800 mt-1">{{ number_format($averageRating, 2) }}</p>
-        </div>
-    </div>
+    <section class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
+        <h2 class="text-2xl font-playfair font-bold text-gray-900 mb-3">Satisfaction Trend (Last 6 Months)</h2>
+        <div id="feedbackTrendChart" class="min-h-[220px]"></div>
+    </section>
 
-    <div class="rounded-2xl border border-gray-200 bg-white p-5 mb-6">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Satisfaction Trend (Last 6 Months)</h2>
-        <div class="relative h-48">
-            <div id="feedbackTrendChart"></div>
-        </div>
-    </div>
-
-    <div class="rounded-2xl border border-gray-200 bg-white p-5 mb-6">
+    <section class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
         <form method="GET" action="{{ route('admin.feedback.index') }}" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3">
             <input type="text" name="q" value="{{ request('q') }}" placeholder="Search comment, user, product" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm">
             <select name="status" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm">
@@ -65,9 +61,9 @@
                 <a href="{{ route('admin.feedback.index') }}" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-center">Reset</a>
             </div>
         </form>
-    </div>
+    </section>
 
-    <div class="rounded-2xl border border-gray-200 bg-white overflow-hidden">
+    <section class="rounded-3xl border border-gray-200 bg-white overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
                 <thead class="bg-gray-50 text-gray-600">
@@ -82,7 +78,7 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse($reviews as $review)
-                    <tr>
+                    <tr class="hover:bg-amber-50/40 transition-colors">
                         <td class="px-4 py-4 align-top">
                             <p class="font-semibold text-gray-900">{{ $review->product->name ?? 'Unknown Product' }}</p>
                             <p class="text-xs text-gray-500">By {{ $review->user->name ?? 'Unknown User' }} ({{ $review->user->email ?? 'no-email' }})</p>
@@ -129,10 +125,11 @@
                                     @csrf
                                     @method('PATCH')
                                     <input type="hidden" name="reason" value="Flag toggled by moderator">
-                                    <button class="h-12 w-12 shrink-0 inline-flex items-center justify-center gap-1 rounded-lg text-white px-3 py-2 text-xs font-semibold transition-colors {{ $review->is_flagged ? 'bg-red-600 hover:bg-red-500' : 'bg-blue-600 hover:bg-blue-500' }}" title="{{ $review->is_flagged  }}">
+                                    <button class="h-12 w-12 shrink-0 inline-flex items-center justify-center gap-1 rounded-lg text-white px-3 py-2 text-xs font-semibold transition-colors {{ $review->is_flagged ? 'bg-red-600 hover:bg-red-500' : 'bg-blue-600 hover:bg-blue-500' }}" title="Toggle flag">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
-                                        </svg></button>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
+                                        </svg>
+                                    </button>
                                 </form>
 
                                 <button type="button" class="h-12 w-12 shrink-0 inline-flex items-center justify-center rounded-lg bg-red-600 hover:bg-red-500 text-white transition-colors" title="Reject" onclick="openModerationReasonModal('{{ route('admin.feedback.reject', $review) }}', 'Reject Review', 'Please provide the reason for rejecting this review.')">
@@ -160,7 +157,7 @@
         <div class="px-4 py-4 border-t border-gray-100">
             {{ $reviews->links() }}
         </div>
-    </div>
+    </section>
 </div>
 
 <div id="moderationReasonModal" class="fixed inset-0 z-120 hidden" aria-labelledby="moderation-reason-title" role="dialog" aria-modal="true">
@@ -186,75 +183,75 @@
 </div>
 
 <script>
-    function openModerationReasonModal(actionUrl, title, subtitle) {
-        const modal = document.getElementById('moderationReasonModal');
-        const form = document.getElementById('moderationReasonForm');
-        const input = document.getElementById('moderationReasonInput');
-        const modalTitle = document.getElementById('moderation-reason-title');
-        const modalSubtitle = document.getElementById('moderation-reason-subtitle');
+function openModerationReasonModal(actionUrl, title, subtitle) {
+    const modal = document.getElementById('moderationReasonModal');
+    const form = document.getElementById('moderationReasonForm');
+    const input = document.getElementById('moderationReasonInput');
+    const modalTitle = document.getElementById('moderation-reason-title');
+    const modalSubtitle = document.getElementById('moderation-reason-subtitle');
 
-        if (!modal || !form || !input || !modalTitle || !modalSubtitle) return;
+    if (!modal || !form || !input || !modalTitle || !modalSubtitle) return;
 
-        form.action = actionUrl;
-        modalTitle.textContent = title;
-        modalSubtitle.textContent = subtitle;
-        input.value = '';
+    form.action = actionUrl;
+    modalTitle.textContent = title;
+    modalSubtitle.textContent = subtitle;
+    input.value = '';
 
-        modal.classList.remove('hidden');
-        input.focus();
+    modal.classList.remove('hidden');
+    input.focus();
+}
+
+function closeModerationReasonModal() {
+    const modal = document.getElementById('moderationReasonModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+(function () {
+    const el = document.getElementById('feedbackTrendChart');
+    if (!el || typeof ApexCharts === 'undefined') return;
+
+    const isDark = document.documentElement.classList.contains('dark');
+    const reviewCounts = @json($trendReviewCounts);
+    const ratings = @json($trendAverageRatings);
+
+    new ApexCharts(el, {
+        chart: {
+            type: 'area',
+            height: 220,
+            toolbar: { show: false },
+            background: 'transparent',
+            animations: { enabled: false },
+        },
+        theme: { mode: isDark ? 'dark' : 'light' },
+        series: [{ name: 'Satisfaction Trend', data: ratings }],
+        xaxis: { categories: @json($trendLabels) },
+        yaxis: { min: 1, max: 5, tickAmount: 4 },
+        colors: ['#f59e0b'],
+        fill: {
+            type: 'gradient',
+            gradient: { shadeIntensity: 1, opacityFrom: 0.35, opacityTo: 0.06 },
+        },
+        stroke: { curve: 'smooth', width: 2 },
+        dataLabels: { enabled: false },
+        markers: { size: 4 },
+        legend: { show: false },
+        tooltip: {
+            custom: function ({ dataPointIndex }) {
+                const count = reviewCounts[dataPointIndex] ?? 0;
+                const value = ratings[dataPointIndex];
+                if (value === null) {
+                    return '<div style="padding:8px 12px">No approved reviews this month</div>';
+                }
+                return `<div style="padding:8px 12px">Smoothed rating: ${value} (${count} review${count === 1 ? '' : 's'})</div>`;
+            },
+        },
+    }).render();
+})();
+
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+        closeModerationReasonModal();
     }
-
-    function closeModerationReasonModal() {
-        const modal = document.getElementById('moderationReasonModal');
-        if (modal) modal.classList.add('hidden');
-    }
-
-    (function () {
-        const el = document.getElementById('feedbackTrendChart');
-        if (!el || typeof ApexCharts === 'undefined') return;
-
-        const isDark = document.documentElement.classList.contains('dark');
-        const reviewCounts = @json($trendReviewCounts);
-        const ratings = @json($trendAverageRatings);
-
-        new ApexCharts(el, {
-            chart: {
-                type: 'area',
-                height: 192,
-                toolbar: { show: false },
-                background: 'transparent',
-                animations: { enabled: false },
-            },
-            theme: { mode: isDark ? 'dark' : 'light' },
-            series: [{ name: 'Satisfaction Trend', data: ratings }],
-            xaxis: { categories: @json($trendLabels) },
-            yaxis: { min: 1, max: 5, tickAmount: 4 },
-            colors: ['#f59e0b'],
-            fill: {
-                type: 'gradient',
-                gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05 },
-            },
-            stroke: { curve: 'smooth', width: 2 },
-            dataLabels: { enabled: false },
-            markers: { size: 4 },
-            legend: { show: false },
-            tooltip: {
-                custom: function ({ dataPointIndex }) {
-                    const count = reviewCounts[dataPointIndex] ?? 0;
-                    const value = ratings[dataPointIndex];
-                    if (value === null) {
-                        return '<div style="padding:8px 12px">No approved reviews this month</div>';
-                    }
-                    return `<div style="padding:8px 12px">Smoothed rating: ${value} (${count} review${count === 1 ? '' : 's'})</div>`;
-                },
-            },
-        }).render();
-    })();
-
-    document.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape') {
-            closeModerationReasonModal();
-        }
-    });
+});
 </script>
 @endsection

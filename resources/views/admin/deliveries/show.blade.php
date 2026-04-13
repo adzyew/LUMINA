@@ -3,31 +3,26 @@
 @section('title', "Delivery #{$order->display_order_number} | Lumina Admin")
 
 @section('content')
-<div class="max-w-4xl w-full">
-    <header class="mb-8 flex justify-between items-center">
-    @include('partials.favicon')
+<div class="max-w-5xl mx-auto space-y-6">
+    <header class="flex flex-wrap justify-between gap-3 items-center">
         <div>
-            <h1 class="text-3xl font-playfair font-bold text-gray-900">Delivery #{{ $order->display_order_number }}</h1>
-            <p class="text-gray-600 text-sm mt-1">Track and update delivery status</p>
+            <h1 class="text-4xl font-playfair font-bold text-gray-900">Delivery #{{ $order->display_order_number }}</h1>
+            <p class="text-sm text-gray-600 mt-1">Track and update delivery status.</p>
         </div>
-        <a href="{{ route('admin.deliveries.index') }}" class="text-sm text-gray-600 hover:text-black">← Back to Deliveries</a>
+        <a href="{{ route('admin.deliveries.index') }}" class="px-4 py-2 rounded-xl border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-100">Back to Deliveries</a>
     </header>
 
-    @if(session('success'))
-        <div class="mb-6 bg-green-100 text-green-800 p-4 rounded-lg border border-green-200">{{ session('success') }}</div>
-    @endif
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div class="bg-white border border-gray-200 rounded-2xl p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">Delivery Details</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
+            <h2 class="text-2xl font-playfair font-bold text-gray-900 mb-4">Delivery Details</h2>
             <dl class="space-y-3 text-sm">
                 <div class="flex justify-between"><dt class="text-gray-500">Customer</dt><dd class="text-gray-900">{{ $order->user->name ?? 'Guest' }}</dd></div>
-                <div class="flex justify-between"><dt class="text-gray-500">Status</dt><dd><span class="px-2 py-1 rounded-full text-xs font-medium {{ $order->status === 'delivered' ? 'bg-green-500/20 text-green-400' : ($order->status === 'shipped' ? 'bg-purple-500/20 text-purple-400' : 'bg-indigo-500/20 text-indigo-400') }}">{{ ucfirst($order->status) }}</span></dd></div>
+                <div class="flex justify-between"><dt class="text-gray-500">Status</dt><dd><span class="px-2.5 py-1 rounded-full text-xs font-semibold {{ $order->status === 'delivered' ? 'bg-green-100 text-green-700 border border-green-200' : ($order->status === 'shipped' ? 'bg-purple-100 text-purple-700 border border-purple-200' : 'bg-indigo-100 text-indigo-700 border border-indigo-200') }}">{{ ucfirst($order->status) }}</span></dd></div>
                 <div class="flex justify-between"><dt class="text-gray-500">Tracking Number</dt><dd class="text-gray-900">{{ $order->tracking_number ?? 'Not set' }}</dd></div>
                 <div class="flex justify-between"><dt class="text-gray-500">Courier</dt><dd class="text-gray-900">{{ $order->courier_name ?? 'Not set' }}</dd></div>
                 <div class="flex justify-between"><dt class="text-gray-500">Tracking URL</dt><dd class="text-gray-900 break-all">{{ $order->tracking_url ?? 'Not set' }}</dd></div>
-                <div class="flex justify-between"><dt class="text-gray-500">Shipped At</dt><dd class="text-gray-900">{{ $order->shipped_at ? $order->shipped_at->format('M d, Y H:i') : '—' }}</dd></div>
-                <div class="flex justify-between"><dt class="text-gray-500">Delivered At</dt><dd class="text-gray-900">{{ $order->delivered_at ? $order->delivered_at->format('M d, Y H:i') : '—' }}</dd></div>
+                <div class="flex justify-between"><dt class="text-gray-500">Shipped At</dt><dd class="text-gray-900">{{ $order->shipped_at ? $order->shipped_at->format('M d, Y H:i') : '-' }}</dd></div>
+                <div class="flex justify-between"><dt class="text-gray-500">Delivered At</dt><dd class="text-gray-900">{{ $order->delivered_at ? $order->delivered_at->format('M d, Y H:i') : '-' }}</dd></div>
             </dl>
 
             <form method="POST" action="{{ route('admin.deliveries.update', $order) }}" class="mt-6 pt-6 border-t border-gray-200 space-y-4">
@@ -57,13 +52,13 @@
             </form>
         </div>
 
-        <div class="bg-white border border-gray-200 rounded-2xl p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">Order Details</h3>
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
+            <h2 class="text-2xl font-playfair font-bold text-gray-900 mb-4">Order Items</h2>
             <div class="space-y-4">
                 @forelse($order->items as $item)
                 <div class="flex justify-between py-2 border-b border-gray-100">
-                    <p class="text-gray-900">{{ $item->product->name ?? 'Product' }} × {{ $item->quantity }}</p>
-                    <p class="text-amber-300">₱{{ number_format($item->quantity * $item->unit_price, 2) }}</p>
+                    <p class="text-gray-900">{{ $item->product->name ?? 'Product' }} x {{ $item->quantity }}</p>
+                    <p class="text-amber-600 font-semibold">PHP {{ number_format($item->quantity * $item->unit_price, 2) }}</p>
                 </div>
                 @empty
                 <p class="text-gray-500">No items.</p>
@@ -71,7 +66,7 @@
             </div>
             <div class="mt-4 pt-4 border-t border-gray-200 flex justify-between">
                 <span class="text-gray-900 font-bold">Total</span>
-                <span class="text-amber-300 font-bold">₱{{ number_format($order->total_price, 2) }}</span>
+                <span class="text-amber-600 font-bold">PHP {{ number_format($order->total_price, 2) }}</span>
             </div>
         </div>
     </div>
