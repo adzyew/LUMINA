@@ -164,30 +164,40 @@ class AnalyticsController extends Controller
             $query->where('status', $request->status);
         }
 
-        $orders = $query->get();
+        $filename = 'orders-' . now()->format('Y-m-d_His') . '.csv';
 
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="orders-' . date('Y-m-d') . '.csv"',
-        ];
-
-        return response()->stream(function () use ($orders) {
+        return response()->streamDownload(function () use ($query) {
             $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['Order ID', 'Date', 'Customer', 'Email', 'Status', 'Total (₱)', 'Items']);
-
-            foreach ($orders as $order) {
-                $items = $order->items->map(fn ($i) => $i->product->name . ' x' . $i->quantity)->implode('; ');
-                fputcsv($handle, [
-                    $order->display_order_number,
-                    $order->created_at->format('Y-m-d H:i'),
-                    $order->user->name ?? 'Guest',
-                    $order->user->email ?? '',
-                    $order->status,
-                    $order->total_price,
-                    $items,
-                ]);
+            if ($handle === false) {
+                return;
             }
+
+            fputcsv($handle, ['Order ID', 'Date', 'Customer', 'Email', 'Status', 'Total (PHP)', 'Items']);
+
+            $query->chunkById(200, function ($orders) use ($handle) {
+                foreach ($orders as $order) {
+                    $items = $order->items->map(function ($item) {
+                        $name = $item->product->name ?? ('Product #' . $item->product_id);
+                        return $name . ' x' . $item->quantity;
+                    })->implode('; ');
+
+                    fputcsv($handle, [
+                        $order->display_order_number,
+                        optional($order->created_at)->format('Y-m-d H:i'),
+                        $order->user->name ?? 'Guest',
+                        $order->user->email ?? '',
+                        $order->status,
+                        number_format((float) $order->total_price, 2, '.', ''),
+                        $items,
+                    ]);
+                }
+            });
+
             fclose($handle);
-        }, 200, $headers);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate',
+            'Pragma' => 'no-cache',
+        ]);
     }
 }

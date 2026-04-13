@@ -6,7 +6,6 @@
 <div class="max-w-7xl mx-auto space-y-6">
     <header>
         <h1 class="text-4xl font-playfair font-bold text-gray-900">Returns & Refunds</h1>
-        <p class="text-sm text-gray-600 mt-1">Review customer refund requests and resolve them with clear notes.</p>
     </header>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">

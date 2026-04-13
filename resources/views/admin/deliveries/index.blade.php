@@ -6,7 +6,6 @@
 <div class="max-w-7xl mx-auto space-y-6">
     <header>
         <h1 class="text-4xl font-playfair font-bold text-gray-900">Delivery Tracking</h1>
-        <p class="text-sm text-gray-600 mt-1">Track orders in processing, shipped, or delivered.</p>
     </header>
 
     <div class="flex flex-wrap gap-2">
