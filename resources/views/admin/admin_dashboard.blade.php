@@ -6,7 +6,7 @@
 <div class="max-w-7xl mx-auto space-y-8">
     @include('admin.staff.partials.topbar', [
         'title' => 'Admin Overview',
-        'subtitle' => 'Track performance, orders, inventory, and delivery health in one place.',
+        'welcomeMessage' => 'Welcome back, Admin!',
     ])
 
     <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
@@ -33,7 +33,6 @@
                 </span>
             </div>
             <p class="mt-5 text-4xl font-bold text-gray-900">{{ number_format($totalOrders ?? 0) }}</p>
-            <p class="mt-2 text-xs text-gray-500">All-time order count</p>
         </article>
 
         <article class="rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-6 shadow-sm">
@@ -44,7 +43,6 @@
                 </span>
             </div>
             <p class="mt-5 text-4xl font-bold text-gray-900">{{ number_format($totalProducts ?? 0) }}</p>
-            <p class="mt-2 text-xs text-gray-500">Catalog items currently tracked</p>
         </article>
 
         <article class="rounded-3xl border border-violet-200 bg-gradient-to-br from-violet-50 to-white p-6 shadow-sm">
@@ -55,7 +53,6 @@
                 </span>
             </div>
             <p class="mt-5 text-4xl font-bold text-gray-900">{{ number_format($totalUsers ?? 0) }}</p>
-            <p class="mt-2 text-xs text-gray-500">Admins, staff, and customers</p>
         </article>
     </section>
 

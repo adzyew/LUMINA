@@ -6,7 +6,6 @@
 <div class="max-w-7xl mx-auto space-y-6">
     <header>
         <h1 class="text-4xl font-playfair font-bold text-gray-900">Feedback Moderation</h1>
-        <p class="text-sm text-gray-600 mt-1">Review, approve, reject, and remove customer product feedback.</p>
     </header>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">

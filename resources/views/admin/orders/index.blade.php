@@ -6,7 +6,6 @@
 <div class="max-w-7xl mx-auto space-y-6">
     <header>
         <h1 class="text-3xl font-playfair font-bold text-gray-900">Orders</h1>
-        <p class="text-gray-600 text-sm mt-1">Track and manage customer orders.</p>
     </header>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -35,7 +34,7 @@
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse min-w-[900px]">
                 <thead>
-                    <tr class="bg-gray-50 text-gray-700 border-b border-gray-200 text-sm uppercase tracking-wide">
+                    <tr class="bg-gray-50 text-gray-700 border-b border-gray-200 text-sm  tracking-wide">
                         <th class="p-4 font-semibold">Order ID</th>
                         <th class="p-4 font-semibold">Customer</th>
                         <th class="p-4 font-semibold">Payment</th>
@@ -124,7 +123,6 @@
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
         <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
             <h2 class="text-xl font-playfair font-bold text-gray-900">Order <span id="order-view-number"></span></h2>
-            <button onclick="closeOrderViewModal()" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors text-xl leading-none">&times;</button>
         </div>
         <div class="p-6 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
@@ -151,8 +149,8 @@
             </div>
         </div>
         <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
-            <button id="order-edit-btn" type="button" class="px-5 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors text-sm">Update Order</button>
             <button onclick="closeOrderViewModal()" class="px-5 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 border border-gray-200 transition-colors text-sm">Close</button>
+            <button id="order-edit-btn" type="button" class="px-5 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors text-sm">Update Order</button>
         </div>
     </div>
 </div>
@@ -161,7 +159,6 @@
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
         <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
             <h2 class="text-xl font-playfair font-bold text-gray-900">Update Order</h2>
-            <button onclick="closeOrderUpdateModal()" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors text-xl leading-none">&times;</button>
         </div>
         <form id="order-update-form" class="p-6 sm:p-8 space-y-4" onsubmit="return submitOrderUpdate(event)">
             <div>
@@ -186,8 +183,8 @@
             <div id="order-update-success" class="hidden mt-2 text-green-600 text-sm font-semibold"></div>
             <div id="order-update-error" class="hidden mt-2 text-red-600 text-sm font-semibold"></div>
             <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                <button type="submit" id="order-update-btn" class="px-5 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400">Update Order</button>
                 <button type="button" onclick="closeOrderUpdateModal()" class="px-5 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 border border-gray-200 transition-colors text-sm">Cancel</button>
+                <button type="submit" id="order-update-btn" class="px-5 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400">Update Order</button>
             </div>
         </form>
     </div>

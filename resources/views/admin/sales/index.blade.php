@@ -6,7 +6,6 @@
 <div class="max-w-7xl mx-auto space-y-6">
     <header>
         <h1 class="text-4xl font-playfair font-bold text-gray-900">Sales</h1>
-        <p class="text-sm text-gray-600 mt-1">View revenue and payment performance from completed orders.</p>
     </header>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
