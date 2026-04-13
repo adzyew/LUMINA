@@ -32,6 +32,7 @@ class ReturnRequest extends Model
         'order_id',
         'reason',
         'details',
+        'proof_image_path',
         'requested_amount',
         'status',
         'admin_notes',

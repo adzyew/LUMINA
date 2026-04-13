@@ -4,12 +4,74 @@
     Order #{{ $order->display_order_number }} | Lumina
 @endsection
 
+@php
+    $openRefundOnLoad = request()->boolean('open_refund') || $errors->hasAny(['reason', 'other_reason', 'details', 'proof_image']);
+@endphp
+
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const stars = document.querySelectorAll('input[name="rating"]');
-        if (!stars.length) return;
+        const refundModal = document.getElementById('refundRequestModal');
+        const openRefundBtn = document.getElementById('openRefundRequestModal');
+        const closeRefundButtons = document.querySelectorAll('[data-close-refund-modal]');
+        const reasonSelect = document.getElementById('refund_reason');
+        const otherReasonWrap = document.getElementById('refundOtherReasonWrap');
+        const otherReasonInput = document.getElementById('refund_other_reason');
+        const proofInput = document.getElementById('refund_proof_image');
+        const proofPreviewWrap = document.getElementById('refundProofPreviewWrap');
+        const proofPreviewImage = document.getElementById('refundProofPreviewImage');
 
+        const openRefundModal = function () {
+            if (!refundModal) return;
+            refundModal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        };
+
+        const closeRefundModal = function () {
+            if (!refundModal) return;
+            refundModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        };
+
+        if (openRefundBtn && refundModal) {
+            openRefundBtn.addEventListener('click', openRefundModal);
+        }
+
+        closeRefundButtons.forEach((button) => {
+            button.addEventListener('click', closeRefundModal);
+        });
+
+        if (reasonSelect && otherReasonWrap && otherReasonInput) {
+            const toggleOtherReason = function () {
+                const isOther = reasonSelect.value === 'Other';
+                otherReasonWrap.classList.toggle('hidden', !isOther);
+                otherReasonInput.required = isOther;
+                if (!isOther) otherReasonInput.value = '';
+            };
+
+            reasonSelect.addEventListener('change', toggleOtherReason);
+            toggleOtherReason();
+        }
+
+        if (proofInput && proofPreviewWrap && proofPreviewImage) {
+            proofInput.addEventListener('change', function () {
+                const [file] = proofInput.files || [];
+                if (!file) {
+                    proofPreviewWrap.classList.add('hidden');
+                    proofPreviewImage.src = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    proofPreviewImage.src = event.target?.result || '';
+                    proofPreviewWrap.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        const stars = document.querySelectorAll('input[name="rating"]');
         const applyStarState = () => {
             const selected = Number(document.querySelector('input[name="rating"]:checked')?.value || 0);
             stars.forEach((input) => {
@@ -26,13 +88,37 @@
             });
         };
 
-        stars.forEach((input) => input.addEventListener('change', applyStarState));
-        applyStarState();
+        if (stars.length) {
+            stars.forEach((input) => input.addEventListener('change', applyStarState));
+            applyStarState();
+        }
+
+        const shouldOpenRefund = @json($openRefundOnLoad);
+        if (shouldOpenRefund && refundModal) {
+            openRefundModal();
+        }
     });
 </script>
 @endpush
 
 @section('content')
+    @php
+        $reasonOptions = [
+            'Damaged item',
+            'Wrong item received',
+            'Missing item/part',
+            'Item not as described',
+            'Late delivery',
+            'Other',
+        ];
+
+        $isPendingRefund = (bool) ($refundRequest && $refundRequest->status === 'pending');
+        $existingReason = $refundRequest->reason ?? '';
+        $isExistingOtherReason = $existingReason !== '' && !in_array($existingReason, array_slice($reasonOptions, 0, 5), true);
+        $selectedRefundReason = old('reason', $isExistingOtherReason ? 'Other' : $existingReason);
+        $selectedOtherReason = old('other_reason', $isExistingOtherReason ? $existingReason : '');
+    @endphp
+
     <div class="container mx-auto px-4 sm:px-6 lg:px-10 py-12 max-w-6xl">
         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
             <div>
@@ -44,16 +130,25 @@
                 <h1 class="text-3xl font-playfair font-bold text-gray-900 mt-2">Order #{{ $order->display_order_number }}</h1>
                 <p class="text-gray-600 text-sm mt-1">Placed on {{ $order->created_at->format('F d, Y \a\t h:i A') }}</p>
                 <div class="mt-3 flex flex-wrap items-center gap-2">
-                    <a href="{{ route('orders.invoice', $order) }}" class="inline-flex items-center px-4 py-2 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold transition-colors">
-                        Download Invoice
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 ml-1">
+                    <a title="Download Invoice (PDF)" href="{{ route('orders.invoice', $order) }}" class="inline-flex items-center px-4 py-2 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                         </svg>
                     </a>
                     @if($order->status === 'delivered')
-                        <a href="{{ route('orders.refund', $order) }}" class="inline-flex items-center px-4 py-2 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold transition-colors">
-                            Request Refund
-                        </a>
+                    @if($isPendingRefund)
+                    <a title="View Refund Status" href="#refund-status" class="inline-flex items-center px-4 py-2 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                    </a>
+                    @else
+                    <button id="openRefundRequestModal" type="button" title="Request Refund" class="inline-flex items-center px-4 py-2 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9.75h4.875a2.625 2.625 0 0 1 0 5.25H12M8.25 9.75 10.5 7.5M8.25 9.75 10.5 12m9-7.243V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185Z" />
+                        </svg>
+                    </button>
+                    @endif
                     @endif
                 </div>
             </div>
@@ -193,7 +288,7 @@
             @endif
 
             @if($refundRequest)
-                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+                <div id="refund-status" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
                     <h2 class="text-gray-900 text-lg font-bold mb-4">Refund Request</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                         <div>
@@ -212,6 +307,11 @@
                     @if($refundRequest->details)
                         <p class="text-sm text-gray-700 mt-3">{{ $refundRequest->details }}</p>
                     @endif
+                    @if($refundRequest->proof_image_path)
+                        <a href="{{ asset('storage/' . $refundRequest->proof_image_path) }}" target="_blank" rel="noopener noreferrer" class="inline-block mt-3">
+                            <img src="{{ asset('storage/' . $refundRequest->proof_image_path) }}" alt="Refund proof photo" class="h-20 w-20 rounded-lg border border-gray-200 object-cover">
+                        </a>
+                    @endif
                     @if($refundRequest->admin_notes)
                         <div class="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">
                             <span class="font-semibold">Admin note:</span> {{ $refundRequest->admin_notes }}
@@ -221,4 +321,90 @@
             @endif
         </div>
     </div>
+
+    @if($order->status === 'delivered' && !$isPendingRefund)
+        <div id="refundRequestModal" class="fixed inset-0 z-[80] hidden" role="dialog" aria-modal="true" aria-labelledby="refund-request-title">
+            <div class="absolute inset-0 bg-black/60" data-close-refund-modal></div>
+            <div class="absolute inset-0 p-4 sm:p-6 flex items-center justify-center">
+                <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl border border-gray-200 shadow-2xl">
+                    <div class="sticky top-0 bg-white border-b border-gray-100 px-5 py-4 flex items-center justify-between">
+                        <div>
+                            <h2 id="refund-request-title" class="text-xl font-bold text-gray-900">Request Refund</h2>
+                            <p class="text-sm text-gray-500">Order #{{ $order->display_order_number }}</p>
+                        </div>
+                        <button type="button" class="w-9 h-9 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-100" data-close-refund-modal>&times;</button>
+                    </div>
+
+                    <form method="POST" action="{{ route('orders.refund.store', $order) }}" class="p-5 space-y-4" enctype="multipart/form-data">
+                        @csrf
+
+                        <div>
+                            <label for="refund_reason" class="block text-sm font-semibold text-gray-700 mb-2">Reason</label>
+                            <select id="refund_reason" name="reason" required class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-300">
+                                <option value="">Select a reason</option>
+                                @foreach($reasonOptions as $reasonOption)
+                                    <option value="{{ $reasonOption }}" {{ $selectedRefundReason === $reasonOption ? 'selected' : '' }}>{{ $reasonOption }}</option>
+                                @endforeach
+                            </select>
+                            @error('reason')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div id="refundOtherReasonWrap" class="{{ $selectedRefundReason === 'Other' ? '' : 'hidden' }}">
+                            <label for="refund_other_reason" class="block text-sm font-semibold text-gray-700 mb-2">Please specify your reason</label>
+                            <input
+                                id="refund_other_reason"
+                                name="other_reason"
+                                type="text"
+                                maxlength="120"
+                                value="{{ $selectedOtherReason }}"
+                                placeholder="Enter your reason"
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                            >
+                            @error('other_reason')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label for="refund_details" class="block text-sm font-semibold text-gray-700 mb-2">Details</label>
+                            <textarea id="refund_details" name="details" rows="4" class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-300" placeholder="Tell us what happened and why you want a refund.">{{ old('details', $refundRequest->details ?? '') }}</textarea>
+                            @error('details')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label for="refund_proof_image" class="block text-sm font-semibold text-gray-700 mb-2">Proof Photo <span class="text-gray-500 font-normal">(optional)</span></label>
+                            <input
+                                id="refund_proof_image"
+                                name="proof_image"
+                                type="file"
+                                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900"
+                            >
+                            <p class="text-xs text-gray-500 mt-1">Accepted: JPG, PNG, WEBP up to 5MB.</p>
+                            <div id="refundProofPreviewWrap" class="mt-3 hidden">
+                                <p class="text-xs text-gray-500 mb-1">Selected proof preview</p>
+                                <img id="refundProofPreviewImage" src="" alt="Selected refund proof preview" class="h-28 w-28 rounded-lg border border-gray-200 object-cover">
+                            </div>
+                            @error('proof_image')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="flex items-center justify-end gap-3 pt-2">
+                            <button type="button" data-close-refund-modal class="px-5 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-700 font-semibold hover:bg-gray-100 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit" class="px-5 py-2.5 rounded-lg bg-amber-300 text-black font-semibold hover:bg-amber-400 transition-colors">
+                                Submit Request
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection

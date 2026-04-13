@@ -233,7 +233,10 @@ class UserManagementController extends Controller
         $user->syncPermissions($request->permissions ?? []);
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'User created successfully.');
+            ->with([
+                'toast_type' => 'success',
+                'toast_message' => 'User created successfully.',
+            ]);
     }
 
     /**
@@ -355,13 +358,19 @@ class UserManagementController extends Controller
     public function archive(User $user)
     {
         if ($user->hasRole('admin')) {
-            return redirect()->back()->with('error', 'Cannot archive admin users.');
+            return redirect()->back()->with([
+                'toast_type' => 'error',
+                'toast_message' => 'Cannot archive admin users.',
+            ]);
         }
 
         $user->archived_at = Carbon::now();
         $user->save();
 
-        return redirect()->route('admin.users.index')->with('success', 'User archived.');
+        return redirect()->route('admin.users.index')->with([
+            'toast_type' => 'success',
+            'toast_message' => 'User archived.',
+        ]);
     }
 
     /**
@@ -372,7 +381,10 @@ class UserManagementController extends Controller
         $user->archived_at = null;
         $user->save();
 
-        return redirect()->route('admin.users.index')->with('success', 'User unarchived.');
+        return redirect()->route('admin.users.index')->with([
+            'toast_type' => 'success',
+            'toast_message' => 'User unarchived.',
+        ]);
     }
 
     /**
@@ -381,13 +393,19 @@ class UserManagementController extends Controller
     public function verify(User $user)
     {
         if ($user->hasRole('admin')) {
-            return redirect()->back()->with('error', 'Cannot manually verify admin users.');
+            return redirect()->back()->with([
+                'toast_type' => 'error',
+                'toast_message' => 'Cannot manually verify admin users.',
+            ]);
         }
 
         $user->email_verified_at = now();
         $user->save();
 
-        return redirect()->back()->with('success', "'{$user->name}' has been verified.");
+        return redirect()->back()->with([
+            'toast_type' => 'success',
+            'toast_message' => "'{$user->name}' has been verified.",
+        ]);
     }
 
     /**
@@ -396,13 +414,19 @@ class UserManagementController extends Controller
     public function destroy(User $user)
     {
         if ($user->hasRole('admin')) {
-            return redirect()->back()->with('error', 'Cannot delete admin users.');
+            return redirect()->back()->with([
+                'toast_type' => 'error',
+                'toast_message' => 'Cannot delete admin users.',
+            ]);
         }
 
         $user->delete();
 
         return redirect()->route('admin.users.index', ['filter' => 'archived'])
-            ->with('success', 'User permanently deleted.');
+            ->with([
+                'toast_type' => 'success',
+                'toast_message' => 'User permanently deleted.',
+            ]);
     }
 
     /**
