@@ -36,12 +36,19 @@
     <div class="container mx-auto px-4 sm:px-6 lg:px-10 py-12 max-w-6xl">
         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
             <div>
-                <a href="{{ route('orders.index') }}" class="text-gray-500 hover:text-amber-600 text-sm transition-colors">&larr; Back to Orders</a>
+                <a href="{{ route('orders.index') }}" class="text-gray-500 hover:text-amber-600 text-sm transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M11.707 4.293a1 1 0 010 1.414L8.414 9H16a1 1 0 110 2H8.414l3.293 3.293a1 1 0 01-1.414 1.414l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </a>
                 <h1 class="text-3xl font-playfair font-bold text-gray-900 mt-2">Order #{{ $order->display_order_number }}</h1>
                 <p class="text-gray-600 text-sm mt-1">Placed on {{ $order->created_at->format('F d, Y \a\t h:i A') }}</p>
                 <div class="mt-3 flex flex-wrap items-center gap-2">
-                    <a href="{{ route('orders.invoice', $order) }}" class="inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100 text-gray-800 text-sm font-semibold transition-colors">
-                        Download Invoice (PDF)
+                    <a href="{{ route('orders.invoice', $order) }}" class="inline-flex items-center px-4 py-2 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold transition-colors">
+                        Download Invoice
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 ml-1">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                        </svg>
                     </a>
                     @if($order->status === 'delivered')
                         <a href="{{ route('orders.refund', $order) }}" class="inline-flex items-center px-4 py-2 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold transition-colors">

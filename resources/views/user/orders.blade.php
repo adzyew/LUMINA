@@ -176,10 +176,10 @@
                                                 Request Refund
                                             </a>
                                         @endif
-                                        <a href="{{ route('orders.invoice', $order) }}" class="inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 font-semibold hover:bg-gray-100 transition-colors">
+                                        <a href="{{ route('orders.invoice', $order) }}" class="inline-flex items-center px-4 py-2 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold transition-colors">
                                             Download Invoice
                                         </a>
-                                        <a href="{{ route('orders.show', $order) }}" class="inline-flex items-center px-4 py-2 rounded-lg bg-amber-300 text-black font-semibold hover:bg-amber-400 transition-colors">
+                                        <a href="{{ route('orders.show', $order) }}" class="inline-flex items-center px-4 py-2 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold transition-colors">
                                         Open Full Details
                                         </a>
                                     </div>

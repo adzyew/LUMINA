@@ -76,6 +76,9 @@ class DeliveryController extends Controller
             $order->user->increment('points_balance', $pointsEarned);
         }
 
-        return redirect()->back()->with('success', 'Delivery status updated.');
+        return redirect()->back()->with([
+            'toast_type' => 'success',
+            'toast_message' => 'Delivery status updated.',
+        ]);
     }
 }
