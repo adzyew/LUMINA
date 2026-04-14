@@ -100,7 +100,7 @@
         .phone-floating-group .floating-input.phone-input {
             width: 100%;
             padding-bottom: 0.75rem;
-            padding-left: 1rem;
+            padding-left: 4rem;
             padding-right: 1rem;
             background-color: white;
             border: 1px solid rgb(229 231 235);
@@ -117,7 +117,7 @@
 
         .phone-floating-label {
             position: absolute;
-            left: 1rem;
+            left: 4rem;
             top: 50%;
             transform: translateY(-50%);
             color: rgb(156 163 175);
@@ -364,7 +364,8 @@
                                 <!-- Phone -->
                                 <div class="phone-floating-group relative">
                                     <div class="relative">
-                                        <input id="register-phone" pattern="^\+639\d{9}$" type="tel" name="phone" value="{{ old('phone') }}" placeholder=" " class="floating-input phone-input w-full py-3 leading-tight" inputmode="tel" maxlength="13">
+                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-700 font-semibold z-10">+63</span>
+                                        <input id="register-phone" pattern="^9\d{9}$" type="tel" name="phone" value="{{ old('phone') }}" placeholder=" " class="floating-input phone-input w-full py-3 pl-16  leading-tight" inputmode="numeric" maxlength="10">
                                         <label for="register-phone" class="phone-floating-label pt-1 pb-1 py-4">
                                             Phone Number
                                         </label>
@@ -507,31 +508,17 @@
         const activeTab = '{{ $activeTab ?? 'login' }}';
 
         function normalizePhilippineMobile(value) {
-            const raw = (value || '').trim();
-            const hasPlus = raw.startsWith('+');
-            const digits = raw.replace(/\D/g, '');
+            let digits = (value || '').replace(/\D/g, '');
 
-            if (/^639\d{9}$/.test(digits)) {
-                return `+${digits}`;
+            if (digits.startsWith('63')) {
+                digits = digits.slice(2);
             }
 
-            if (/^09\d{9}$/.test(digits)) {
-                return `+63${digits.slice(1)}`;
+            if (digits.startsWith('0')) {
+                digits = digits.slice(1);
             }
 
-            if (/^9\d{9}$/.test(digits)) {
-                return `+63${digits}`;
-            }
-
-            if (/^63\d{0,10}$/.test(digits)) {
-                return `+${digits}`;
-            }
-
-            if (hasPlus) {
-                return `+${digits.slice(0, 12)}`;
-            }
-
-            return digits.slice(0, 12);
+            return digits.slice(0, 10);
         }
 
         function showTab(tab) {
@@ -605,10 +592,7 @@
 
             const normalizeAndLimitPhilippineMobile = (value) => {
                 const normalized = normalizePhilippineMobile(value || '');
-                if (normalized.startsWith('+')) {
-                    return `+${normalized.replace(/\D/g, '').slice(0, 12)}`;
-                }
-                return normalized.replace(/\D/g, '').slice(0, 12);
+                return normalized.replace(/\D/g, '').slice(0, 10);
             };
 
             const sanitizeNameInput = (value) => (value || '')
@@ -631,14 +615,14 @@
                     return false;
                 }
 
-                const isValid = /^\+639\d{9}$/.test(phoneValue);
+                const isValid = /^9\d{9}$/.test(phoneValue);
                 phoneValidityLabel.classList.remove('hidden');
 
                 if (isValid) {
                     phoneValidityLabel.textContent = 'Valid Philippine number.';
                     phoneValidityLabel.className = 'text-xs mt-2 text-green-600';
                 } else {
-                    phoneValidityLabel.textContent = 'Use +639XXXXXXXXX.';
+                    phoneValidityLabel.textContent = 'Use exactly 10 digits: 9XXXXXXXXX.';
                     phoneValidityLabel.className = 'text-xs mt-2 text-red-500';
                 }
 
@@ -654,7 +638,7 @@
                 const password = registerPassword ? (registerPassword.value || '') : '';
                 const confirmPassword = registerPasswordConfirm ? (registerPasswordConfirm.value || '') : '';
                 const passwordsMatch = password.length > 0 && confirmPassword.length > 0 && password === confirmPassword;
-                const phoneValid = registerPhone ? /^\+639\d{9}$/.test(registerPhone.value || '') : false;
+                const phoneValid = registerPhone ? /^9\d{9}$/.test(registerPhone.value || '') : false;
 
                 signupBtn.disabled = !(termsAccepted && passwordsMatch && phoneValid);
             }
@@ -803,10 +787,16 @@
                             suffixInput.value = sanitizeSuffixInput(suffixInput.value).trim();
                         }
                         registerPhone.value = normalizeAndLimitPhilippineMobile(registerPhone.value);
+                        if (/^9\d{9}$/.test(registerPhone.value)) {
+                            registerPhone.value = `+63${registerPhone.value}`;
+                        }
                     });
                 }
             }
 
+            if (registerPhone) {
+                registerPhone.value = normalizeAndLimitPhilippineMobile(registerPhone.value);
+            }
             updatePhoneValidityState();
             updateSignupButtonState();
         });

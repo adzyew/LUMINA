@@ -379,7 +379,7 @@ class AuthController extends Controller
             'middle_name' => ['nullable', 'string', 'max:30', 'regex:/^[\pL\s]+$/u'],
             'last_name' => ['required', 'string', 'max:30', 'regex:/^[\pL\s]+$/u'],
             'suffix' => ['nullable', 'string', 'max:20', 'regex:/^[\pL\pN\s\.\-]+$/u'],
-            'phone' => ['required', 'regex:/^(?:\\+63|0)9\\d{9}$/'],
+            'phone' => ['required', 'regex:/^(?:\\+63|0)?9\\d{9}$/'],
             'email' => 'required|email|unique:users',
             'otp_channel' => 'nullable|in:email,sms',
             'password' => [
@@ -399,7 +399,7 @@ class AuthController extends Controller
             'suffix.regex' => 'Suffix contains invalid characters.',
             'password.min' => 'Password must be at least 8 characters.',
             'password.regex' => 'Password must include uppercase, lowercase, and a number.',
-            'phone.regex' => 'Please enter a valid Philippine mobile number (e.g. +639171234567 or 09171234567).',
+            'phone.regex' => 'Please enter a valid Philippine mobile number (e.g. 9171234567).',
         ]);
 
         $fullName = $this->buildFullName(
@@ -416,7 +416,7 @@ class AuthController extends Controller
             'middle_name' => trim((string) $request->input('middle_name')),
             'last_name' => trim((string) $request->input('last_name')),
             'suffix' => trim((string) $request->input('suffix')),
-            'phone' => $request->phone,
+            'phone' => $this->normalizeToPhE164((string) $request->phone),
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ];
@@ -1095,11 +1095,6 @@ class AuthController extends Controller
         $user->save();
 
         // ✅ B. Log the User In
-        Auth::login($user);
-        $request->session()->regenerate();
-        $this->rememberActiveSession($user, $request->session()->getId());
-        $this->restoreCartAfterLogin($request, $user);
-
         // ✅ C. Clean Up
         Cache::forget('otp_' . $email);
         Cache::forget('otp_expires_' . $email);
@@ -1107,21 +1102,16 @@ class AuthController extends Controller
         Cache::forget($attemptsKey);
         Cache::forget($lockKey);
         Cache::forget('pending_registration_' . $email);
-        session(['otp_verified' => true]);
         // Clear the `email` session key used while verifying
         $request->session()->forget(['email', 'otp_channel', 'otp_recipient', 'firebase_phone_e164', 'firebase_sms_nonce']);
 
         Log::info('verifyOtp success: user verified', ['email' => $email, 'user_id' => $user->id]);
 
         // ✅ D. Redirect based on role
-        if (($user->is_admin ?? false) || $user->hasRole('admin')) {
-            return redirect()->route('admin.admin_dashboard')->with('success', 'Account verified!');
-        }
-        if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('returns.manage') || $user->can('deliveries.manage') || $user->can('reviews.moderate')) {
-            return redirect()->route('admin.staff.dashboard')->with('success', 'Account verified!');
-        }
-
-        return redirect()->route('dashboard')->with('success', 'Account verified!');
+        return redirect()->route('login')->with([
+            'toast_type' => 'success',
+            'toast_message' => 'Account verified successfully. Please log in to continue.',
+        ]);
     }
 
     return back()->with('error', 'User not found.');
@@ -1205,10 +1195,6 @@ class AuthController extends Controller
         $user->email_verified_at = now();
         $user->save();
 
-        Auth::login($user);
-        $request->session()->regenerate();
-        $this->rememberActiveSession($user, $request->session()->getId());
-        $this->restoreCartAfterLogin($request, $user);
 
         Cache::forget('otp_' . $email);
         Cache::forget('otp_expires_' . $email);
@@ -1216,17 +1202,12 @@ class AuthController extends Controller
         Cache::forget('otp_attempts_' . $email);
         Cache::forget('otp_lock_until_' . $email);
         Cache::forget('pending_registration_' . $email);
-        session(['otp_verified' => true]);
         $request->session()->forget(['email', 'otp_channel', 'otp_recipient', 'firebase_phone_e164', 'firebase_sms_nonce']);
 
-        if (($user->is_admin ?? false) || $user->hasRole('admin')) {
-            return redirect()->route('admin.admin_dashboard')->with('success', 'Account verified!');
-        }
-        if ($user->can('inventory.view') || $user->can('sales.view') || $user->can('returns.manage') || $user->can('deliveries.manage') || $user->can('reviews.moderate')) {
-            return redirect()->route('admin.staff.dashboard')->with('success', 'Account verified!');
-        }
-
-        return redirect()->route('dashboard')->with('success', 'Account verified!');
+        return redirect()->route('login')->with([
+            'toast_type' => 'success',
+            'toast_message' => 'Account verified successfully. Please log in to continue.',
+        ]);
     }
 
     private function incrementOtpAttempts(string $attemptsKey): int

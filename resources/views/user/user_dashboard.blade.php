@@ -104,7 +104,7 @@
             </div>
             <p class="text-gray-900 font-bold text-lg mb-1">No orders found</p>
             <p class="text-gray-600 mb-6">You haven't purchased any luxury items yet.</p>
-            <a href="{{ route('collection') }}" class="px-6 py-3 bg-amber-300 text-black font-bold rounded-full hover:bg-amber-400 transition-colors">
+            <a href="{{ route('products.index') }}" class="px-6 py-3 bg-amber-300 text-black font-bold rounded-full hover:bg-amber-400 transition-colors">
                 Browse Collection
             </a>
         </div>
