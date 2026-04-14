@@ -6,7 +6,7 @@
     <div class="container mx-auto px-4 sm:px-6 lg:px-4 py-10 max-w-7xl">
         <div class="flex items-center justify-between gap-3 mb-6">
             <h1 class="text-3xl font-playfair font-bold text-gray-900">Help & Support</h1>
-            <a href="{{ route('collection') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-300 text-black font-semibold hover:bg-amber-400 transition-colors">
+            <a href="{{ route('products.index') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-300 text-black font-semibold hover:bg-amber-400 transition-colors">
                 Continue Shopping
             </a>
         </div>

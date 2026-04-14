@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\PaymentController;
@@ -59,7 +58,10 @@ Route::middleware('customer')->group(function () {
     // Public browsing
     Route::get('/', [HomeController::class, 'index']);
     Route::get('/home', [HomeController::class, 'index'])->name('home');
-    Route::get('/collection', [CollectionController::class, 'index'])->name('collection');
+    // Legacy collection URL kept for backward compatibility.
+    Route::get('/collection', function () {
+        return redirect()->route('products.index', request()->query());
+    })->name('collection');
     Route::get('/products', [ProductsController::class, 'index'])->name('products.index');
     Route::get('/products/{product}', [ProductsController::class, 'show'])->name('products.show');
 

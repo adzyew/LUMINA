@@ -249,7 +249,7 @@
             @empty
                 <div class="col-span-full text-center py-20">
                     <p class="text-white font-bold text-lg mb-4">No products found.</p>
-                    <a href="{{ route('collection') }}" class="text-amber-600 hover:text-amber-700 font-semibold">View all products</a>
+                    <a href="{{ route('products.index') }}" class="text-amber-600 hover:text-amber-700 font-semibold">View all products</a>
                 </div>
             @endforelse
         </div>

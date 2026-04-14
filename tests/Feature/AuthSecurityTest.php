@@ -11,7 +11,7 @@ class AuthSecurityTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_verify_otp_regenerates_the_session_before_authenticating(): void
+    public function test_verify_otp_redirects_to_login_without_auto_authenticating(): void
     {
         $user = User::factory()->create([
             'email' => 'customer@example.com',
@@ -29,15 +29,12 @@ class AuthSecurityTest extends TestCase
             ->post(route('verify.otp'), [
                 'code' => ['1', '2', '3', '4', '5', '6'],
             ])
-            ->assertRedirect(route('dashboard'))
-            ->assertSessionMissing('email');
+            ->assertRedirect(route('login'))
+            ->assertSessionMissing('email')
+            ->assertSessionHas('toast_type', 'success');
 
-        $this->assertAuthenticatedAs($user);
-        $this->assertNotSame(
-            'fixed-session-id',
-            app('session')->getId(),
-            'OTP verification should rotate the session identifier.'
-        );
+        $this->assertGuest();
+        $this->assertTrue((bool) $user->fresh()?->is_verified);
     }
 
     public function test_forgot_password_does_not_reveal_whether_an_email_exists(): void
