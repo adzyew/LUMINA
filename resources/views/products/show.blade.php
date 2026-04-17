@@ -277,14 +277,28 @@
             {{-- Reviews List --}}
             <div class="space-y-8">
                 @forelse($reviews ?? [] as $review)
+                    @php
+                        $reviewerName = $review->user->name ?? 'Anonymous';
+                        $reviewerPhoto = $review->user->profile_photo_url ?? null;
+                        $reviewerInitials = collect(explode(' ', trim($reviewerName)))
+                            ->filter()
+                            ->map(fn ($part) => strtoupper(substr($part, 0, 1)))
+                            ->take(2)
+                            ->implode('');
+                        $reviewerInitials = $reviewerInitials !== '' ? $reviewerInitials : 'U';
+                    @endphp
                     <div class="pb-8 border-b border-gray-100 last:border-0 last:pb-0">
                         <div class="flex items-start justify-between mb-4">
                             <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 font-bold text-lg border border-amber-200">
-                                    {{ strtoupper(substr($review->user->name ?? 'U', 0, 1)) }}
-                                </div>
+                                @if($reviewerPhoto)
+                                    <img src="{{ $reviewerPhoto }}" alt="{{ $reviewerName }}" class="w-12 h-12 rounded-full object-cover border border-amber-200">
+                                @else
+                                    <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 font-bold text-lg border border-amber-200">
+                                        {{ $reviewerInitials }}
+                                    </div>
+                                @endif
                                 <div>
-                                    <p class="font-bold text-gray-900 text-lg">{{ $review->user->name ?? 'Anonymous' }}</p>
+                                    <p class="font-bold text-gray-900 text-lg">{{ $reviewerName }}</p>
                                     <p class="text-sm text-gray-500">{{ $review->created_at->diffForHumans() }}</p>
                                 </div>
                             </div>

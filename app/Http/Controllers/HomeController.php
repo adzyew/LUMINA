@@ -13,10 +13,12 @@ class HomeController extends Controller
     {
         $featuredProducts = Product::where('is_featured', 1)
             ->withAvg(['reviews' => function ($query) {
-                $query->where('status', 'approved');
+                $query->where('status', 'approved')
+                    ->where('is_flagged', false);
             }], 'rating')
             ->withCount(['reviews' => function ($query) {
-                $query->where('status', 'approved');
+                $query->where('status', 'approved')
+                    ->where('is_flagged', false);
             }])
             ->latest()
             ->take(6)
@@ -24,12 +26,13 @@ class HomeController extends Controller
         $heroSlides = Product::whereNotNull('image_url')->inRandomOrder()->take(6)->get();
         $customerReviews = Review::query()
             ->approved()
+            ->where('is_flagged', false)
             ->whereNotNull('comment')
             ->whereRaw("TRIM(comment) <> ''")
             ->with(['user:id,name', 'product:id,name'])
             ->latest('moderated_at')
             ->latest()
-            ->take(3)
+            ->take(12)
             ->get();
 
         return view('welcome', compact('featuredProducts', 'heroSlides', 'customerReviews'));
@@ -41,39 +44,47 @@ class HomeController extends Controller
     {
         $featuredProducts = Product::where('is_featured', 1)
             ->withAvg(['reviews' => function ($query) {
-                $query->where('status', 'approved');
+                $query->where('status', 'approved')
+                    ->where('is_flagged', false);
             }], 'rating')
             ->withCount(['reviews' => function ($query) {
-                $query->where('status', 'approved');
+                $query->where('status', 'approved')
+                    ->where('is_flagged', false);
             }])
             ->latest()
             ->take(8)
             ->get();
         if ($featuredProducts->isEmpty()) {
             $featuredProducts = Product::withAvg(['reviews' => function ($query) {
-                $query->where('status', 'approved');
+                $query->where('status', 'approved')
+                    ->where('is_flagged', false);
             }], 'rating')
                 ->withCount(['reviews' => function ($query) {
-                    $query->where('status', 'approved');
+                    $query->where('status', 'approved')
+                        ->where('is_flagged', false);
                 }])
                 ->inRandomOrder()
                 ->take(8)
                 ->get();
         }
         $latestProducts = Product::withAvg(['reviews' => function ($query) {
-            $query->where('status', 'approved');
+            $query->where('status', 'approved')
+                ->where('is_flagged', false);
         }], 'rating')
             ->withCount(['reviews' => function ($query) {
-                $query->where('status', 'approved');
+                $query->where('status', 'approved')
+                    ->where('is_flagged', false);
             }])
             ->latest()
             ->take(8)
             ->get();
         $browseProducts = Product::withAvg(['reviews' => function ($query) {
-            $query->where('status', 'approved');
+            $query->where('status', 'approved')
+                ->where('is_flagged', false);
         }], 'rating')
             ->withCount(['reviews' => function ($query) {
-                $query->where('status', 'approved');
+                $query->where('status', 'approved')
+                    ->where('is_flagged', false);
             }])
             ->inRandomOrder()
             ->take(12)
@@ -81,12 +92,13 @@ class HomeController extends Controller
         $heroSlides = Product::whereNotNull('image_url')->inRandomOrder()->take(6)->get();
         $customerReviews = Review::query()
             ->approved()
+            ->where('is_flagged', false)
             ->whereNotNull('comment')
             ->whereRaw("TRIM(comment) <> ''")
             ->with(['user:id,name', 'product:id,name'])
             ->latest('moderated_at')
             ->latest()
-            ->take(3)
+            ->take(12)
             ->get();
 
         return view('welcome', compact('featuredProducts', 'latestProducts', 'browseProducts', 'heroSlides', 'customerReviews'));
