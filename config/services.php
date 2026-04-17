@@ -68,7 +68,7 @@ return [
         'messaging_sender_id' => env('FIREBASE_MESSAGING_SENDER_ID'),
         'app_check_site_key' => env('FIREBASE_APP_CHECK_SITE_KEY'),
         'app_check_debug_token' => env('FIREBASE_APP_CHECK_DEBUG_TOKEN'),
-        'enable_app_check' => env('FIREBASE_ENABLE_APP_CHECK', false),
+        'enable_app_check' => filter_var(env('FIREBASE_ENABLE_APP_CHECK', false), FILTER_VALIDATE_BOOL),
     ],
     
 
