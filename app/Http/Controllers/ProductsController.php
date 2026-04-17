@@ -57,7 +57,8 @@ class ProductsController extends Controller
         $reviews = $product->reviews()
             ->with('user')
             ->where(function ($query) {
-                $query->where('status', 'approved');
+                $query->where('status', 'approved')
+                    ->where('is_flagged', false);
 
                 if (Auth::check()) {
                     $query->orWhere(function ($ownQuery) {
@@ -69,7 +70,10 @@ class ProductsController extends Controller
             ->latest()
             ->paginate(5);
 
-        $averageRating = (float) ($product->reviews()->where('status', 'approved')->avg('rating') ?? 0);
+        $averageRating = (float) ($product->reviews()
+            ->where('status', 'approved')
+            ->where('is_flagged', false)
+            ->avg('rating') ?? 0);
         /** @var \App\Models\User|null $currentUser */
         $currentUser = Auth::user();
         $isWishlisted = $currentUser ? $currentUser->wishlist()->where('product_id', $product->id)->exists() : false;
@@ -88,10 +92,12 @@ class ProductsController extends Controller
                 $query->whereRaw('LOWER(category) = ?', [strtolower((string) $product->category)]);
             })
             ->withAvg(['reviews' => function ($query) {
-                $query->where('status', 'approved');
+                $query->where('status', 'approved')
+                    ->where('is_flagged', false);
             }], 'rating')
             ->withCount(['reviews' => function ($query) {
-                $query->where('status', 'approved');
+                $query->where('status', 'approved')
+                    ->where('is_flagged', false);
             }])
             ->inRandomOrder()
             ->take(4)
@@ -102,10 +108,12 @@ class ProductsController extends Controller
                 ->where('id', '!=', $product->id)
                 ->whereNotIn('id', $relatedProducts->pluck('id'))
                 ->withAvg(['reviews' => function ($query) {
-                    $query->where('status', 'approved');
+                    $query->where('status', 'approved')
+                        ->where('is_flagged', false);
                 }], 'rating')
                 ->withCount(['reviews' => function ($query) {
-                    $query->where('status', 'approved');
+                    $query->where('status', 'approved')
+                        ->where('is_flagged', false);
                 }])
                 ->inRandomOrder()
                 ->take(4 - $relatedProducts->count())

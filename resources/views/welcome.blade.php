@@ -55,6 +55,34 @@
             opacity: 1;
             transform: scale(1);
         }
+        .testimonials-swiper-track {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .testimonials-swiper-track::-webkit-scrollbar {
+            display: none;
+        }
+        .testimonials-center {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+        }
+        .testimonials-center .testimonial-card {
+            width: min(100%, 30rem);
+        }
+        .testimonials-swipe {
+            display: flex;
+            gap: 1.5rem;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            padding: 0 0.25rem 0.5rem;
+        }
+        .testimonials-swipe .testimonial-card {
+            flex: 0 0 min(86vw, 420px);
+            scroll-snap-align: start;
+        }
         </style>
     </head>
 <body class="bg-gray-50 text-gray-900 antialiased">
@@ -325,10 +353,11 @@
     <section class="py-20 bg-gray-50 scroll-fade-in">
         <div class="container mx-auto px-4 sm:px-6">
             <h2 class="text-3xl font-playfair font-bold text-gray-900 text-center mb-12 scroll-scale">What Our Customers Say</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div id="testimonialsContainer" class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
                 @forelse(($customerReviews ?? collect()) as $review)
                     @php
                         $customerName = $review->user->name ?? 'Verified Customer';
+                        $profilePhotoUrl = $review->user->profile_photo_url ?? null;
                         $initials = collect(explode(' ', trim($customerName)))
                             ->filter()
                             ->map(fn ($part) => strtoupper(substr($part, 0, 1)))
@@ -337,7 +366,7 @@
                         $initials = $initials !== '' ? $initials : 'VC';
                         $rating = (int) ($review->rating ?? 0);
                     @endphp
-                    <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
+                    <div class="testimonial-card bg-white rounded-xl p-8 shadow-sm border border-gray-100">
                         <div class="flex gap-1 mb-4">
                             @for($star = 1; $star <= 5; $star++)
                                 <svg class="w-4 h-4 {{ $star <= $rating ? 'text-amber-400' : 'text-gray-300' }}" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -347,7 +376,11 @@
                         </div>
                         <p class="text-gray-600 mb-6 leading-relaxed">"{{ \Illuminate\Support\Str::limit($review->comment, 190) }}"</p>
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-amber-200 rounded-full flex items-center justify-center font-bold text-gray-900">{{ $initials }}</div>
+                            @if($profilePhotoUrl)
+                                <img src="{{ $profilePhotoUrl }}" alt="{{ $customerName }}" class="w-12 h-12 rounded-full object-cover border border-amber-200">
+                            @else
+                                <div class="w-12 h-12 bg-amber-200 rounded-full flex items-center justify-center font-bold text-gray-900">{{ $initials }}</div>
+                            @endif
                             <div>
                                 <p class="font-semibold text-gray-900">{{ $customerName }}</p>
                                 <p class="text-sm text-gray-500">
@@ -426,6 +459,71 @@
                 autoplay: { delay: 4000, disableOnInteraction: false },
                 allowTouchMove: false,
             });
+
+            const testimonialsContainer = document.getElementById('testimonialsContainer');
+            if (testimonialsContainer) {
+                const testimonialCards = Array.from(testimonialsContainer.querySelectorAll('.testimonial-card'));
+                const count = testimonialCards.length;
+
+                // 1–2 cards: center them.
+                if (count > 0 && count < 3) {
+                    testimonialsContainer.className = 'max-w-6xl mx-auto testimonials-center';
+                }
+
+                // 4+ cards: guaranteed auto-swipe carousel (library-independent).
+                if (count > 3) {
+                    testimonialsContainer.className = 'max-w-6xl mx-auto testimonials-swiper-track';
+                    testimonialsContainer.style.display = 'flex';
+                    testimonialsContainer.style.gap = '24px';
+                    testimonialsContainer.style.overflowX = 'auto';
+                    testimonialsContainer.style.scrollSnapType = 'x mandatory';
+                    testimonialsContainer.style.paddingBottom = '8px';
+                    testimonialsContainer.style.scrollBehavior = 'smooth';
+
+                    testimonialCards.forEach((card) => {
+                        card.style.flex = '0 0 min(86vw, 420px)';
+                        card.style.scrollSnapAlign = 'start';
+                    });
+
+                    const getStep = () => {
+                        const firstCard = testimonialCards[0];
+                        if (!firstCard) return 0;
+                        return firstCard.getBoundingClientRect().width + 24;
+                    };
+
+                    let autoSwipeTimer = null;
+                    const startAutoSwipe = () => {
+                        if (autoSwipeTimer) return;
+                        autoSwipeTimer = setInterval(() => {
+                            const step = getStep();
+                            if (step <= 0) return;
+
+                            const maxScrollLeft = testimonialsContainer.scrollWidth - testimonialsContainer.clientWidth;
+                            if (maxScrollLeft <= 4) return;
+
+                            const nextLeft = testimonialsContainer.scrollLeft + step;
+                            if (nextLeft >= maxScrollLeft - 8) {
+                                testimonialsContainer.scrollTo({ left: 0, behavior: 'smooth' });
+                            } else {
+                                testimonialsContainer.scrollTo({ left: nextLeft, behavior: 'smooth' });
+                            }
+                        }, 5000);
+                    };
+
+                    const stopAutoSwipe = () => {
+                        if (!autoSwipeTimer) return;
+                        clearInterval(autoSwipeTimer);
+                        autoSwipeTimer = null;
+                    };
+
+                    testimonialsContainer.addEventListener('mouseenter', stopAutoSwipe);
+                    testimonialsContainer.addEventListener('mouseleave', startAutoSwipe);
+                    testimonialsContainer.addEventListener('touchstart', stopAutoSwipe, { passive: true });
+                    testimonialsContainer.addEventListener('touchend', startAutoSwipe, { passive: true });
+
+                    startAutoSwipe();
+                }
+            }
 
             // Scroll Animation Observer
             const observerOptions = {
