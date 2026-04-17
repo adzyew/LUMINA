@@ -224,10 +224,25 @@
                 let confirmationResult = null;
                 let recaptchaVerifier = null;
                 let recaptchaWidgetId = null;
+                let recaptchaContainerVersion = 0;
 
                 const firebaseErrorMessage = (error) => {
-                    const code = (error && error.code) ? String(error.code) : '';
-                    const fallback = 'SMS verification failed. Please try again.';
+                    const explicitCode = (error && error.code) ? String(error.code) : '';
+                    const rawMessage = (error && error.message) ? String(error.message).toLowerCase() : '';
+                    const inferredCode = explicitCode || (
+                        rawMessage.includes('too-many-requests') ? 'auth/too-many-requests' :
+                        rawMessage.includes('invalid-app-credential') ? 'auth/invalid-app-credential' :
+                        rawMessage.includes('firebase-app-check-token-is-invalid') ? 'auth/firebase-app-check-token-is-invalid' :
+                        rawMessage.includes('captcha-check-failed') ? 'auth/captcha-check-failed' :
+                        rawMessage.includes('network-request-failed') ? 'auth/network-request-failed' :
+                        rawMessage.includes('quota-exceeded') ? 'auth/quota-exceeded' :
+                        rawMessage.includes('invalid-phone-number') ? 'auth/invalid-phone-number' :
+                        rawMessage.includes('session-expired') ? 'auth/session-expired' :
+                        rawMessage.includes('invalid-verification-code') ? 'auth/invalid-verification-code' :
+                        rawMessage.includes('code-expired') ? 'auth/code-expired' :
+                        ''
+                    );
+                    const fallback = 'Unable to send SMS OTP right now. Please try again shortly, or use Email OTP.';
                     const map = {
                         'auth/invalid-app-credential': 'Security check expired. Please tap "Send SMS Code" again.',
                         'auth/firebase-app-check-token-is-invalid': 'App security check failed. Please try again in a moment.',
@@ -244,8 +259,8 @@
                         'auth/argument-error': 'Invalid verification request. Please try again.',
                     };
 
-                    if (code && map[code]) {
-                        return map[code];
+                    if (inferredCode && map[inferredCode]) {
+                        return map[inferredCode];
                     }
                     return fallback;
                 };
@@ -258,12 +273,14 @@
                 const isTooManyRequests = (error) => (error && error.code) === 'auth/too-many-requests';
                 const shouldRebuildRecaptcha = (error) => {
                     const code = (error && error.code) ? String(error.code) : '';
+                    const message = (error && error.message) ? String(error.message).toLowerCase() : '';
                     return [
                         'auth/invalid-app-credential',
+                        'auth/firebase-app-check-token-is-invalid',
                         'auth/captcha-check-failed',
                         'auth/session-expired',
                         'auth/argument-error',
-                    ].includes(code);
+                    ].includes(code) || message.includes('already been rendered');
                 };
                 const fallbackToEmailOtp = async () => {
                     const response = await fetch(emailFallbackUrl, {
@@ -287,6 +304,11 @@
 
                 const buildRecaptchaVerifier = async () => {
                     const container = document.getElementById('firebase-recaptcha');
+                    if (!container) {
+                        throw new Error('reCAPTCHA container is missing.');
+                    }
+                    const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+                    const recaptchaSize = isLocalHost ? 'normal' : 'invisible';
                     if (recaptchaVerifier) {
                         try {
                             recaptchaVerifier.clear();
@@ -296,12 +318,15 @@
                     }
                     recaptchaVerifier = null;
                     recaptchaWidgetId = null;
-                    if (container) {
-                        container.innerHTML = '';
-                    }
+                    container.innerHTML = '';
+                    recaptchaContainerVersion += 1;
+                    const innerId = `firebase-recaptcha-inner-${recaptchaContainerVersion}`;
+                    const inner = document.createElement('div');
+                    inner.id = innerId;
+                    container.appendChild(inner);
 
-                    recaptchaVerifier = new window.firebase.auth.RecaptchaVerifier('firebase-recaptcha', {
-                        size: 'invisible',
+                    recaptchaVerifier = new window.firebase.auth.RecaptchaVerifier(innerId, {
+                        size: recaptchaSize,
                         callback: () => {
                             if (resendHint) {
                                 resendHint.classList.add('hidden');
@@ -376,12 +401,10 @@
                         throw new Error('reCAPTCHA is not ready yet.');
                     }
 
-                    await recaptchaVerifier.verify();
                     confirmationResult = await window.firebase.auth().signInWithPhoneNumber(firebasePhone, recaptchaVerifier);
                     markSmsSent();
                     setSmsResendCountdown(120);
                     updateSmsTimer();
-                    await buildRecaptchaVerifier();
                 };
 
                 const initSmsVerification = async () => {
@@ -409,7 +432,10 @@
                             resendHint.classList.add('hidden');
                         }
                         if (resendTimerText && resendRemaining <= 0) {
-                            resendTimerText.textContent = 'Tap "Send SMS Code" to receive your OTP.';
+                            const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+                            resendTimerText.textContent = isLocalHost
+                                ? 'Complete reCAPTCHA, then tap "Send SMS Code".'
+                                : 'Tap "Send SMS Code" to receive your OTP.';
                         }
                     } catch (e) {
                         logFirebaseError(e);
@@ -434,6 +460,9 @@
                         } catch (error) {
                             logFirebaseError(error);
                             if (isTooManyRequests(error)) {
+                                // Back off client retries when Firebase temporarily blocks this device/session.
+                                setSmsResendCountdown(300);
+                                updateSmsTimer();
                                 try {
                                     const fallback = await fallbackToEmailOtp();
                                     if (resendHint) {
@@ -448,6 +477,9 @@
                             }
                             if (shouldRebuildRecaptcha(error)) {
                                 try {
+                                    if (window.grecaptcha && recaptchaWidgetId !== null) {
+                                        window.grecaptcha.reset(recaptchaWidgetId);
+                                    }
                                     await buildRecaptchaVerifier();
                                 } catch (renderError) {
                                     logFirebaseError(renderError);
