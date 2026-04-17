@@ -93,6 +93,7 @@ class AuthSecurityTest extends TestCase
             "default-src 'self'",
             "base-uri 'self'",
             "frame-ancestors 'self'",
+            "frame-src 'self' https://www.google.com https://www.gstatic.com https://recaptcha.google.com",
             $formAction,
             "img-src 'self' data: https:",
             "font-src 'self' data: https:",
