@@ -10,18 +10,19 @@
         </div>
     </header>
 
+    <div id="products-autofilter-content" data-admin-autofilter-root="1">
     <div class="flex flex-wrap gap-2 mb-2">
-        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'all'])) }}"      class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? 'all') === 'all'      ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">All</a>
-        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'active'])) }}"   class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'active'   ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">Active</a>
-        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'archived'])) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($filter ?? '') === 'archived' ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">Archived</a>
+        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'all'])) }}" data-autofilter-link="1" data-autofilter-container="#products-autofilter-content" class="px-5 py-2.5 rounded-lg text-md font-semibold transition-colors {{ ($filter ?? 'all') === 'all'      ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">All</a>
+        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'active'])) }}" data-autofilter-link="1" data-autofilter-container="#products-autofilter-content" class="px-5 py-2.5 rounded-lg text-md font-semibold transition-colors {{ ($filter ?? '') === 'active'   ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">Active</a>
+        <a href="{{ route('admin.products.index', array_merge(request()->query(), ['filter' => 'archived'])) }}" data-autofilter-link="1" data-autofilter-container="#products-autofilter-content" class="px-5 py-2.5 rounded-lg text-md font-semibold transition-colors {{ ($filter ?? '') === 'archived' ? 'bg-amber-300 text-black' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300' }}">Archived</a>
         <div class="flex flex-wrap justify-end items-end ml-auto">
-            <a href="{{ route('admin.products.create') }}" class="px-5 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors">
+            <a href="{{ route('admin.products.create') }}" class="px-5 py-2.5 bg-amber-300 text-gray-900 font-bold rounded-lg hover:bg-amber-400 transition-colors">
                 + Add New Product
             </a>
         </div>
     </div>
 
-    <form method="GET" action="{{ route('admin.products.index') }}" class="mb-6 bg-white border border-gray-200 rounded-2xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+    <form method="GET" action="{{ route('admin.products.index') }}" class="js-admin-auto-filter mb-6 bg-white border border-gray-200 rounded-2xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3" data-autofilter-container="#products-autofilter-content">
         <input type="hidden" name="filter" value="{{ $filter ?? 'all' }}">
         <div>
             <label for="search" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Search</label>
@@ -49,8 +50,7 @@
             </select>
         </div>
         <div class="flex items-end gap-2">
-            <button type="submit" class="px-4 py-2 rounded-lg bg-amber-300 text-black font-semibold hover:bg-amber-400 transition-colors">Apply</button>
-            <a href="{{ route('admin.products.index') }}" class="px-4 py-2 rounded-lg border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors">Reset</a>
+            <a href="{{ route('admin.products.index') }}" data-autofilter-reset="1" data-autofilter-container="#products-autofilter-content" class="px-4 py-2 rounded-lg border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors">Reset</a>
         </div>
     </form>
 
@@ -154,6 +154,7 @@
     </div>
 
     <div class="mt-4">{{ $products->links() }}</div>
+    </div>
 
 
     {{-- ================================================================

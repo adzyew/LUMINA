@@ -3,7 +3,7 @@
 @section('title', 'Returns | Lumina Admin')
 
 @section('content')
-<div class="max-w-7xl mx-auto space-y-6">
+<div id="returns-autofilter-content" data-admin-autofilter-root="1" class="max-w-7xl mx-auto space-y-6">
     <header>
         <h1 class="text-4xl font-playfair font-bold text-gray-900">Returns & Refunds</h1>
     </header>
@@ -28,7 +28,7 @@
     </div>
 
     <section class="bg-white border border-gray-200 rounded-3xl p-4 shadow-sm">
-        <form method="GET" action="{{ route('admin.returns.index') }}" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <form method="GET" action="{{ route('admin.returns.index') }}" class="js-admin-auto-filter grid grid-cols-1 md:grid-cols-3 gap-3" data-autofilter-container="#returns-autofilter-content">
             <input
                 type="text"
                 name="q"
@@ -43,8 +43,7 @@
                 <option value="rejected" @selected(request('status') === 'rejected')>Rejected</option>
             </select>
             <div class="flex gap-2">
-                <button type="submit" class="w-full rounded-xl bg-amber-300 hover:bg-amber-400 text-black font-semibold px-4 py-2.5 text-sm">Filter</button>
-                <a href="{{ route('admin.returns.index') }}" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-center">Reset</a>
+                <a href="{{ route('admin.returns.index') }}" data-autofilter-reset="1" data-autofilter-container="#returns-autofilter-content" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-center">Reset</a>
             </div>
         </form>
     </section>

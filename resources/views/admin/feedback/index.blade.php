@@ -3,7 +3,7 @@
 @section('title', 'Feedback Moderation | Lumina')
 
 @section('content')
-<div class="max-w-7xl mx-auto space-y-6">
+<div id="feedback-autofilter-content" data-admin-autofilter-root="1" class="max-w-7xl mx-auto space-y-6">
     <header>
         <h1 class="text-4xl font-playfair font-bold text-gray-900">Feedback Moderation</h1>
     </header>
@@ -37,7 +37,7 @@
     </section>
 
     <section class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
-        <form method="GET" action="{{ route('admin.feedback.index') }}" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3">
+        <form method="GET" action="{{ route('admin.feedback.index') }}" class="js-admin-auto-filter grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3" data-autofilter-container="#feedback-autofilter-content">
             <input type="text" name="q" value="{{ request('q') }}" placeholder="Search comment, user, product" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm">
             <select name="status" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm">
                 <option value="">All Status</option>
@@ -56,8 +56,7 @@
                 Flagged only
             </label>
             <div class="flex gap-2">
-                <button type="submit" class="w-full rounded-xl bg-amber-300 hover:bg-amber-400 text-black font-semibold px-4 py-2.5 text-sm">Filter</button>
-                <a href="{{ route('admin.feedback.index') }}" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-center">Reset</a>
+                <a href="{{ route('admin.feedback.index') }}" data-autofilter-reset="1" data-autofilter-container="#feedback-autofilter-content" class="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-center">Reset</a>
             </div>
         </form>
     </section>
@@ -110,15 +109,17 @@
                         </td>
                         <td class="px-4 py-4 align-top">
                             <div class="flex items-center gap-2 flex-nowrap">
-                                <form method="POST" action="{{ route('admin.feedback.approve', $review) }}">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button class="h-12 w-12 shrink-0 inline-flex items-center justify-center rounded-lg bg-green-600 hover:bg-green-500 text-white transition-colors" title="Approve">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                        </svg>
-                                    </button>
-                                </form>
+                                @if($review->status !== 'approved')
+                                    <form method="POST" action="{{ route('admin.feedback.approve', $review) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button class="h-12 w-12 shrink-0 inline-flex items-center justify-center rounded-lg bg-green-600 hover:bg-green-500 text-white transition-colors" title="Approve">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                @endif
 
                                 <form method="POST" action="{{ route('admin.feedback.flag', $review) }}" onsubmit="{{ $review->is_flagged ? 'return confirm(\'Are you sure to unflag it?\');' : 'return true;' }}">
                                     @csrf
@@ -131,11 +132,13 @@
                                     </button>
                                 </form>
 
-                                <button type="button" class="h-12 w-12 shrink-0 inline-flex items-center justify-center rounded-lg bg-red-600 hover:bg-red-500 text-white transition-colors" title="Reject" onclick="openModerationReasonModal('{{ route('admin.feedback.reject', $review) }}', 'Reject Review', 'Please provide the reason for rejecting this review.')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                    </svg>
-                                </button>
+                                @if($review->status !== 'approved')
+                                    <button type="button" class="h-12 w-12 shrink-0 inline-flex items-center justify-center rounded-lg bg-red-600 hover:bg-red-500 text-white transition-colors" title="Reject" onclick="openModerationReasonModal('{{ route('admin.feedback.reject', $review) }}', 'Reject Review', 'Please provide the reason for rejecting this review.')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                        </svg>
+                                    </button>
+                                @endif
 
                                 <button type="button" class="h-12 w-12 shrink-0 inline-flex items-center justify-center rounded-lg bg-gray-700 hover:bg-gray-600 text-white transition-colors" title="Delete" onclick="openModerationReasonModal('{{ route('admin.feedback.remove', $review) }}', 'Delete Review', 'Please provide the reason for deleting this review.')">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">

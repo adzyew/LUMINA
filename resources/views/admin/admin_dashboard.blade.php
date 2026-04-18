@@ -10,7 +10,7 @@
     ])
 
     <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-        <article class="rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-6 shadow-sm">
+        <article class="rounded-3xl border border-amber-200 bg-linear-to-br from-amber-50 to-white p-6 shadow-sm">
             <div class="flex items-center justify-between">
                 <p class="text-sm font-semibold uppercase tracking-wide text-amber-700">Total Revenue</p>
                 <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
@@ -25,7 +25,7 @@
             </p>
         </article>
 
-        <article class="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-6 shadow-sm">
+        <article class="rounded-3xl border border-blue-200 bg-linear-to-br from-blue-50 to-white p-6 shadow-sm">
             <div class="flex items-center justify-between">
                 <p class="text-sm font-semibold uppercase tracking-wide text-blue-700">Total Orders</p>
                 <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-100 text-blue-700">
@@ -35,7 +35,7 @@
             <p class="mt-5 text-4xl font-bold text-gray-900">{{ number_format($totalOrders ?? 0) }}</p>
         </article>
 
-        <article class="rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-6 shadow-sm">
+        <article class="rounded-3xl border border-emerald-200 bg-linear-to-br from-emerald-50 to-white p-6 shadow-sm">
             <div class="flex items-center justify-between">
                 <p class="text-sm font-semibold uppercase tracking-wide text-emerald-700">Products</p>
                 <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
@@ -45,7 +45,7 @@
             <p class="mt-5 text-4xl font-bold text-gray-900">{{ number_format($totalProducts ?? 0) }}</p>
         </article>
 
-        <article class="rounded-3xl border border-violet-200 bg-gradient-to-br from-violet-50 to-white p-6 shadow-sm">
+        <article class="rounded-3xl border border-violet-200 bg-linear-to-br from-violet-50 to-white p-6 shadow-sm">
             <div class="flex items-center justify-between">
                 <p class="text-sm font-semibold uppercase tracking-wide text-violet-700">Users</p>
                 <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-100 text-violet-700">
