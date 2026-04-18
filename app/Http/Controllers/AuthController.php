@@ -661,6 +661,17 @@ class AuthController extends Controller
 
     public function updateProfile(Request $request, CloudinaryService $cloudinary)
     {
+        $user = Auth::user();
+        if (!$user instanceof User) {
+            abort(403);
+        }
+
+        $isGoogleWithoutPassword = strtolower((string) ($user->provider_name ?? '')) === 'google'
+            && empty($user->password);
+        $currentPasswordRule = $isGoogleWithoutPassword
+            ? 'nullable|string|max:72'
+            : 'nullable|required_with:new_password,new_password_confirmation|string|max:72';
+
         $validated = $request->validate([
             'active_tab' => 'nullable|string',
             'first_name' => ['required', 'string', 'max:80', 'regex:/^[\pL\s]+$/u'],
@@ -669,10 +680,10 @@ class AuthController extends Controller
             'suffix' => ['nullable', 'string', 'max:20', 'regex:/^[\pL\pN\s\.\-]+$/u'],
             'phone' => ['required', 'regex:/^(?:\\+63|0)9\\d{9}$/'],
             'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'current_password' => 'nullable|required_with:new_password,new_password_confirmation|string|max:72',
+            'current_password' => $currentPasswordRule,
             'new_password' => [
                 'nullable',
-                'required_with:current_password,new_password_confirmation',
+                'required_with:new_password_confirmation',
                 'string',
                 'min:8',
                 'max:72',
@@ -710,11 +721,6 @@ class AuthController extends Controller
             'new_password.confirmed' => 'New password confirmation does not match.',
         ]);
 
-        $user = Auth::user();
-        if (!$user instanceof User) {
-            abort(403);
-        }
-
         $validated['first_name'] = trim((string) ($validated['first_name'] ?? ''));
         $validated['middle_name'] = trim((string) ($validated['middle_name'] ?? ''));
         $validated['last_name'] = trim((string) ($validated['last_name'] ?? ''));
@@ -730,7 +736,8 @@ class AuthController extends Controller
         $validated['notify_loyalty'] = $request->boolean('notify_loyalty');
 
         if ($request->filled('new_password')) {
-            if (!$request->filled('current_password') || !Hash::check($request->input('current_password'), $user->password)) {
+            $requiresCurrentPassword = !$isGoogleWithoutPassword;
+            if ($requiresCurrentPassword && (!$request->filled('current_password') || !Hash::check($request->input('current_password'), $user->password))) {
                 return back()->withErrors(['current_password' => 'Current password is incorrect.'])->withInput();
             }
 
@@ -791,8 +798,10 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            "email" => "required|email",
+            "email" => ["required", "email", "regex:/^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/"],
             "password" => "required"
+        ], [
+            "email.regex" => "Please enter a valid email address (e.g. name@example.com).",
         ]);
 
         $user = User::where('email', $request->email)->first();
@@ -881,13 +890,15 @@ class AuthController extends Controller
         ]);
     }
 
-    public function loginPost(Request $request)
+public function loginPost(Request $request)
 {
     // 1. Validate Input
     $request->validate([
-        "email" => "required|email",
+        "email" => ["required", "email", "regex:/^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/"],
         "password" => "required",
         "otp_channel" => "nullable|in:email,sms",
+    ], [
+        "email.regex" => "Please enter a valid email address (e.g. name@example.com).",
     ]);
 
     // 2. Find the User

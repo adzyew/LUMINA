@@ -183,7 +183,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                             </svg>
                                         </span>
-                                        <input type="email" name="email" id="login-email" value="{{ old('email') }}" placeholder=" " class=" floating-input peer pl-12 pr-12 py-4" >
+                                        <input type="email" name="email" id="login-email" value="{{ old('email') }}" placeholder=" " class=" floating-input peer pl-12 pr-12 py-4" required autocomplete="email" inputmode="email" pattern="^[^\s@]+@[^\s@]+\.[^\s@]{2,}$" title="Please enter a valid email address (e.g. name@example.com)." >
                                         <label for="login-email" class="floating-label">Email Address</label>
                                     </div>
 
