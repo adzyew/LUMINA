@@ -61,23 +61,48 @@ class ProviderCallbackController extends Controller
             ]);
         }
 
-        // 2. Create or update OAuth details after archive check passes
-        $payload = [
-            'name'                   => $socialName,
+        // 2. Create or update OAuth details after archive check passes.
+        // Important: do not overwrite user-edited names on every social login.
+        $oauthPayload = [
             'provider_id'            => $providerId,
             'provider_name'          => $provider,
             'provider_token'         => $providerToken,
             'provider_refresh_token' => $providerRefreshToken,
         ];
 
-        if (Schema::hasColumn('users', 'first_name')) {
-            $payload['first_name'] = $splitName['first_name'];
-        }
-        if (Schema::hasColumn('users', 'last_name')) {
-            $payload['last_name'] = $splitName['last_name'];
-        }
+        if (!$existingUser) {
+            // First-time social signup: seed names from provider.
+            $createPayload = array_merge($oauthPayload, [
+                'email' => $socialEmail,
+                'name'  => $socialName,
+            ]);
 
-        $user = User::updateOrCreate(['email' => $socialEmail], $payload);
+            if (Schema::hasColumn('users', 'first_name')) {
+                $createPayload['first_name'] = $splitName['first_name'];
+            }
+            if (Schema::hasColumn('users', 'last_name')) {
+                $createPayload['last_name'] = $splitName['last_name'];
+            }
+
+            $user = User::create($createPayload);
+        } else {
+            // Existing account: update only OAuth linkage and fill missing name fields.
+            $updates = $oauthPayload;
+
+            if (!$existingUser->name && $socialName !== '') {
+                $updates['name'] = $socialName;
+            }
+
+            if (Schema::hasColumn('users', 'first_name') && !$existingUser->first_name && !empty($splitName['first_name'])) {
+                $updates['first_name'] = $splitName['first_name'];
+            }
+            if (Schema::hasColumn('users', 'last_name') && !$existingUser->last_name && !empty($splitName['last_name'])) {
+                $updates['last_name'] = $splitName['last_name'];
+            }
+
+            $existingUser->update($updates);
+            $user = $existingUser->fresh();
+        }
 
         if ($user->is_verified) {
             Auth::login($user);

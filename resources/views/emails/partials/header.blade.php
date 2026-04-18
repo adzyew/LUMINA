@@ -1,11 +1,15 @@
 @php
     $headerTitle = $emailHeaderTitle ?? null;
     $headerFile = 'IMAGES/Lumina Email Header.png';
+    $headerFilePath = public_path($headerFile);
 
     if (!empty($emailHeaderImageUrl)) {
         $headerImage = $emailHeaderImageUrl;
+    } elseif (isset($message) && file_exists($headerFilePath)) {
+        // Prefer CID embedding so Gmail/outlook can render the header reliably.
+        $headerImage = $message->embed($headerFilePath);
     } else {
-        // Use an absolute public URL for maximum inbox compatibility.
+        // Fallback to absolute URL if embedding is unavailable.
         $appUrl = rtrim((string) config('app.url'), '/');
         $headerImage = $appUrl . '/' . str_replace(' ', '%20', ltrim($headerFile, '/'));
     }

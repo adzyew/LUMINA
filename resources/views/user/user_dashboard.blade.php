@@ -15,8 +15,11 @@
                 <h1 class="text-2xl md:text-4xl font-playfair font-medium text-gray-900 mb-2">Dashboard</h1>
                 <p class="text-gray-600">Welcome back, {{ Auth::user()->first_name }}!</p>
             </div>
-            <a href="{{ route('products.index') }}" class="mt-4 md:mt-0 text-amber-500 hover:text-amber-600 transition-colors text-sm font-semibold flex items-center gap-1">
-                Continue Shopping &rarr;
+            <a href="{{ route('products.index') }}" class="mt-4 md:mt-0 text-amber-500 hover:text-amber-600   rounded-full transition-colors text-sm font-semibold flex items-center ">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-chevron-right-icon lucide-circle-chevron-right size-10">
+                    <circle cx="12" cy="12" r="10"/><path d="m10 8 4 4-4 4"/>
+                </svg>
+                
             </a>
         </div>
 

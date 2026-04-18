@@ -34,7 +34,7 @@
                 }
             }
         @endphp
-        <div class="p-6 flex flex-col gap-1 border-b border-gray-200 min-h-[5rem] justify-center">
+        <div class="p-6 flex flex-col gap-1 border-b border-gray-200 min-h-20 justify-center">
             <div class="flex items-center gap-2">
             <div class="w-8 h-8 bg-linear-to-br from-amber-300 to-amber-600 rounded-full flex items-center justify-center font-bold text-black">L</div>
                 <span class="font-playfair font-bold text-xl text-black">{{ $isAdmin ? 'Lumina Admin' : 'Lumina Staff' }}</span>
@@ -51,7 +51,7 @@
                     : route('admin.staff.dashboard');
                 $dashboardActive = request()->routeIs('admin.admin_dashboard') || request()->routeIs('admin.staff.dashboard') || request()->routeIs('admin.inventory.dashboard') || request()->routeIs('admin.sales.dashboard') || request()->routeIs('admin.delivery.dashboard');
             @endphp
-            <a href="{{ $dashboardUrl }}" class="flex items-center gap-3 px-4 py-3 {{ $dashboardActive ? 'bg-amber-300 text-black font-bold' : 'text-black hover:text-amber-600 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
+            <a href="{{ $dashboardUrl }}" class="flex items-center gap-3 px-4 py-3 {{ $dashboardActive ? 'bg-amber-300/40 text-black font-bold border-l-amber-400 border-l-4' : 'text-gray-900 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
                 </svg>
@@ -61,7 +61,7 @@
             {{-- Inventory department: Dashboard + Products only --}}
             @if($isAdmin || $staffDepartment === 'Inventory')
             @can('inventory.view')
-            <a href="{{ route('admin.products.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.products.*') ? 'bg-amber-300 text-black font-bold' : 'text-black hover:text-amber-600 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
+            <a href="{{ route('admin.products.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.products.*') ? 'bg-amber-300/40 text-black font-bold border-l-amber-400 border-l-4' : 'text-gray-900 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                 Products
             </a>
@@ -71,21 +71,23 @@
             {{-- Sales department: Orders, Analytics, Sales only --}}
             @if($isAdmin || $staffDepartment === 'Sales')
             @can('sales.view')
-            <a href="{{ route('admin.orders.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.orders.*') ? 'bg-amber-300 text-black font-bold' : 'text-black hover:text-amber-600 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
+            <a href="{{ route('admin.orders.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.orders.*') ? 'bg-amber-300/40 text-black font-bold border-l-amber-400 border-l-4' : 'text-gray-900 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
                 Orders
             </a>
-            <a href="{{ route('admin.analytics.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.analytics.*') ? 'bg-amber-300 text-black font-bold' : 'text-black hover:text-amber-600 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
+            <a href="{{ route('admin.analytics.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.analytics.*') ? 'bg-amber-300/40 text-black font-bold border-l-amber-400 border-l-4' : 'text-gray-900 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                 Analytics
             </a>
-            <a href="{{ route('admin.sales.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.sales.index') ? 'bg-amber-300 text-black font-bold' : 'text-black hover:text-amber-600 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <a href="{{ route('admin.sales.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.sales.index') ? 'bg-amber-300/40 text-black font-bold border-l-amber-400 border-l-4' : 'text-gray-900 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-philippine-peso-icon lucide-philippine-peso size-5">
+                    <path d="M20 11H4"/><path d="M20 7H4"/><path d="M7 21V4a1 1 0 0 1 1-1h4a1 1 0 0 1 0 12H7"/>
+                </svg>
                 Sales
             </a>
             @endcan
             @can('returns.manage')
-            <a href="{{ route('admin.returns.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.returns.*') ? 'bg-amber-300 text-black font-bold' : 'text-black hover:text-amber-600 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
+            <a href="{{ route('admin.returns.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.returns.*') ? 'bg-amber-300/40 text-black font-bold border-l-amber-400 border-l-4' : 'text-gray-900 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7.5h13.5m0 0L13.5 4.5m3 3-3 3m3 6h4.5m0 0-3-3m3 3-3 3M3 16.5h9"></path></svg>
                 Returns
             </a>
@@ -95,7 +97,7 @@
             {{-- Delivery department: Deliveries only --}}
             @if($isAdmin || $staffDepartment === 'Delivery')
             @can('deliveries.manage')
-            <a href="{{ route('admin.deliveries.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.deliveries.*') ? 'bg-amber-300 text-black font-bold' : 'text-black hover:text-amber-600 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
+            <a href="{{ route('admin.deliveries.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.deliveries.*') ? 'bg-amber-300/40 text-black font-bold border-l-amber-400 border-l-4' : 'text-gray-900 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
             </svg>
@@ -106,29 +108,31 @@
 
             @if($isAdmin || $staffDepartment === 'Feedback')
             @can('reviews.moderate')
-            <a href="{{ route('admin.feedback.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.feedback.*') ? 'bg-amber-300 text-black font-bold' : 'text-black hover:text-amber-600 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16h6M7 4h10a2 2 0 012 2v12l-3-2-3 2-3-2-3 2V6a2 2 0 012-2z"></path></svg>
+            <a href="{{ route('admin.feedback.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.feedback.*') ? 'bg-amber-300/40 text-black font-bold border-l-amber-400 border-l-4' : 'text-gray-900 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square-more-icon lucide-message-square-more size-5">
+                <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="M12 11h.01"/><path d="M16 11h.01"/><path d="M8 11h.01"/>
+            </svg>               
                 Feedback
             </a>
             @endcan
             @endif
 
             @role('admin')
-                <a href="{{ route('admin.promos.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.promos.*') ? 'bg-amber-300 text-black font-bold' : 'text-black hover:text-amber-600 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
+                <a href="{{ route('admin.promos.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.promos.*') ? 'bg-amber-300/40 text-black font-bold border-l-amber-400 border-l-4' : 'text-gray-900 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />
                     </svg>
                     Promos
                 </a>
 
-                <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.users.*') ? 'bg-amber-300 text-black font-bold' : 'text-black hover:text-amber-600 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
+                <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.users.*') ? 'bg-amber-300/40 text-black font-bold border-l-amber-400 border-l-4' : 'text-gray-900 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                     </svg>
                     Users
                 </a>
 
-                <a href="{{ route('admin.roles.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.roles.*') ? 'bg-amber-300 text-black font-bold' : 'text-black hover:text-amber-600 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
+                <a href="{{ route('admin.roles.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.roles.*') ? 'bg-amber-300/40 text-black font-bold border-l-amber-400 border-l-4' : 'text-gray-900 hover:bg-amber-50 font-bold' }} rounded-lg transition-colors">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                     </svg>
@@ -137,6 +141,19 @@
             @endrole
 
         </nav>
+
+        <div class="p-3 border-t border-gray-200">
+            <button
+                type="button"
+                onclick="showLogoutModal()"
+                class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 font-semibold transition-colors"
+            >
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                </svg>
+                Logout
+            </button>
+        </div>
     </aside>
 
     <main class="flex-1 min-w-0 overflow-y-auto bg-[#F4F4F4] p-4 sm:p-8 md:p-10">
@@ -257,6 +274,125 @@
             chevron.classList.remove('rotate-180');
         }
 
+        function fetchAndSwapAdminSection(url, containerSelector, pushHistory) {
+            const target = document.querySelector(containerSelector);
+            if (!target) return;
+
+            target.classList.add('opacity-60', 'pointer-events-none');
+
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'text/html',
+                },
+            })
+                .then(function (response) {
+                    if (!response.ok) throw new Error('Request failed');
+                    return response.text();
+                })
+                .then(function (html) {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newSection = doc.querySelector(containerSelector);
+                    const currentSection = document.querySelector(containerSelector);
+
+                    if (!newSection || !currentSection) {
+                        window.location.href = url;
+                        return;
+                    }
+
+                    currentSection.innerHTML = newSection.innerHTML;
+
+                    if (pushHistory) {
+                        window.history.pushState({ adminAutoFilter: true }, '', url);
+                    }
+
+                    initAdminAutoFilters();
+                    document.dispatchEvent(new CustomEvent('admin:content-refreshed'));
+                })
+                .catch(function () {
+                    window.location.href = url;
+                })
+                .finally(function () {
+                    const refreshedTarget = document.querySelector(containerSelector);
+                    if (refreshedTarget) {
+                        refreshedTarget.classList.remove('opacity-60', 'pointer-events-none');
+                    }
+                });
+        }
+
+        function buildAutoFilterUrl(form) {
+            const url = new URL(form.action || window.location.href, window.location.origin);
+            const params = new URLSearchParams();
+            const formData = new FormData(form);
+
+            formData.forEach(function (value, key) {
+                if (value !== null && String(value).trim() !== '') {
+                    params.append(key, String(value));
+                }
+            });
+
+            const queryString = params.toString();
+            url.search = queryString ? ('?' + queryString) : '';
+            return url.toString();
+        }
+
+        function initAdminAutoFilters() {
+            document.querySelectorAll('.js-admin-auto-filter').forEach(function (form, index) {
+                if (form.dataset.autoFilterBound === '1') return;
+                form.dataset.autoFilterBound = '1';
+
+                const containerSelector = form.dataset.autofilterContainer || '#admin-auto-filter-content';
+                const textDelay = Number(form.dataset.autofilterDelay || 450);
+                const timerKey = '__autoFilterTimer' + index;
+
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    fetchAndSwapAdminSection(buildAutoFilterUrl(form), containerSelector, true);
+                });
+
+                form.querySelectorAll('input, select, textarea').forEach(function (field) {
+                    if (field.type === 'hidden') return;
+
+                    if (field.tagName === 'SELECT' || field.type === 'checkbox' || field.type === 'radio') {
+                        field.addEventListener('change', function () {
+                            fetchAndSwapAdminSection(buildAutoFilterUrl(form), containerSelector, true);
+                        });
+                        return;
+                    }
+
+                    field.addEventListener('input', function () {
+                        clearTimeout(form[timerKey]);
+                        form[timerKey] = setTimeout(function () {
+                            fetchAndSwapAdminSection(buildAutoFilterUrl(form), containerSelector, true);
+                        }, textDelay);
+                    });
+                });
+            });
+
+            document.querySelectorAll('a[data-autofilter-link="1"]').forEach(function (link) {
+                if (link.dataset.autoFilterBound === '1') return;
+                link.dataset.autoFilterBound = '1';
+
+                link.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const selector = link.dataset.autofilterContainer || '#admin-auto-filter-content';
+                    fetchAndSwapAdminSection(link.href, selector, true);
+                });
+            });
+
+            document.querySelectorAll('a[data-autofilter-reset="1"]').forEach(function (link) {
+                if (link.dataset.autoFilterBound === '1') return;
+                link.dataset.autoFilterBound = '1';
+
+                link.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const selector = link.dataset.autofilterContainer || '#admin-auto-filter-content';
+                    fetchAndSwapAdminSection(link.href, selector, true);
+                });
+            });
+        }
+
         document.addEventListener('click', function (e) {
             const staffWrapper = document.getElementById('staffProfileDropdownWrapper');
             if (staffWrapper && !staffWrapper.contains(e.target)) {
@@ -264,7 +400,16 @@
             }
         });
 
+        window.addEventListener('popstate', function () {
+            const activeContainer = document.querySelector('[data-admin-autofilter-root="1"]');
+            if (!activeContainer) return;
+
+            fetchAndSwapAdminSection(window.location.href, '#' + activeContainer.id, false);
+        });
+
         document.addEventListener('DOMContentLoaded', function () {
+            initAdminAutoFilters();
+
             const logoutForm = document.getElementById('adminLogoutForm');
             const logoutButton = document.getElementById('adminLogoutSubmitButton');
             if (!logoutForm || !logoutButton) return;
