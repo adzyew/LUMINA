@@ -278,6 +278,17 @@
                     <textarea id="edit-description" name="description" rows="4" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 focus:ring-2 focus:ring-amber-100 outline-none transition-colors resize-none"></textarea>
                 </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-2">Product Size / Fit</label>
+                        <input type="text" id="edit-size-spec" name="size_spec" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 focus:ring-2 focus:ring-amber-100 outline-none transition-colors" placeholder="e.g. Adjustable ring, 16-18cm, 40mm case">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-2">Specification Details</label>
+                        <textarea id="edit-specification-details" name="specification_details" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-900 focus:border-amber-300 focus:ring-2 focus:ring-amber-100 outline-none transition-colors resize-none" placeholder="One detail per line (e.g. Material: Stainless Steel)"></textarea>
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-sm font-medium text-gray-500 mb-2">Current Image</label>
                     <img id="edit-current-image" src="" alt="" class="h-36 rounded-lg border border-gray-200 object-cover">
@@ -530,6 +541,10 @@
                 document.getElementById('edit-price').value                = data.price;
                 document.getElementById('edit-stock-qty').value            = data.stock_quantity;
                 document.getElementById('edit-description').value          = data.description || '';
+                document.getElementById('edit-size-spec').value            = (data.specifications && data.specifications.size) ? data.specifications.size : '';
+                document.getElementById('edit-specification-details').value = (data.specifications && Array.isArray(data.specifications.details))
+                    ? data.specifications.details.filter(function (line) { return !!line; }).join('\n')
+                    : '';
                 document.getElementById('edit-current-image').src          = data.image_url || '';
                 document.getElementById('edit-is-featured').checked        = !!data.is_featured;
 
