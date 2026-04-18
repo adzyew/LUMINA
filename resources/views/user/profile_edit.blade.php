@@ -9,14 +9,16 @@
         $middleName = old('middle_name', $user->middle_name ?? '');
         $lastName = old('last_name', $user->last_name ?? ($nameParts[1] ?? ''));
         $suffix = old('suffix', $user->suffix ?? '');
+        $isGoogleAccount = strtolower((string) ($user->provider_name ?? '')) === 'google'
+            && empty($user->password);
     @endphp
 
     <div class="container mx-auto px-4 sm:px-6 lg:px-4 py-10 max-w-7xl">
         <div class="flex items-center justify-between gap-3 mb-6">
             <h1 class="text-3xl font-playfair font-bold text-gray-900">Settings</h1>
-            <button id="editProfileBtn" type="button" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-amber-300 bg-amber-100 hover:bg-amber-100 text-amber-700 font-semibold transition-colors">
-                Edit Profile
-            </button>
+            <span id="editModeBadge" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 text-sm font-semibold">
+                Viewing Mode
+            </span>
         </div>
 
         @if($errors->any())
@@ -58,15 +60,15 @@
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
                                             <label class="block text-sm font-medium text-gray-600 mb-2">First Name</label>
-                                            <input type="text" name="first_name" value="{{ $firstName }}" required class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                                            <input type="text" name="first_name" value="{{ $firstName }}" required pattern="^[A-Za-z\s]+$" title="First name must contain letters only." class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-600 mb-2">Middle Name (Optional)</label>
-                                            <input type="text" name="middle_name" value="{{ $middleName }}" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                                            <input type="text" name="middle_name" value="{{ $middleName }}" pattern="^[A-Za-z\s]*$" title="Middle name must contain letters only." class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-600 mb-2">Last Name</label>
-                                            <input type="text" name="last_name" value="{{ $lastName }}" required class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                                            <input type="text" name="last_name" value="{{ $lastName }}" required pattern="^[A-Za-z\s]+$" title="Last name must contain letters only." class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-600 mb-2">Suffix (Optional)</label>
@@ -91,17 +93,22 @@
                                     <div class="rounded-lg border border-gray-200 bg-white p-4 h-full min-h-70 flex flex-col">
                                         <div class="flex-1 flex justify-center items-center gap-3">
                                             @if($user->profile_photo_url)
-                                                <img src="{{ $user->profile_photo_url }}" alt="Profile" class="w-40 h-40 rounded-full object-cover border border-amber-300/40">
+                                                <img id="profilePhotoPreview" src="{{ $user->profile_photo_url }}" alt="Profile" class="w-40 h-40 rounded-full object-cover border border-amber-300/40">
+                                                <div id="profileInitialsAvatar" class="hidden w-40 h-40 bg-linear-to-br from-amber-300 to-amber-600 rounded-full items-center justify-center text-black text-2xl font-bold">
+                                                    {{ strtoupper(substr($user->name, 0, 1)) }}
+                                                </div>
                                             @else
-                                                <div class="w-40 h-40 bg-linear-to-br from-amber-300 to-amber-600 rounded-full flex items-center justify-center text-black text-2xl font-bold">
+                                                <img id="profilePhotoPreview" src="" alt="Profile preview" class="hidden w-40 h-40 rounded-full object-cover border border-amber-300/40">
+                                                <div id="profileInitialsAvatar" class="w-40 h-40 bg-linear-to-br from-amber-300 to-amber-600 rounded-full flex items-center justify-center text-black text-2xl font-bold">
                                                     {{ strtoupper(substr($user->name, 0, 1)) }}
                                                 </div>
                                             @endif
                                         </div>
                                         <label class="mt-3 self-end inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-gray-300 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors" data-edit-only>
                                             Choose File
-                                            <input type="file" name="profile_photo" accept="image/*" class="hidden">
+                                            <input id="profilePhotoInput" type="file" name="profile_photo" accept="image/*" class="hidden">
                                         </label>
+                                        <p id="profilePhotoFileName" class="mt-2 text-xs text-gray-500 text-right" data-edit-only>No file selected</p>
                                     </div>
                                 </div>
                             </div>
@@ -199,20 +206,26 @@
                             </button>
 
                             <div id="securityChangePasswordPanel" class="hidden border-t border-gray-200 p-4 sm:p-5 space-y-4 bg-gray-50">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-600 mb-2">Current Password</label>
-                                    <div class="relative">
-                                        <input id="profile-current-password" type="password" name="current_password" autocomplete="current-password" maxlength="72" class="w-full px-4 py-3 pr-11 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
-                                        <button type="button" onclick="togglePasswordField('profile-current-password', 'profile-current-eye-open', 'profile-current-eye-closed')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="Toggle password visibility" data-edit-only>
-                                            <svg id="profile-current-eye-open" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 0 1 6 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                                            <svg id="profile-current-eye-closed" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 0 1 1.563-3.029m5.858.908a3 3 0 1 1 4.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532 3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0 1 12 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 0 1-4.132 5.411m0 0L21 21" /></svg>
-                                        </button>
+                                @if(!$isGoogleAccount)
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-600 mb-2">Current Password</label>
+                                        <div class="relative">
+                                            <input id="profile-current-password" type="password" name="current_password" autocomplete="current-password" maxlength="72" class="w-full px-4 py-3 pr-11 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                                            <button type="button" onclick="togglePasswordField('profile-current-password', 'profile-current-eye-open', 'profile-current-eye-closed')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="Toggle password visibility" data-edit-only>
+                                                <svg id="profile-current-eye-open" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 0 1 6 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                                <svg id="profile-current-eye-closed" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 0 1 1.563-3.029m5.858.908a3 3 0 1 1 4.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532 3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0 1 12 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 0 1-4.132 5.411m0 0L21 21" /></svg>
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
+                                @else
+                                    <div class="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-700">
+                                        You signed in with Google. Create a password below so you can also log in using email and password.
+                                    </div>
+                                @endif
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-600 mb-2">New Password</label>
+                                        <label class="block text-sm font-medium text-gray-600 mb-2">{{ $isGoogleAccount ? 'Create Password' : 'New Password' }}</label>
                                         <div class="relative">
                                             <input id="profile-new-password" type="password" name="new_password" autocomplete="new-password" maxlength="72" minlength="8" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,72}" title="Use 8 to 72 characters with uppercase, lowercase, and a number." class="w-full px-4 py-3 pr-11 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
                                             <button type="button" onclick="togglePasswordField('profile-new-password', 'profile-new-eye-open', 'profile-new-eye-closed')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="Toggle password visibility" data-edit-only>
@@ -262,9 +275,15 @@
                 </section>
             </fieldset>
 
-            <div class="flex items-center justify-end gap-3 pt-2">
-                <button id="saveProfileBtn" type="submit" class="hidden px-6 py-3 bg-amber-300 text-black font-bold rounded-xl hover:bg-amber-400 transition-colors">Save Changes</button>
-                <button id="cancelEditBtn" type="button" class="hidden px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 border border-gray-200 transition-colors">Cancel</button>
+            <div class="pt-3 border-t border-gray-200">
+                <p id="editModeHint" class="text-sm text-gray-500">Click Edit Profile to start editing.</p>
+                <div class="mt-3 flex items-center justify-end gap-3">
+                    <button id="editProfileBtn" type="button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-amber-300 bg-amber-100 hover:bg-amber-100 text-amber-700 font-semibold transition-colors">
+                        Edit Profile
+                    </button>
+                    <button id="cancelEditBtn" type="button" class="hidden px-6 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 border border-gray-200 transition-colors">Cancel</button>
+                    <button id="saveProfileBtn" type="submit" class="hidden px-6 py-2.5 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors">Save Changes</button>
+                </div>
             </div>
         </form>
 
@@ -309,6 +328,8 @@ function togglePasswordField(inputId, eyeOpenId, eyeClosedId) {
     const form = document.getElementById('profileSettingsForm');
     const fieldset = document.getElementById('profileSettingsFields');
     const editBtn = document.getElementById('editProfileBtn');
+    const editModeBadge = document.getElementById('editModeBadge');
+    const editModeHint = document.getElementById('editModeHint');
     const saveBtn = document.getElementById('saveProfileBtn');
     const cancelBtn = document.getElementById('cancelEditBtn');
     const personalDetailsToggle = document.getElementById('personalDetailsToggle');
@@ -321,7 +342,12 @@ function togglePasswordField(inputId, eyeOpenId, eyeClosedId) {
     const securityPasswordPanel = document.getElementById('securityChangePasswordPanel');
     const securityPasswordChevron = document.getElementById('securityChangePasswordChevron');
     const hasValidationErrors = @json($errors->any());
+    const isGoogleAccount = @json($isGoogleAccount);
     const editOnlyEls = document.querySelectorAll('[data-edit-only]');
+    const profilePhotoInput = document.getElementById('profilePhotoInput');
+    const profilePhotoPreview = document.getElementById('profilePhotoPreview');
+    const profileInitialsAvatar = document.getElementById('profileInitialsAvatar');
+    const profilePhotoFileName = document.getElementById('profilePhotoFileName');
 
     const phoneInput = document.getElementById('phone');
     const firstNameInput = form?.querySelector('input[name="first_name"]');
@@ -360,6 +386,41 @@ function togglePasswordField(inputId, eyeOpenId, eyeClosedId) {
     const sanitizeSuffixInput = (value) => (value || '')
         .replace(/[^A-Za-z0-9.\-\s]/g, '')
         .replace(/\s{2,}/g, ' ');
+
+    const wireNameInputSanitizer = (input, sanitizer) => {
+        if (!input) return;
+        input.addEventListener('input', function () {
+            const cleaned = sanitizer(this.value);
+            if (cleaned !== this.value) this.value = cleaned;
+        });
+    };
+
+    wireNameInputSanitizer(firstNameInput, sanitizeNameInput);
+    wireNameInputSanitizer(middleNameInput, sanitizeNameInput);
+    wireNameInputSanitizer(lastNameInput, sanitizeNameInput);
+    wireNameInputSanitizer(suffixInput, sanitizeSuffixInput);
+
+    if (profilePhotoInput && profilePhotoPreview) {
+        profilePhotoInput.addEventListener('change', function () {
+            const file = this.files && this.files[0] ? this.files[0] : null;
+            if (!file) {
+                if (profilePhotoFileName) profilePhotoFileName.textContent = 'No file selected';
+                return;
+            }
+
+            if (profilePhotoFileName) profilePhotoFileName.textContent = file.name;
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                profilePhotoPreview.src = event.target?.result || '';
+                profilePhotoPreview.classList.remove('hidden');
+                if (profileInitialsAvatar) {
+                    profileInitialsAvatar.classList.add('hidden');
+                    profileInitialsAvatar.classList.remove('flex');
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    }
     if (phoneInput && window.intlTelInput) {
         window.intlTelInput(phoneInput, {
             initialCountry: 'ph',
@@ -378,6 +439,20 @@ function togglePasswordField(inputId, eyeOpenId, eyeClosedId) {
         editBtn.classList.toggle('hidden', enabled);
         saveBtn.classList.toggle('hidden', !enabled);
         cancelBtn.classList.toggle('hidden', !enabled);
+        editBtn.style.display = enabled ? 'none' : 'inline-flex';
+        saveBtn.style.display = enabled ? 'inline-flex' : 'none';
+        cancelBtn.style.display = enabled ? 'inline-flex' : 'none';
+
+        if (editModeBadge) {
+            editModeBadge.textContent = enabled ? 'Edit Mode: ON' : 'Viewing Mode';
+            editModeBadge.className = enabled
+                ? 'inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-100 text-amber-700 text-sm font-semibold'
+                : 'inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 text-sm font-semibold';
+        }
+        if (editModeHint) {
+            editModeHint.textContent = enabled ? 'You are currently editing your profile.' : 'Click Edit Profile to start editing.';
+            editModeHint.className = enabled ? 'text-sm text-amber-700 font-medium' : 'text-sm text-gray-500';
+        }
 
         editOnlyEls.forEach((el) => {
             el.classList.toggle('opacity-60', !enabled);
@@ -440,20 +515,20 @@ function togglePasswordField(inputId, eyeOpenId, eyeClosedId) {
             phoneInput.value = normalizePhilippineMobile(phoneInput.value);
         }
 
-        if (!currentPassword || !newPassword || !confirmPassword) return;
+        if (!newPassword || !confirmPassword) return;
 
-        const currentValue = currentPassword.value.trim();
+        const currentValue = currentPassword ? currentPassword.value.trim() : '';
         const newValue = newPassword.value.trim();
         const confirmValue = confirmPassword.value.trim();
         const wantsPasswordChange = currentValue.length > 0 || newValue.length > 0 || confirmValue.length > 0;
 
-        currentPassword.setCustomValidity('');
+        if (currentPassword) currentPassword.setCustomValidity('');
         newPassword.setCustomValidity('');
         confirmPassword.setCustomValidity('');
 
         if (!wantsPasswordChange) return;
 
-        if (!currentValue) {
+        if (!isGoogleAccount && !currentValue && currentPassword) {
             currentPassword.setCustomValidity('Current password is required to change your password.');
         }
         if (!newValue) {

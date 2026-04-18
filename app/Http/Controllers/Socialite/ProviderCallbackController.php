@@ -15,6 +15,60 @@ use Illuminate\Support\Facades\Schema;
 
 class ProviderCallbackController extends Controller
 {
+    private function cartCacheKey(User $user): string
+    {
+        return 'cart_user_' . $user->id;
+    }
+
+    private function mergeCarts(array $baseCart, array $incomingCart): array
+    {
+        foreach ($incomingCart as $productId => $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            $qty = (int) ($item['quantity'] ?? 0);
+            if ($qty <= 0) {
+                continue;
+            }
+
+            if (isset($baseCart[$productId])) {
+                $baseCart[$productId]['quantity'] = ((int) ($baseCart[$productId]['quantity'] ?? 0)) + $qty;
+                continue;
+            }
+
+            $baseCart[$productId] = [
+                'name' => (string) ($item['name'] ?? 'Product'),
+                'quantity' => $qty,
+                'price' => (float) ($item['price'] ?? 0),
+                'image' => (string) ($item['image'] ?? ''),
+            ];
+        }
+
+        return $baseCart;
+    }
+
+    private function restoreCartAfterSocialLogin(Request $request, User $user): void
+    {
+        $sessionCart = $request->session()->get('cart', []);
+        $storedCart = Cache::get($this->cartCacheKey($user), []);
+
+        if (!is_array($sessionCart)) {
+            $sessionCart = [];
+        }
+        if (!is_array($storedCart)) {
+            $storedCart = [];
+        }
+
+        $mergedCart = $this->mergeCarts($storedCart, $sessionCart);
+        if ($mergedCart === []) {
+            return;
+        }
+
+        $request->session()->put('cart', $mergedCart);
+        Cache::put($this->cartCacheKey($user), $mergedCart, now()->addDays(30));
+    }
+
     private function splitName(string $fullName): array
     {
         $normalized = trim(preg_replace('/\s+/u', ' ', $fullName) ?? '');
@@ -108,6 +162,7 @@ class ProviderCallbackController extends Controller
             Auth::login($user);
             request()->session()->regenerate();
             session(['otp_verified' => true]); // Satisfy the custom middleware
+            $this->restoreCartAfterSocialLogin(request(), $user);
 
             // Redirect based on role
             if ($user->is_admin || $user->hasRole('admin')) {

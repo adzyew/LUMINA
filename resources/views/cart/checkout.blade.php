@@ -158,42 +158,93 @@
                 </div>
 
                 <h3 class="text-xl font-bold text-gray-900 pt-2">Delivery Information</h3>
-                <div>
-                    <label class="block text-sm font-medium text-gray-500 mb-2">Street / Building / House No. <span class="text-amber-500">*</span></label>
-                    <input type="text" name="shipping_street" value="{{ old('shipping_street', auth()->user()->shipping_street ?? '') }}" required
-                        class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:border-amber-400 outline-none transition-colors"
-                        placeholder="Street, building name, house number">
-                    @error('shipping_street')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
+                @php
+                    $savedStreet = auth()->user()->shipping_street ?? '';
+                    $savedCity = auth()->user()->shipping_city ?? '';
+                    $savedBarangay = auth()->user()->shipping_barangay ?? '';
+                    $savedPostalCode = auth()->user()->shipping_postal_code ?? '';
+                    $savedAddressPayload = [
+                        'street' => $savedStreet,
+                        'city' => $savedCity,
+                        'barangay' => $savedBarangay,
+                        'postal_code' => $savedPostalCode,
+                    ];
+                    $addressMode = old('address_mode', $savedStreet ? 'saved' : 'another');
+                    $shippingStreetValue = $addressMode === 'another' ? old('shipping_street', '') : old('shipping_street', $savedStreet);
+                    $shippingCityValue = $addressMode === 'another' ? old('shipping_city', '') : old('shipping_city', $savedCity);
+                    $shippingBarangayValue = $addressMode === 'another' ? old('shipping_barangay', '') : old('shipping_barangay', $savedBarangay);
+                    $shippingPostalValue = $addressMode === 'another' ? old('shipping_postal_code', '') : old('shipping_postal_code', $savedPostalCode);
+                @endphp
+
+                <div class="rounded-lg border border-gray-200 bg-white p-4 space-y-3">
+                    <p class="text-sm font-semibold text-gray-700">Choose delivery address</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <label class="flex items-start gap-3 p-3 rounded-lg border border-gray-200 cursor-pointer">
+                            <input type="radio" id="address_mode_saved" name="address_mode" value="saved" class="mt-1 h-4 w-4 text-amber-500 border-gray-300 focus:ring-amber-400" {{ $addressMode === 'saved' ? 'checked' : '' }}>
+                            <span>
+                                <span class="block text-sm font-semibold text-gray-900">Use saved address</span>
+                                <span class="block text-xs text-gray-500">Use your default address from settings.</span>
+                            </span>
+                        </label>
+                        <label class="flex items-start gap-3 p-3 rounded-lg border border-gray-200 cursor-pointer">
+                            <input type="radio" id="address_mode_another" name="address_mode" value="another" class="mt-1 h-4 w-4 text-amber-500 border-gray-300 focus:ring-amber-400" {{ $addressMode === 'another' ? 'checked' : '' }}>
+                            <span>
+                                <span class="block text-sm font-semibold text-gray-900">Use another address</span>
+                                <span class="block text-xs text-gray-500">Fill up a different delivery address for this order.</span>
+                            </span>
+                        </label>
+                    </div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-500 mb-2">City / Municipality <span class="text-amber-500">*</span></label>
-                        <select id="city" name="shipping_city" required
-                            class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:border-amber-400 outline-none transition-colors">
-                            <option value="">Loading cities...</option>
-                        </select>
-                        @error('shipping_city')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-500 mb-2">Barangay <span class="text-amber-500">*</span></label>
-                        <select id="barangay" name="shipping_barangay" required
-                            class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:border-amber-400 outline-none transition-colors">
-                            <option value="">Select Barangay</option>
-                        </select>
-                        @error('shipping_barangay')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
-                    </div>
+
+                <div id="saved-address-summary" class="rounded-lg border border-amber-200 bg-amber-50 p-4 space-y-1 text-sm text-gray-700">
+                    <p><span class="font-semibold">Street:</span> {{ $savedStreet ?: 'No saved street address yet.' }}</p>
+                    <p><span class="font-semibold">City/Barangay:</span> {{ trim(($savedCity ?: '-') . ', ' . ($savedBarangay ?: '-')) }}</p>
+                    <p><span class="font-semibold">ZIP:</span> {{ $savedPostalCode ?: '-' }}</p>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <input type="hidden" id="shipping_street_hidden" name="shipping_street" value="{{ $shippingStreetValue }}">
+                <input type="hidden" id="shipping_city_hidden" name="shipping_city" value="{{ $shippingCityValue }}">
+                <input type="hidden" id="shipping_barangay_hidden" name="shipping_barangay" value="{{ $shippingBarangayValue }}">
+                <input type="hidden" id="shipping_postal_code_hidden" name="shipping_postal_code" value="{{ $shippingPostalValue }}">
+
+                <div id="another-address-fields" class="space-y-4 {{ $addressMode === 'another' ? '' : 'hidden' }}">
                     <div>
-                        <label class="block text-sm font-medium text-gray-500 mb-2">Postal / ZIP Code</label>
-                        <input type="text" id="zip" name="shipping_postal_code" value="{{ old('shipping_postal_code', auth()->user()->shipping_postal_code ?? '') }}" readonly
-                            class="w-full bg-gray-100 border border-gray-200 rounded-lg p-3 text-gray-500 cursor-not-allowed outline-none"
-                            placeholder="Auto-filled">
+                        <label class="block text-sm font-medium text-gray-500 mb-2">Street / Building / House No. <span class="text-amber-500">*</span></label>
+                        <input type="text" id="another_shipping_street" value="{{ $addressMode === 'another' ? old('shipping_street', '') : '' }}"
+                            class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:border-amber-400 outline-none transition-colors"
+                            placeholder="Street, building name, house number">
+                        @error('shipping_street')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-500 mb-2">Country</label>
-                        <input type="text" name="shipping_country" value="Philippines" readonly
-                            class="w-full bg-gray-100 border border-gray-200 rounded-lg p-3 text-gray-500 cursor-not-allowed outline-none">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-2">City / Municipality <span class="text-amber-500">*</span></label>
+                            <select id="another_city"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:border-amber-400 outline-none transition-colors">
+                                <option value="">Loading cities...</option>
+                            </select>
+                            @error('shipping_city')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-2">Barangay <span class="text-amber-500">*</span></label>
+                            <select id="another_barangay"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:border-amber-400 outline-none transition-colors">
+                                <option value="">Select Barangay</option>
+                            </select>
+                            @error('shipping_barangay')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-2">Postal / ZIP Code</label>
+                            <input type="text" id="another_zip" value="{{ $addressMode === 'another' ? old('shipping_postal_code', '') : '' }}" readonly
+                                class="w-full bg-gray-100 border border-gray-200 rounded-lg p-3 text-gray-500 cursor-not-allowed outline-none"
+                                placeholder="Auto-filled">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-2">Country</label>
+                            <input type="text" value="Philippines" readonly
+                                class="w-full bg-gray-100 border border-gray-200 rounded-lg p-3 text-gray-500 cursor-not-allowed outline-none">
+                        </div>
                     </div>
                 </div>
 
@@ -343,6 +394,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const backToDetailsBtn = document.getElementById('back-to-details');
     const nextToPaymentBtn = document.getElementById('next-to-payment');
     const backToReviewBtn = document.getElementById('back-to-review');
+    const addressModeSaved = document.getElementById('address_mode_saved');
+    const addressModeAnother = document.getElementById('address_mode_another');
+    const savedAddressSummary = document.getElementById('saved-address-summary');
+    const anotherAddressFields = document.getElementById('another-address-fields');
+    const anotherStreetInput = document.getElementById('another_shipping_street');
+    const anotherCitySelect = document.getElementById('another_city');
+    const anotherBarangaySelect = document.getElementById('another_barangay');
+    const anotherZipInput = document.getElementById('another_zip');
+    const shippingStreetHidden = document.getElementById('shipping_street_hidden');
+    const shippingCityHidden = document.getElementById('shipping_city_hidden');
+    const shippingBarangayHidden = document.getElementById('shipping_barangay_hidden');
+    const shippingPostalHidden = document.getElementById('shipping_postal_code_hidden');
+    const savedAddress = @json($savedAddressPayload);
+    const previousAnotherCity = @json($addressMode === 'another' ? old('shipping_city', '') : '');
+    const previousAnotherBarangay = @json($addressMode === 'another' ? old('shipping_barangay', '') : '');
+    const previousAnotherPostalCode = @json($addressMode === 'another' ? old('shipping_postal_code', '') : '');
 
     let activeStep = initialStep >= 1 && initialStep <= 3 ? initialStep : 1;
 
@@ -382,8 +449,43 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function usingAnotherAddress() {
+        return Boolean(addressModeAnother?.checked);
+    }
+
+    function syncShippingFields() {
+        if (!shippingStreetHidden || !shippingCityHidden || !shippingBarangayHidden || !shippingPostalHidden) return;
+
+        if (usingAnotherAddress()) {
+            shippingStreetHidden.value = (anotherStreetInput?.value || '').trim();
+            shippingCityHidden.value = anotherCitySelect?.value || '';
+            shippingBarangayHidden.value = anotherBarangaySelect?.value || '';
+            shippingPostalHidden.value = anotherZipInput?.value || '';
+            return;
+        }
+
+        shippingStreetHidden.value = savedAddress.street || '';
+        shippingCityHidden.value = savedAddress.city || '';
+        shippingBarangayHidden.value = savedAddress.barangay || '';
+        shippingPostalHidden.value = savedAddress.postal_code || '';
+    }
+
+    function setAddressModeUI() {
+        const anotherMode = usingAnotherAddress();
+
+        anotherAddressFields?.classList.toggle('hidden', !anotherMode);
+        savedAddressSummary?.classList.toggle('hidden', anotherMode);
+
+        if (anotherStreetInput) anotherStreetInput.required = anotherMode;
+        if (anotherCitySelect) anotherCitySelect.required = anotherMode;
+        if (anotherBarangaySelect) anotherBarangaySelect.required = anotherMode;
+
+        syncShippingFields();
+    }
+
     function validateStepOne() {
         if (!checkoutForm) return false;
+        syncShippingFields();
         const requiredFields = checkoutForm.querySelectorAll('[data-step-panel="1"] [required]');
         for (const field of requiredFields) {
             if (typeof field.reportValidity === 'function' && !field.reportValidity()) {
@@ -436,6 +538,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     checkoutForm?.addEventListener('submit', function () {
+        syncShippingFields();
         if (!validateStepOne()) {
             renderStep(1);
             return;
@@ -445,9 +548,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     renderStep(activeStep);
 
-    const citySelect = document.getElementById('city');
-    const barangaySelect = document.getElementById('barangay');
-    const zipInput = document.getElementById('zip');
+    const citySelect = anotherCitySelect;
+    const barangaySelect = anotherBarangaySelect;
+    const zipInput = anotherZipInput;
 
     const zipCodes = {
         "City of Manila": "1000",
@@ -469,56 +572,62 @@ document.addEventListener('DOMContentLoaded', function() {
         "Pateros": "1620"
     };
 
-    fetch('https://psgc.gitlab.io/api/regions/130000000/cities-municipalities/')
-        .then(response => response.json())
-        .then(data => {
-            citySelect.innerHTML = '<option value="">Select City</option>';
-            data.forEach(city => {
-                const option = document.createElement('option');
-                option.value = city.name;
-                option.textContent = city.name;
-                option.dataset.code = city.code;
-
-                if (option.value === "{{ old('shipping_city', auth()->user()->shipping_city) }}") {
-                    option.selected = true;
-                }
-
-                citySelect.appendChild(option);
-            });
-
-            if (citySelect.value) citySelect.dispatchEvent(new Event('change'));
-        });
-
-    citySelect.addEventListener('change', function () {
-        const selectedOption = this.selectedOptions[0];
-        if (!selectedOption || !selectedOption.dataset.code) return;
-
-        const cityCode = selectedOption.dataset.code;
-        const cityName = selectedOption.value;
-
-        zipInput.value = zipCodes[cityName] ?? '';
-        barangaySelect.innerHTML = '<option value="">Loading barangays...</option>';
-
-        fetch(`https://psgc.gitlab.io/api/cities-municipalities/${cityCode}/barangays/`)
+    if (citySelect && barangaySelect && zipInput) {
+        fetch('https://psgc.gitlab.io/api/regions/130000000/cities-municipalities/')
             .then(response => response.json())
             .then(data => {
-                barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
-                data.forEach(brgy => {
+                citySelect.innerHTML = '<option value="">Select City</option>';
+                data.forEach(city => {
                     const option = document.createElement('option');
-                    option.value = brgy.name;
-                    option.textContent = brgy.name;
-
-                    if (option.value === "{{ old('shipping_barangay', auth()->user()->shipping_barangay) }}") {
-                        option.selected = true;
-                    }
-
-                    barangaySelect.appendChild(option);
+                    option.value = city.name;
+                    option.textContent = city.name;
+                    option.dataset.code = city.code;
+                    if (option.value === previousAnotherCity) option.selected = true;
+                    citySelect.appendChild(option);
                 });
-            })
-            .catch(() => {
-                barangaySelect.innerHTML = '<option value="">Failed to load</option>';
+
+                if (citySelect.value) {
+                    zipInput.value = previousAnotherPostalCode || '';
+                    citySelect.dispatchEvent(new Event('change'));
+                }
             });
-    });
+
+        citySelect.addEventListener('change', function () {
+            const selectedOption = this.selectedOptions[0];
+            if (!selectedOption || !selectedOption.dataset.code) return;
+
+            const cityCode = selectedOption.dataset.code;
+            const cityName = selectedOption.value;
+
+            zipInput.value = zipCodes[cityName] ?? '';
+            barangaySelect.innerHTML = '<option value="">Loading barangays...</option>';
+
+            fetch(`https://psgc.gitlab.io/api/cities-municipalities/${cityCode}/barangays/`)
+                .then(response => response.json())
+                .then(data => {
+                    barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+                    data.forEach(brgy => {
+                        const option = document.createElement('option');
+                        option.value = brgy.name;
+                        option.textContent = brgy.name;
+                        if (option.value === previousAnotherBarangay) option.selected = true;
+                        barangaySelect.appendChild(option);
+                    });
+                    syncShippingFields();
+                })
+                .catch(() => {
+                    barangaySelect.innerHTML = '<option value="">Failed to load</option>';
+                });
+        });
+    }
+
+    addressModeSaved?.addEventListener('change', setAddressModeUI);
+    addressModeAnother?.addEventListener('change', setAddressModeUI);
+    anotherStreetInput?.addEventListener('input', syncShippingFields);
+    anotherCitySelect?.addEventListener('change', syncShippingFields);
+    anotherBarangaySelect?.addEventListener('change', syncShippingFields);
+    anotherZipInput?.addEventListener('input', syncShippingFields);
+    setAddressModeUI();
 });
 </script>
 

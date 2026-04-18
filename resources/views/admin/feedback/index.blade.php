@@ -121,7 +121,7 @@
                                     </form>
                                 @endif
 
-                                <form method="POST" action="{{ route('admin.feedback.flag', $review) }}" onsubmit="{{ $review->is_flagged ? 'return confirm(\'Are you sure to unflag it?\');' : 'return true;' }}">
+                                <form method="POST" action="{{ route('admin.feedback.flag', $review) }}" onsubmit="return handleFlagToggleSubmit(event, this, {{ $review->is_flagged ? 'true' : 'false' }})">
                                     @csrf
                                     @method('PATCH')
                                     <input type="hidden" name="reason" value="Flag toggled by moderator">
@@ -162,6 +162,24 @@
     </section>
 </div>
 
+<div id="flagConfirmModal" class="fixed inset-0 z-120 hidden" aria-labelledby="flag-confirm-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm"></div>
+    <div class="fixed inset-0 flex items-center justify-center p-4">
+        <div class="w-full max-w-md rounded-2xl bg-white border border-gray-200 shadow-2xl overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100">
+                <h3 id="flag-confirm-title" class="text-lg font-bold text-gray-900">Confirm Unflag</h3>
+                <p class="text-sm text-gray-500 mt-1">Are you sure you want to unflag this review?</p>
+            </div>
+            <div class="px-5 py-4">
+                <div class="flex gap-2 justify-end">
+                    <button type="button" onclick="closeFlagConfirmModal()" class="rounded-xl border border-gray-300 px-4 py-2 text-sm">Cancel</button>
+                    <button type="button" onclick="confirmFlagToggleSubmit()" class="rounded-xl bg-amber-300 hover:bg-amber-400 text-black font-semibold px-4 py-2 text-sm">Yes, Unflag</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="moderationReasonModal" class="fixed inset-0 z-120 hidden" aria-labelledby="moderation-reason-title" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModerationReasonModal()"></div>
     <div class="fixed inset-0 flex items-center justify-center p-4">
@@ -185,6 +203,42 @@
 </div>
 
 <script>
+let pendingFlagToggleForm = null;
+
+function handleFlagToggleSubmit(event, form, isFlagged) {
+    if (!isFlagged) {
+        return true;
+    }
+
+    event.preventDefault();
+    pendingFlagToggleForm = form;
+    const modal = document.getElementById('flagConfirmModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+
+    return false;
+}
+
+function closeFlagConfirmModal() {
+    const modal = document.getElementById('flagConfirmModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    pendingFlagToggleForm = null;
+}
+
+function confirmFlagToggleSubmit() {
+    if (!pendingFlagToggleForm) {
+        closeFlagConfirmModal();
+        return;
+    }
+
+    const formToSubmit = pendingFlagToggleForm;
+    closeFlagConfirmModal();
+    formToSubmit.submit();
+}
+
 function openModerationReasonModal(actionUrl, title, subtitle) {
     const modal = document.getElementById('moderationReasonModal');
     const form = document.getElementById('moderationReasonForm');
@@ -253,6 +307,7 @@ function closeModerationReasonModal() {
 document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
         closeModerationReasonModal();
+        closeFlagConfirmModal();
     }
 });
 </script>
