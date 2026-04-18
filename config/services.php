@@ -70,6 +70,10 @@ return [
         'app_check_debug_token' => env('FIREBASE_APP_CHECK_DEBUG_TOKEN'),
         'enable_app_check' => filter_var(env('FIREBASE_ENABLE_APP_CHECK', false), FILTER_VALIDATE_BOOL),
     ],
-    
+
+    'promo' => [
+        'daily_code' => env('PROMO_DAILY_CODE', 'LUMIPRO'),
+        'daily_discount_percent' => (float) env('PROMO_DAILY_DISCOUNT_PERCENT', 5),
+    ],
 
 ];

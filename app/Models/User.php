@@ -108,6 +108,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(\App\Models\CourierFeedback::class);
     }
 
+    public function promoClaims(): HasMany
+    {
+        return $this->hasMany(\App\Models\PromoClaim::class);
+    }
+
     public function isPrivilegedStaff(): bool
     {
         return (bool) ($this->is_admin ?? false)
@@ -120,3 +125,4 @@ class User extends Authenticatable implements MustVerifyEmail
             || $this->can('reviews.moderate');
     }
 }
+

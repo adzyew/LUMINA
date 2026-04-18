@@ -6,8 +6,11 @@ use App\Mail\OrderPlacedMail;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\InventoryLog;
+use App\Models\Promo;
+use App\Models\PromoClaim;
 use App\Models\Product;
 use App\Services\PaymongoService;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,6 +24,8 @@ use RuntimeException;
 class CartController extends Controller
 {
     private const CART_CACHE_TTL_DAYS = 30;
+    private const PROMO_MIN_DISCOUNT_PERCENT = 5.00;
+    private const PROMO_CLAIM_WINDOW_MINUTES = 60;
 
     private function cartCacheKey(int $userId): string
     {
@@ -53,6 +58,85 @@ class CartController extends Controller
         }
 
         Cache::forget($this->cartCacheKey($userId));
+    }
+
+    private function activePromoSessionClaimId(): ?int
+    {
+        $claimId = (int) session('checkout_promo_claim_id', 0);
+        return $claimId > 0 ? $claimId : null;
+    }
+
+    private function clearPromoSession(): void
+    {
+        session()->forget('checkout_promo_claim_id');
+    }
+
+    private function getSessionPromoClaimForUser(int $userId): ?PromoClaim
+    {
+        $claimId = $this->activePromoSessionClaimId();
+        if (!$claimId) {
+            return null;
+        }
+
+        $claim = PromoClaim::with('promo')
+            ->where('id', $claimId)
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$claim) {
+            $this->clearPromoSession();
+            return null;
+        }
+
+        if ($claim->used_at !== null) {
+            $this->clearPromoSession();
+            return null;
+        }
+
+        $now = now();
+        $promo = $claim->promo;
+        if (
+            !$promo ||
+            !$promo->is_active ||
+            ($promo->starts_at && $promo->starts_at->isFuture()) ||
+            $promo->expires_at->isPast() ||
+            !$claim->expires_at ||
+            $claim->expires_at->isPast()
+        ) {
+            $this->clearPromoSession();
+            return null;
+        }
+
+        if ((float) $promo->discount_percent < self::PROMO_MIN_DISCOUNT_PERCENT) {
+            $this->clearPromoSession();
+            return null;
+        }
+
+        return $claim;
+    }
+
+    private function promoViewDataFromClaim(?PromoClaim $claim, float $discountableTotal): array
+    {
+        if (!$claim || !$claim->promo) {
+            return [
+                'hasPromo' => false,
+                'code' => null,
+                'discount_percent' => 0.0,
+                'discount_amount' => 0.0,
+                'expires_at' => null,
+            ];
+        }
+
+        $percent = max((float) $claim->promo->discount_percent, self::PROMO_MIN_DISCOUNT_PERCENT);
+        $amount = round(($discountableTotal * $percent) / 100, 2);
+
+        return [
+            'hasPromo' => true,
+            'code' => $claim->promo->code,
+            'discount_percent' => $percent,
+            'discount_amount' => $amount,
+            'expires_at' => optional($claim->expires_at)?->toIso8601String(),
+        ];
     }
 
     // 1. SHOW CART PAGE (This fixes the error)
@@ -196,6 +280,80 @@ class CartController extends Controller
         return redirect()->back()->with('success', 'Cart updated.');
     }
 
+    public function applyPromo(Request $request)
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Please log in to apply a promo code.');
+        }
+
+        $validated = $request->validate([
+            'promo_code' => 'required|string|max:50',
+        ]);
+
+        $userId = (int) Auth::id();
+        $code = strtoupper(trim((string) $validated['promo_code']));
+
+        $promo = Promo::query()
+            ->whereRaw('UPPER(code) = ?', [$code])
+            ->first();
+
+        if (!$promo) {
+            return back()->with('error', 'Promo code not found.');
+        }
+
+        if ((float) $promo->discount_percent < self::PROMO_MIN_DISCOUNT_PERCENT) {
+            return back()->with('error', 'Promo discount must be at least 5%.');
+        }
+
+        $now = now();
+        if (!$promo->is_active || ($promo->starts_at && $promo->starts_at->isFuture()) || $promo->expires_at->isPast()) {
+            return back()->with('error', 'This promo code is not active.');
+        }
+
+        $existingUsedClaim = PromoClaim::query()
+            ->where('promo_id', $promo->id)
+            ->where('user_id', $userId)
+            ->whereNotNull('used_at')
+            ->exists();
+
+        if ($existingUsedClaim) {
+            return back()->with('error', 'You already used this promo code.');
+        }
+
+        $claimExpiry = CarbonImmutable::now()->addMinutes(self::PROMO_CLAIM_WINDOW_MINUTES);
+        $promoExpiry = CarbonImmutable::instance($promo->expires_at);
+        if ($claimExpiry->greaterThan($promoExpiry)) {
+            $claimExpiry = $promoExpiry;
+        }
+
+        $claim = PromoClaim::query()->updateOrCreate(
+            [
+                'promo_id' => $promo->id,
+                'user_id' => $userId,
+            ],
+            [
+                'claimed_at' => now(),
+                'expires_at' => $claimExpiry,
+                'used_at' => null,
+                'order_id' => null,
+            ]
+        );
+
+        session(['checkout_promo_claim_id' => $claim->id]);
+
+        return back()->with('success', sprintf(
+            'Promo %s applied. You have %d minutes to use it.',
+            $promo->code,
+            self::PROMO_CLAIM_WINDOW_MINUTES
+        ));
+    }
+
+    public function removePromo()
+    {
+        $this->clearPromoSession();
+        return back()->with('info', 'Promo code removed.');
+    }
+
     public function checkout()
     {
         $cart = session()->get('cart', []);
@@ -203,8 +361,19 @@ class CartController extends Controller
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
 
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        $userId = $user ? (int) $user->id : 0;
+
+        $subtotal = $this->calculateSubtotal($cart);
+        $shippingFee = 0.0;
+        $discountableTotal = $subtotal + $shippingFee;
+        $promoClaim = $userId > 0 ? $this->getSessionPromoClaimForUser($userId) : null;
+        $promoView = $this->promoViewDataFromClaim($promoClaim, $discountableTotal);
+
         return view('cart.checkout', [
             'shippingRates' => $this->shippingRates(),
+            'promoView' => $promoView,
         ]);
     }
 
@@ -241,24 +410,34 @@ class CartController extends Controller
         ]);
 
         try {
-            // ✨ START TRANSACTION ✨
-            // We pass the $request and $cart into the transaction using "use"
             $order = DB::transaction(function () use ($request, $cart) {
-
                 $subtotal = $this->calculateSubtotal($cart);
                 $shippingFee = $this->shippingFeeForCity($request->shipping_city);
                 $total = $subtotal + $shippingFee;
 
+                $promoDiscountAmount = 0.0;
+                $promoDiscountPercent = null;
+                $promoCode = null;
+                $promoId = null;
+
                 /** @var \App\Models\User $user */
                 $user = Auth::user();
                 $pointsUsed = 0;
-                $discountAmount = 0;
+                $pointsDiscountAmount = 0.0;
 
-                if($request->has('use_points') && $request->use_points == '1' && $user->points_balance > 0){
-                    $discountAmount = min($total, $user->points_balance);
-                    $pointsUsed = $discountAmount; 
+                $promoClaim = $this->getSessionPromoClaimForUser((int) $user->id);
+                if ($promoClaim && $promoClaim->promo) {
+                    $promoDiscountPercent = max((float) $promoClaim->promo->discount_percent, self::PROMO_MIN_DISCOUNT_PERCENT);
+                    $promoDiscountAmount = round(($total * $promoDiscountPercent) / 100, 2);
+                    $total = max(0, $total - $promoDiscountAmount);
+                    $promoCode = $promoClaim->promo->code;
+                    $promoId = (int) $promoClaim->promo->id;
+                }
 
-                    $total -= $discountAmount;
+                if ($request->has('use_points') && $request->use_points == '1' && $user->points_balance > 0) {
+                    $pointsDiscountAmount = min($total, (float) $user->points_balance);
+                    $pointsUsed = (int) round($pointsDiscountAmount);
+                    $total -= $pointsDiscountAmount;
                     $user->decrement('points_balance', $pointsUsed);
                 }
 
@@ -271,12 +450,14 @@ class CartController extends Controller
                 ]);
                 $fullAddress = implode(', ', $addressParts);
 
-                // 1. Create Order
                 $orderData = [
                     'user_id' => Auth::id(),
-                    'total_price' => $total,
+                    'total_price' => round($total, 2),
                     'points_used' => $pointsUsed,
-                    'discount_amount' => $discountAmount,
+                    'discount_amount' => round($promoDiscountAmount + $pointsDiscountAmount, 2),
+                    'promo_id' => $promoId,
+                    'promo_code' => $promoCode,
+                    'promo_discount_percent' => $promoDiscountPercent,
                     'status' => $request->payment_method === 'paymongo' ? 'awaiting_payment' : 'pending',
                     'payment_method' => $request->payment_method,
                     'payment_status' => 'pending',
@@ -297,14 +478,12 @@ class CartController extends Controller
 
                 $order = Order::create($orderData);
 
-                // 2. Process Items & Inventory
                 foreach ($cart as $productId => $item) {
-                    // FIXED BUG: Changed $id to $productId here!
                     $product = Product::find($productId);
 
-                    if($product) {
+                    if ($product) {
                         $oldStock = $product->stock_quantity;
-                        $quantityBought = $item['quantity'];
+                        $quantityBought = (int) $item['quantity'];
 
                         OrderItem::create([
                             'order_id' => $order->id,
@@ -330,10 +509,17 @@ class CartController extends Controller
                     }
                 }
 
-                // Return the order out of the transaction so the email can use it
-                return $order; 
-            }); 
-            // ✨ END TRANSACTION ✨
+                if ($promoClaim) {
+                    $promoClaim->forceFill([
+                        'used_at' => now(),
+                        'order_id' => $order->id,
+                    ])->save();
+                }
+
+                return $order;
+            });
+
+            $this->clearPromoSession();
 
             if ($order->payment_method === 'paymongo') {
                 $order->loadMissing(['user', 'items.product']);
@@ -360,8 +546,7 @@ class CartController extends Controller
             session()->forget('cart');
             $this->clearPersistentCart();
 
-            // Send Email (We do this outside the transaction so if the email fails, 
-            // the order isn't deleted!)
+            // Send email outside the transaction so order persistence is never rolled back by mail failure.
             try {
                 $order->load(['user', 'items.product']);
                 Log::info('Order confirmation email send attempt (COD)', [
@@ -392,7 +577,6 @@ class CartController extends Controller
                 ->with('success', 'Order #' . $order->display_order_number . ' placed successfully! Check your email for confirmation.');
 
         } catch (\Exception $e) {
-            // IF ANYTHING ABOVE FAILED, IT COMES HERE AND NOTHING IS SAVED!
             Log::error('Checkout Failed: ' . $e->getMessage());
             return redirect()->route('cart.index')->with('error', 'There was an issue processing your order. Please try again.');
         }
@@ -428,8 +612,8 @@ class CartController extends Controller
             'City of Makati' => 0,
             'City of Taguig' => 0,
             'City of Pasig' => 0,
-            'City of Parañaque' => 0,
-            'City of Las Piñas' => 0,
+            'City of ParaÃ±aque' => 0,
+            'City of Las PiÃ±as' => 0,
             'City of Mandaluyong' => 0,
             'City of Marikina' => 0,
             'City of Navotas' => 0,
@@ -443,3 +627,4 @@ class CartController extends Controller
         ];
     }
 }
+

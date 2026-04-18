@@ -307,8 +307,7 @@
                     if (!container) {
                         throw new Error('reCAPTCHA container is missing.');
                     }
-                    const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-                    const recaptchaSize = isLocalHost ? 'normal' : 'invisible';
+                    const recaptchaSize = 'normal';
                     if (recaptchaVerifier) {
                         try {
                             recaptchaVerifier.clear();
@@ -432,10 +431,7 @@
                             resendHint.classList.add('hidden');
                         }
                         if (resendTimerText && resendRemaining <= 0) {
-                            const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-                            resendTimerText.textContent = isLocalHost
-                                ? 'Complete reCAPTCHA, then tap "Send SMS Code".'
-                                : 'Tap "Send SMS Code" to receive your OTP.';
+                            resendTimerText.textContent = 'Complete reCAPTCHA, then tap "Send SMS Code".';
                         }
                     } catch (e) {
                         logFirebaseError(e);
@@ -459,7 +455,13 @@
                             resendBtnSmsFirebase.textContent = 'Resend via SMS';
                         } catch (error) {
                             logFirebaseError(error);
-                            if (isTooManyRequests(error)) {
+                            const errorCode = (error && error.code) ? String(error.code) : '';
+                            if (
+                                isTooManyRequests(error) ||
+                                errorCode === 'auth/invalid-app-credential' ||
+                                errorCode === 'auth/firebase-app-check-token-is-invalid' ||
+                                errorCode === 'auth/captcha-check-failed'
+                            ) {
                                 // Back off client retries when Firebase temporarily blocks this device/session.
                                 setSmsResendCountdown(300);
                                 updateSmsTimer();
