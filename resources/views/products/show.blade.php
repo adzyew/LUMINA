@@ -46,7 +46,7 @@
 
             <div class="lg:sticky lg:top-20 h-max">
                 <div class="relative rounded-2xl border border-amber-100 bg-linear-to-b from-white to-stone-50 shadow-md overflow-hidden p-3 sm:p-4 h-max">
-                <div id="productImageStage" class="relative bg-white rounded-xl border border-gray-100 overflow-hidden flex items-center justify-center p-2.5 sm:p-3 aspect-4/5 max-h-[70dvh] group" style="touch-action: pan-y;">
+                <div id="productImageStage" class="relative bg-linear-to-b from-white to-stone-50 rounded-xl overflow-hidden flex items-center justify-center p-2 sm:p-3 aspect-4/5 max-h-[70dvh] h-full group" style="touch-action: pan-y;">
                     @if($mainImg)
                         <img id="mainProductImage" src="{{ $mainImg }}" alt="{{ $product->name }}" class="w-full h-full object-cover rounded-xl transition-transform duration-700 group-hover:scale-[1.03]">
                     @else
@@ -72,13 +72,7 @@
                         </button>
                         <div id="productImageDots" class="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/40">
                             @foreach($gallery as $dotIndex => $dotImage)
-                                <button
-                                    type="button"
-                                    onclick="goToProductImage({{ $dotIndex }})"
-                                    data-dot-index="{{ $dotIndex }}"
-                                    class="h-2.5 w-2.5 rounded-full transition-all {{ $dotIndex === 0 ? 'bg-white' : 'bg-white/45 hover:bg-white/80' }}"
-                                    aria-label="Go to image {{ $dotIndex + 1 }}"
-                                ></button>
+                                <button type="button" onclick="goToProductImage({{ $dotIndex }})" data-dot-index="{{ $dotIndex }}" class="h-2.5 w-2.5 rounded-full transition-all {{ $dotIndex === 0 ? 'bg-white' : 'bg-white/45 hover:bg-white/80' }}" aria-label="Go to image {{ $dotIndex + 1 }}"></button>
                             @endforeach
                         </div>
                     @endif
@@ -99,13 +93,7 @@
                 @if($gallery->count() > 1)
                     <div id="productImageThumbs" class="mt-3 flex items-center gap-2 overflow-x-auto pb-1">
                         @foreach($gallery as $thumbIndex => $thumbImage)
-                            <button
-                                type="button"
-                                onclick="goToProductImage({{ $thumbIndex }})"
-                                data-thumb-index="{{ $thumbIndex }}"
-                                class="shrink-0 h-14 w-14 sm:h-16 sm:w-16 rounded-lg overflow-hidden border transition-all {{ $thumbIndex === 0 ? 'border-amber-400 ring-2 ring-amber-200' : 'border-gray-200 hover:border-amber-300' }}"
-                                aria-label="Preview image {{ $thumbIndex + 1 }}"
-                            >
+                            <button type="button" onclick="goToProductImage({{ $thumbIndex }})" data-thumb-index="{{ $thumbIndex }}" class="shrink-0 h-14 w-14 sm:h-16 sm:w-16 rounded-lg overflow-hidden border transition-all {{ $thumbIndex === 0 ? 'border-amber-400 ring-2 ring-amber-200' : 'border-gray-200 hover:border-amber-300' }}" aria-label="Preview image {{ $thumbIndex + 1 }}">
                                 <img src="{{ $thumbImage }}" alt="" class="w-full h-full object-cover">
                             </button>
                         @endforeach
@@ -115,7 +103,7 @@
             </div>
 
             {{-- RIGHT COL: Product Details --}}
-            <div class="flex flex-col bg-white rounded-2xl border border-gray-100 shadow-md p-4 sm:p-5">
+            <div class="flex flex-col h-full bg-white rounded-2xl border border-gray-100 shadow-md p-4 sm:p-5">
                 
                 <div class="flex flex-wrap gap-1 mb-4">
                     <span class="px-3 py-1 rounded border border-amber-500/80 text-[11px] font-semibold text-amber-700 uppercase tracking-widest bg-amber-50">

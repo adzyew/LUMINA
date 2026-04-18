@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <form method="GET" action="{{ route('admin.products.index') }}" class="js-admin-auto-filter mb-6 bg-white border border-gray-200 rounded-2xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3" data-autofilter-container="#products-autofilter-content">
+    <form method="GET" action="{{ route('admin.products.index') }}" class="js-admin-auto-filter mb-6 bg-white border border-gray-200 rounded-xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3" data-autofilter-container="#products-autofilter-content">
         <input type="hidden" name="filter" value="{{ $filter ?? 'all' }}">
         <div>
             <label for="search" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Search</label>
@@ -54,7 +54,7 @@
         </div>
     </form>
 
-    <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
+    <div class="bg-white rounded-xl overflow-hidden border border-gray-200">
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-gray-50 text-gray-700 border-b border-gray-200 text-sm">

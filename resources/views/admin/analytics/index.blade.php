@@ -11,9 +11,9 @@
         </div>
 
         <form action="{{ route('admin.analytics.export') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2 w-full xl:w-auto">
-            <input type="date" name="from" value="{{ request('from') }}" class="min-w-[170px] bg-white border border-gray-300 rounded-xl px-3 py-2 text-sm text-gray-900" placeholder="From">
-            <input type="date" name="to" value="{{ request('to') }}" class="min-w-[170px] bg-white border border-gray-300 rounded-xl px-3 py-2 text-sm text-gray-900" placeholder="To">
-            <select name="status" class="min-w-[160px] bg-white border border-gray-300 rounded-xl px-3 py-2 text-sm text-gray-900">
+            <input type="date" name="from" value="{{ request('from') }}" class="min-w-42.5 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900" placeholder="From">
+            <input type="date" name="to" value="{{ request('to') }}" class="min-w-42.5 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900" placeholder="To">
+            <select name="status" class="min-w-40 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900">
                 <option value="">All Statuses</option>
                 <option value="pending" @selected(request('status') === 'pending')>Pending</option>
                 <option value="confirmed" @selected(request('status') === 'confirmed')>Confirmed</option>
@@ -22,36 +22,36 @@
                 <option value="delivered" @selected(request('status') === 'delivered')>Delivered</option>
                 <option value="cancelled" @selected(request('status') === 'cancelled')>Cancelled</option>
             </select>
-            <button type="submit" class="px-4 py-2 bg-amber-300 text-black font-bold rounded-xl hover:bg-amber-400 text-sm">Export CSV</button>
+            <button type="submit" class="px-4 py-2 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 text-sm">Export CSV</button>
         </form>
     </header>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <article class="rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-5 shadow-sm">
+        <article class="rounded-xl border border-amber-200 bg-linear-to-br from-amber-50 to-white p-5 shadow-sm">
             <p class="text-xs uppercase tracking-wide text-amber-700 font-semibold">Total Revenue</p>
             <p class="text-2xl font-bold text-amber-600 mt-2">PHP {{ number_format($totalRevenue, 2) }}</p>
         </article>
-        <article class="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm">
+        <article class="rounded-xl border border-blue-200 bg-linear-to-br from-blue-50 to-white p-5 shadow-sm">
             <p class="text-xs uppercase tracking-wide text-blue-700 font-semibold">This Month</p>
             <p class="text-2xl font-bold text-blue-700 mt-2">PHP {{ number_format($thisMonthRevenue, 2) }}</p>
         </article>
-        <article class="rounded-3xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-5 shadow-sm">
+        <article class="rounded-xl border border-gray-200 bg-linear-to-br from-gray-50 to-white p-5 shadow-sm">
             <p class="text-xs uppercase tracking-wide text-gray-700 font-semibold">Last Month</p>
             <p class="text-2xl font-bold text-gray-900 mt-2">PHP {{ number_format($lastMonthRevenue, 2) }}</p>
         </article>
-        <article class="rounded-3xl border {{ $revenueChange >= 0 ? 'border-green-200 bg-gradient-to-br from-green-50 to-white' : 'border-red-200 bg-gradient-to-br from-red-50 to-white' }} p-5 shadow-sm">
+        <article class="rounded-xl border {{ $revenueChange >= 0 ? 'border-green-200 bg-linear-to-br from-green-50 to-white' : 'border-red-200 bg-linear-to-br from-red-50 to-white' }} p-5 shadow-sm">
             <p class="text-xs uppercase tracking-wide {{ $revenueChange >= 0 ? 'text-green-700' : 'text-red-700' }} font-semibold">Revenue Change</p>
             <p class="text-2xl font-bold mt-2 {{ $revenueChange >= 0 ? 'text-green-600' : 'text-red-600' }}">{{ $revenueChange >= 0 ? '+' : '' }}{{ $revenueChange }}%</p>
         </article>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <article class="rounded-3xl border border-red-200 bg-gradient-to-br from-red-50 to-white p-5 shadow-sm">
+        <article class="rounded-xl border border-red-200 bg-linear-to-br from-red-50 to-white p-5 shadow-sm">
             <p class="text-xs uppercase tracking-wide text-red-700 font-semibold">Cash Outflow (6 Months)</p>
             <p class="text-2xl font-bold text-red-600 mt-2">PHP {{ number_format($totalCashOutflow, 2) }}</p>
             <p class="text-xs text-gray-500 mt-1">Discounts and points redeemed</p>
         </article>
-        <article class="rounded-3xl border {{ $totalNetCashflow >= 0 ? 'border-emerald-200 bg-gradient-to-br from-emerald-50 to-white' : 'border-red-200 bg-gradient-to-br from-red-50 to-white' }} p-5 shadow-sm">
+        <article class="rounded-xl border {{ $totalNetCashflow >= 0 ? 'border-emerald-200 bg-linear-to-br from-emerald-50 to-white' : 'border-red-200 bg-gradient-to-br from-red-50 to-white' }} p-5 shadow-sm">
             <p class="text-xs uppercase tracking-wide {{ $totalNetCashflow >= 0 ? 'text-emerald-700' : 'text-red-700' }} font-semibold">Net Cashflow (6 Months)</p>
             <p class="text-2xl font-bold mt-2 {{ $totalNetCashflow >= 0 ? 'text-emerald-600' : 'text-red-600' }}">PHP {{ number_format($totalNetCashflow, 2) }}</p>
             <p class="text-xs text-gray-500 mt-1">Inflow minus outflow</p>
@@ -59,7 +59,7 @@
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <section class="bg-white border border-gray-200 rounded-3xl p-5 shadow-sm">
+        <section class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
             <div class="flex flex-wrap gap-2 items-center justify-between mb-3">
                 <h2 class="text-2xl font-playfair font-bold text-gray-900" id="revenueChartTitle">Revenue (Last 7 Days)</h2>
                 <div class="flex gap-1 text-xs">
@@ -69,20 +69,20 @@
                     <button onclick="setRevenuePeriod('year')" data-period="year" class="period-btn px-3 py-1.5 rounded-lg font-semibold transition-colors text-gray-500 hover:bg-gray-100">Year</button>
                 </div>
             </div>
-            <div id="revenueChart" class="min-h-[280px]"></div>
+            <div id="revenueChart" class="min-h-70"></div>
         </section>
 
-        <section class="bg-white border border-gray-200 rounded-3xl p-5 shadow-sm">
+        <section class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
             <h2 class="text-2xl font-playfair font-bold text-gray-900 mb-3">Orders by Status</h2>
-            <div id="statusChart" class="min-h-[280px]"></div>
+            <div id="statusChart" class="min-h-70"></div>
         </section>
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <section class="bg-white border border-gray-200 rounded-3xl p-5 shadow-sm">
+        <section class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
             <h2 class="text-2xl font-playfair font-bold text-gray-900 mb-3">Top Products</h2>
             <div class="overflow-x-auto">
-                <table class="w-full text-sm min-w-[420px]">
+                <table class="w-full text-sm min-w-105">
                     <thead>
                         <tr class="text-gray-500 border-b border-gray-200">
                             <th class="pb-3 text-left">Product</th>
@@ -103,9 +103,9 @@
             </div>
         </section>
 
-        <section class="bg-white border border-gray-200 rounded-3xl p-5 shadow-sm">
+        <section class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
             <h2 class="text-2xl font-playfair font-bold text-gray-900 mb-3">Moneyflow (Last 6 Months)</h2>
-            <div id="salesTrendChart" class="min-h-[300px]"></div>
+            <div id="salesTrendChart" class="min-h-75"></div>
         </section>
     </div>
 </div>

@@ -9,33 +9,27 @@
     </header>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <article class="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm">
+        <article class="rounded-xl border border-blue-200 bg-linear-to-br from-blue-50 to-white p-5 shadow-sm">
             <p class="text-xs uppercase tracking-wide text-blue-700 font-semibold">Total Requests</p>
             <p class="text-4xl font-bold text-blue-700 mt-2">{{ number_format($stats['total'] ?? 0) }}</p>
         </article>
-        <article class="rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-5 shadow-sm">
+        <article class="rounded-xl border border-amber-200 bg-linear-to-br from-amber-50 to-white p-5 shadow-sm">
             <p class="text-xs uppercase tracking-wide text-amber-700 font-semibold">Pending</p>
             <p class="text-4xl font-bold text-amber-600 mt-2">{{ number_format($stats['pending'] ?? 0) }}</p>
         </article>
-        <article class="rounded-3xl border border-green-200 bg-gradient-to-br from-green-50 to-white p-5 shadow-sm">
+        <article class="rounded-xl border border-green-200 bg-linear-to-br from-green-50 to-white p-5 shadow-sm">
             <p class="text-xs uppercase tracking-wide text-green-700 font-semibold">Approved</p>
             <p class="text-4xl font-bold text-green-600 mt-2">{{ number_format($stats['approved'] ?? 0) }}</p>
         </article>
-        <article class="rounded-3xl border border-red-200 bg-gradient-to-br from-red-50 to-white p-5 shadow-sm">
+        <article class="rounded-xl border border-red-200 bg-linear-to-br from-red-50 to-white p-5 shadow-sm">
             <p class="text-xs uppercase tracking-wide text-red-700 font-semibold">Rejected</p>
             <p class="text-4xl font-bold text-red-600 mt-2">{{ number_format($stats['rejected'] ?? 0) }}</p>
         </article>
     </div>
 
-    <section class="bg-white border border-gray-200 rounded-3xl p-4 shadow-sm">
+    <section class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
         <form method="GET" action="{{ route('admin.returns.index') }}" class="js-admin-auto-filter grid grid-cols-1 md:grid-cols-3 gap-3" data-autofilter-container="#returns-autofilter-content">
-            <input
-                type="text"
-                name="q"
-                value="{{ request('q') }}"
-                placeholder="Search order #, customer, reason"
-                class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900"
-            >
+            <input type="text" name="q" value="{{ request('q') }}" placeholder="Search order #, customer, reason" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900">
             <select name="status" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900">
                 <option value="">All Status</option>
                 <option value="pending" @selected(request('status') === 'pending')>Pending</option>
@@ -48,7 +42,7 @@
         </form>
     </section>
 
-    <section class="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-sm">
+    <section class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
             <table class="min-w-full text-left text-sm">
                 <thead class="bg-gray-50 text-gray-700 border-b border-gray-200">
@@ -111,22 +105,12 @@
                             <td class="px-4 py-4 min-w-[220px]">
                                 @if($refund->status === 'pending')
                                     <div class="flex items-center justify-center gap-2">
-                                        <button
-                                            type="button"
-                                            onclick="toggleReturnAction('{{ $refund->id }}', 'approve')"
-                                            class="h-10 w-10 rounded-lg bg-green-600 hover:bg-green-500 text-white inline-flex items-center justify-center transition-colors"
-                                            title="Approve refund"
-                                        >
+                                        <button type="button" onclick="toggleReturnAction('{{ $refund->id }}', 'approve')" class="h-10 w-10 rounded-lg bg-green-600 hover:bg-green-500 text-white inline-flex items-center justify-center transition-colors" title="Approve refund">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                             </svg>
                                         </button>
-                                        <button
-                                            type="button"
-                                            onclick="toggleReturnAction('{{ $refund->id }}', 'reject')"
-                                            class="h-10 w-10 rounded-lg bg-red-600 hover:bg-red-500 text-white inline-flex items-center justify-center transition-colors"
-                                            title="Reject refund"
-                                        >
+                                        <button type="button" onclick="toggleReturnAction('{{ $refund->id }}', 'reject')" class="h-10 w-10 rounded-lg bg-red-600 hover:bg-red-500 text-white inline-flex items-center justify-center transition-colors" title="Reject refund">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
@@ -137,22 +121,11 @@
                                         @csrf
                                         @method('PATCH')
                                         <div class="flex justify-end">
-                                            <button
-                                                type="button"
-                                                onclick="closeReturnAction('{{ $refund->id }}')"
-                                                class="inline-flex items-center justify-center h-6 w-6 rounded-md border border-gray-200 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-                                                title="Close"
-                                            >
+                                            <button type="button" onclick="closeReturnAction('{{ $refund->id }}')" class="inline-flex items-center justify-center h-6 w-6 rounded-md border border-gray-200 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors" title="Close">
                                                 <span class="text-sm leading-none">&times;</span>
                                             </button>
                                         </div>
-                                        <input
-                                            type="text"
-                                            name="admin_notes"
-                                            maxlength="1000"
-                                            placeholder="Optional note"
-                                            class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs"
-                                        >
+                                        <input type="text" name="admin_notes" maxlength="1000" placeholder="Optional note" class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs">
                                         <button type="submit" class="w-full rounded-lg bg-green-600 hover:bg-green-500 text-white font-semibold px-3 py-2 text-xs inline-flex items-center justify-center gap-1">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -165,23 +138,11 @@
                                         @csrf
                                         @method('PATCH')
                                         <div class="flex justify-end">
-                                            <button
-                                                type="button"
-                                                onclick="closeReturnAction('{{ $refund->id }}')"
-                                                class="inline-flex items-center justify-center h-6 w-6 rounded-md border border-gray-200 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-                                                title="Close"
-                                            >
+                                            <button type="button" onclick="closeReturnAction('{{ $refund->id }}')" class="inline-flex items-center justify-center h-6 w-6 rounded-md border border-gray-200 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors" title="Close">
                                                 <span class="text-sm leading-none">&times;</span>
                                             </button>
                                         </div>
-                                        <input
-                                            type="text"
-                                            name="admin_notes"
-                                            maxlength="1000"
-                                            required
-                                            placeholder="Reason for rejection"
-                                            class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs"
-                                        >
+                                        <input type="text" name="admin_notes" maxlength="1000" required placeholder="Reason for rejection" class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs">
                                         <button type="submit" class="w-full rounded-lg bg-red-600 hover:bg-red-500 text-white font-semibold px-3 py-2 text-xs inline-flex items-center justify-center gap-1">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

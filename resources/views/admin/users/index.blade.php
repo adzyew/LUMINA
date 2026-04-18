@@ -16,64 +16,36 @@
 {{-- Filter tabs: All | Customers | Staff | Admin --}}
 <div class="flex flex-wrap gap-2 mb-6">
     <a href="{{ route('admin.users.index', ['filter' => 'all']) }}"
-       class="px-5 py-2 rounded-xl font-semibold text-sm transition-colors {{ ($filter ?? 'all') === 'all' ? 'bg-amber-400 text-black shadow' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-gray-200' }}">
+       class="px-5 py-2 rounded-lg font-semibold text-sm transition-colors {{ ($filter ?? 'all') === 'all' ? 'bg-amber-400 text-black shadow' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-gray-200' }}">
         All Users
     </a>
     <a href="{{ route('admin.users.index', ['filter' => 'customer']) }}"
-       class="px-5 py-2 rounded-xl font-semibold text-sm transition-colors {{ ($filter ?? '') === 'customer' ? 'bg-amber-400 text-black shadow' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-gray-200' }}">
+       class="px-5 py-2 rounded-lg font-semibold text-sm transition-colors {{ ($filter ?? '') === 'customer' ? 'bg-amber-400 text-black shadow' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-gray-200' }}">
         Customers
     </a>
     <a href="{{ route('admin.users.index', ['filter' => 'staff']) }}"
-       class="px-5 py-2 rounded-xl font-semibold text-sm transition-colors {{ ($filter ?? '') === 'staff' ? 'bg-amber-400 text-black shadow' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-gray-200' }}">
+       class="px-5 py-2 rounded-lg font-semibold text-sm transition-colors {{ ($filter ?? '') === 'staff' ? 'bg-amber-400 text-black shadow' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-gray-200' }}">
         Staff
     </a>
     <a href="{{ route('admin.users.index', ['filter' => 'admin']) }}"
-       class="px-5 py-2 rounded-xl font-semibold text-sm transition-colors {{ ($filter ?? '') === 'admin' ? 'bg-amber-400 text-black shadow' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-gray-200' }}">
+       class="px-5 py-2 rounded-lg font-semibold text-sm transition-colors {{ ($filter ?? '') === 'admin' ? 'bg-amber-400 text-black shadow' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-gray-200' }}">
         Admin
     </a>
     <a href="{{ route('admin.users.index', ['filter' => 'archived']) }}"
-       class="px-5 py-2 rounded-xl font-semibold text-sm transition-colors {{ ($filter ?? '') === 'archived' ? 'bg-amber-400 text-black shadow' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-gray-200' }}">
+       class="px-5 py-2 rounded-lg font-semibold text-sm transition-colors {{ ($filter ?? '') === 'archived' ? 'bg-amber-400 text-black shadow' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-gray-200' }}">
         Archived
     </a>
 </div>
 
 @if($filter === 'all')
 
-    {{-- Staff & Admin Section --}}
-    <div class="mb-6">
-        <div class="flex items-center gap-2 mb-3">
-            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-500">Staff & Admin</h2>
-            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">{{ $staffUsers->count() }}</span>
-        </div>
-        <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-gray-50 text-gray-700 border-b border-gray-200 text-sm">
-                        <th class="p-4">Name</th>
-                        <th class="p-4">Email Address</th>
-                        <th class="p-4">Role</th>
-                        <th class="p-4">Verified</th>
-                        <th class="p-4 text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    @forelse($staffUsers as $user)
-                        @include('admin.users._row')
-                    @empty
-                        <tr><td colspan="5" class="p-8 text-center text-gray-500">No staff users found.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
-
     {{-- Customers Section --}}
-    <div>
+    <div class="mb-6">
         <div class="flex items-center gap-2 mb-3">
             <h2 class="text-xs font-bold uppercase tracking-widest text-gray-500">Customers</h2>
             <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">{{ $customerUsers->count() }}</span>
         </div>
-        <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
+        <div class="bg-white rounded-xl overflow-hidden border border-gray-200">
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-gray-50 text-gray-700 border-b border-gray-200 text-sm">
@@ -95,9 +67,37 @@
         </div>
     </div>
 
+    {{-- Staff & Admin Section --}}
+    <div >
+        <div class="flex items-center gap-2 mb-3">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-500">Staff & Admin</h2>
+            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">{{ $staffUsers->count() }}</span>
+        </div>
+        <div class="bg-white rounded-xl overflow-hidden border border-gray-200">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 text-gray-700 border-b border-gray-200 text-sm">
+                        <th class="p-4">Name</th>
+                        <th class="p-4">Email Address</th>
+                        <th class="p-4">Role</th>
+                        <th class="p-4">Verified</th>
+                        <th class="p-4 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    @forelse($staffUsers as $user)
+                        @include('admin.users._row')
+                    @empty
+                        <tr><td colspan="5" class="p-8 text-center text-gray-500">No staff users found.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 @else
 
-    <div class="bg-white rounded-2xl overflow-hidden border border-gray-200">
+    <div class="bg-white rounded-xl overflow-hidden border border-gray-200">
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-gray-50 text-gray-700 border-b border-gray-200 text-sm">
@@ -143,7 +143,7 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white border border-gray-200 rounded-2xl p-6">
+                <div class="bg-white border border-gray-200 rounded-xl p-6">
                     <h4 class="text-lg font-bold text-gray-900 mb-4">Account</h4>
                     <div class="space-y-3 text-sm">
                         <div class="flex justify-between gap-4"><span class="text-gray-500">Name</span><span id="viewUserName" class="text-gray-900 font-semibold text-right"></span></div>
@@ -155,7 +155,7 @@
                         <div class="flex justify-between gap-4"><span class="text-gray-500">Last Updated</span><span id="viewUserUpdated" class="text-gray-900 font-semibold text-right"></span></div>
                     </div>
                 </div>
-                <div class="bg-white border border-gray-200 rounded-2xl p-6">
+                <div class="bg-white border border-gray-200 rounded-xl p-6">
                     <h4 class="text-lg font-bold text-gray-900 mb-4">Roles</h4>
                     <div id="viewUserRoles" class="flex flex-wrap gap-2"></div>
                     <div class="mt-6">
@@ -176,7 +176,7 @@
 <div id="editUserModal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
     <div class="flex items-center justify-center min-h-screen px-4 py-8">
         <div class="fixed inset-0 bg-black/75"></div>
-        <div class="relative z-10 bg-white border border-gray-200 rounded-2xl shadow-2xl p-6 sm:p-8 max-w-2xl w-full">
+        <div class="relative z-10 bg-white border border-gray-200 rounded-xl shadow-2xl p-6 sm:p-8 max-w-2xl w-full">
             <div class="flex items-start justify-between mb-6">
                 <div>
                     <h3 class="text-2xl font-playfair font-bold text-gray-900">Edit Staff User</h3>
@@ -320,11 +320,6 @@
                     <h3 class="text-2xl font-playfair font-bold text-gray-900">Add Staff User</h3>
                     <p class="text-gray-500 text-sm mt-1">Create a new staff account and assign a staff role.</p>
                 </div>
-                <button type="button" onclick="hideAddStaffModal()" class="text-gray-400 hover:text-gray-600" aria-label="Close add staff modal">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
             </div>
 
             <form method="POST" action="{{ route('admin.users.store') }}" class="space-y-5">
@@ -406,12 +401,13 @@
                 </div>
 
                 <div class="flex justify-end gap-3 pt-2">
-                    <button type="button" onclick="hideAddStaffModal()" class="px-5 py-2.5 bg-gray-100 border border-gray-300 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors font-medium">
-                        Cancel
-                    </button>
-                    <button type="submit" class="px-5 py-2.5 bg-amber-400 hover:bg-amber-500 text-black font-bold rounded-xl transition-colors">
+                    <button type="submit" class="px-5 py-2.5 bg-amber-400 hover:bg-amber-500 text-black font-bold rounded-lg transition-colors">
                         Create Staff
                     </button>
+                    <button type="button" onclick="hideAddStaffModal()" class="px-5 py-2.5 bg-gray-100 border border-gray-300 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors font-medium">
+                        Cancel
+                    </button>
+                    
                 </div>
             </form>
         </div>

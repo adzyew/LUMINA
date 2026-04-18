@@ -9,34 +9,34 @@
     </header>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
-        <article class="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-4 shadow-sm">
+        <article class="rounded-xl border border-blue-200 bg-linear-to-br from-blue-50 to-white p-4 shadow-sm">
             <p class="text-xs uppercase tracking-wide text-blue-700 font-semibold">Total Reviews</p>
             <p class="text-4xl font-bold text-blue-700 mt-2">{{ $totalReviews }}</p>
         </article>
-        <article class="rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4 shadow-sm">
+        <article class="rounded-xl border border-amber-200 bg-linear-to-br from-amber-50 to-white p-4 shadow-sm">
             <p class="text-xs uppercase tracking-wide text-amber-700 font-semibold">Pending</p>
             <p class="text-4xl font-bold text-amber-600 mt-2">{{ $pendingReviews }}</p>
         </article>
-        <article class="rounded-3xl border border-rose-200 bg-gradient-to-br from-rose-50 to-white p-4 shadow-sm">
+        <article class="rounded-xl border border-rose-200 bg-linear-to-br from-rose-50 to-white p-4 shadow-sm">
             <p class="text-xs uppercase tracking-wide text-rose-700 font-semibold">Flagged</p>
             <p class="text-4xl font-bold text-rose-600 mt-2">{{ $flaggedReviews }}</p>
         </article>
-        <article class="rounded-3xl border border-green-200 bg-gradient-to-br from-green-50 to-white p-4 shadow-sm">
+        <article class="rounded-xl border border-green-200 bg-linear-to-br from-green-50 to-white p-4 shadow-sm">
             <p class="text-xs uppercase tracking-wide text-green-700 font-semibold">Approval Rate</p>
             <p class="text-4xl font-bold text-green-600 mt-2">{{ number_format($approvalRate, 1) }}%</p>
         </article>
-        <article class="rounded-3xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-4 shadow-sm">
+        <article class="rounded-xl border border-indigo-200 bg-linear-to-br from-indigo-50 to-white p-4 shadow-sm">
             <p class="text-xs uppercase tracking-wide text-indigo-700 font-semibold">Avg Rating</p>
             <p class="text-4xl font-bold text-indigo-600 mt-2">{{ number_format($averageRating, 2) }}</p>
         </article>
     </div>
 
-    <section class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
+    <section class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <h2 class="text-2xl font-playfair font-bold text-gray-900 mb-3">Satisfaction Trend (Last 6 Months)</h2>
         <div id="feedbackTrendChart" class="min-h-[220px]"></div>
     </section>
 
-    <section class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
+    <section class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <form method="GET" action="{{ route('admin.feedback.index') }}" class="js-admin-auto-filter grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3" data-autofilter-container="#feedback-autofilter-content">
             <input type="text" name="q" value="{{ request('q') }}" placeholder="Search comment, user, product" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm">
             <select name="status" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm">
@@ -61,7 +61,7 @@
         </form>
     </section>
 
-    <section class="rounded-3xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+    <section class="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
                 <thead class="bg-gray-50 text-gray-600">

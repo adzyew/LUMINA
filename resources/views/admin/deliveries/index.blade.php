@@ -9,15 +9,15 @@
     </header>
 
     <div class="flex flex-wrap gap-2">
-        <a href="{{ route('admin.deliveries.index') }}" class="px-4 py-2 rounded-xl text-sm font-semibold transition-colors {{ !request('status') ? 'bg-amber-300 text-black shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300' }}">All</a>
-        <a href="{{ route('admin.deliveries.index', ['status' => 'processing']) }}" class="px-4 py-2 rounded-xl text-sm font-semibold transition-colors {{ request('status') === 'processing' ? 'bg-amber-300 text-black shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300' }}">Processing</a>
-        <a href="{{ route('admin.deliveries.index', ['status' => 'shipped']) }}" class="px-4 py-2 rounded-xl text-sm font-semibold transition-colors {{ request('status') === 'shipped' ? 'bg-amber-300 text-black shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300' }}">Shipped</a>
-        <a href="{{ route('admin.deliveries.index', ['status' => 'delivered']) }}" class="px-4 py-2 rounded-xl text-sm font-semibold transition-colors {{ request('status') === 'delivered' ? 'bg-amber-300 text-black shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300' }}">Delivered</a>
+        <a href="{{ route('admin.deliveries.index') }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ !request('status') ? 'bg-amber-300 text-black shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300' }}">All</a>
+        <a href="{{ route('admin.deliveries.index', ['status' => 'processing']) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ request('status') === 'processing' ? 'bg-amber-300 text-black shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300' }}">Processing</a>
+        <a href="{{ route('admin.deliveries.index', ['status' => 'shipped']) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ request('status') === 'shipped' ? 'bg-amber-300 text-black shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300' }}">Shipped</a>
+        <a href="{{ route('admin.deliveries.index', ['status' => 'delivered']) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ request('status') === 'delivered' ? 'bg-amber-300 text-black shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300' }}">Delivered</a>
     </div>
 
-    <div class="bg-white rounded-3xl overflow-hidden border border-gray-200 shadow-sm">
+    <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm">
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse min-w-[900px]">
+            <table class="w-full text-left border-collapse min-w-255">
                 <thead>
                     <tr class="bg-gray-50 text-gray-700 border-b border-gray-200 text-sm">
                         <th class="p-4 font-semibold">Order ID</th>
