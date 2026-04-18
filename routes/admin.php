@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\PromoController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -28,6 +29,23 @@ Route::middleware(['auth', \App\Http\Middleware\PreventArchivedUser::class])
         Route::get('analytics/export', [AnalyticsController::class, 'exportOrders'])
             ->middleware('permission:sales.view')
             ->name('analytics.export');
+
+        // Promo management (Admin only)
+        Route::get('promos', [PromoController::class, 'index'])
+            ->middleware('role:admin')
+            ->name('promos.index');
+        Route::post('promos', [PromoController::class, 'store'])
+            ->middleware('role:admin')
+            ->name('promos.store');
+        Route::put('promos/{promo}', [PromoController::class, 'update'])
+            ->middleware('role:admin')
+            ->name('promos.update');
+        Route::patch('promos/{promo}/toggle', [PromoController::class, 'toggle'])
+            ->middleware('role:admin')
+            ->name('promos.toggle');
+        Route::delete('promos/{promo}', [PromoController::class, 'destroy'])
+            ->middleware('role:admin')
+            ->name('promos.destroy');
 
         // Staff dashboards (inventory, sales, delivery)
         Route::get('staff/dashboard', [StaffDashboardController::class, 'index'])

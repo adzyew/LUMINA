@@ -58,7 +58,7 @@
                 @endif
                 <div>
                     <p class="text-gray-900 text-base font-semibold leading-tight">{{ Auth::user()->name }}</p>
-                    <p class="text-gray-400 text-xs mt-0.5 truncate max-w-[160px]">{{ Auth::user()->email }}</p>
+                    <p class="text-gray-400 text-xs mt-0.5 truncate max-w-40">{{ Auth::user()->email }}</p>
                 </div>
             </div>
         </div>
@@ -67,13 +67,13 @@
             <div>
                 <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Overview</p>
                 <div class="space-y-1">
-                    <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl {{ request()->routeIs('dashboard') ? 'text-amber-600 bg-amber-50 font-semibold' : 'text-gray-600 hover:text-amber-600 hover:bg-amber-50/70' }} transition-colors">
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl {{ request()->routeIs('dashboard') ? 'text-amber-600 bg-amber-50 font-semibold border-l-amber-600 border-l-3' : 'text-gray-600 hover:text-amber-600 hover:bg-amber-50/70' }} transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
                         </svg>
                         <span class="text-md font-medium">Dashboard</span>
                     </a>
-                    <a href="{{ route('orders.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl {{ request()->routeIs('orders.*') ? 'text-amber-600 bg-amber-50 font-semibold' : 'text-gray-600 hover:text-amber-600 hover:bg-amber-50/70' }} transition-colors">
+                    <a href="{{ route('orders.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl {{ request()->routeIs('orders.*') ? 'text-amber-600 bg-amber-50 font-semibold border-l-amber-600 border-l-3' : 'text-gray-600 hover:text-amber-600 hover:bg-amber-50/70' }} transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                         </svg>
@@ -82,7 +82,7 @@
                             <span class="ml-auto inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">{{ $pendingOrderCount }}</span>
                         @endif
                     </a>
-                    <a href="{{ route('wishlist.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl {{ request()->routeIs('wishlist.*') ? 'text-amber-600 bg-amber-50 font-semibold' : 'text-gray-600 hover:text-amber-600 hover:bg-amber-50/70' }} transition-colors">
+                    <a href="{{ route('wishlist.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl {{ request()->routeIs('wishlist.*') ? 'text-amber-600 bg-amber-50 font-semibold border-l-amber-600 border-l-3' : 'text-gray-600 hover:text-amber-600 hover:bg-amber-50/70' }} transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m21 8.25c0-2.485-2.015-4.5-4.5-4.5-1.74 0-3.247.99-3.998 2.437A4.502 4.502 0 0 0 8.5 3.75C6.015 3.75 4 5.765 4 8.25c0 7.22 8.5 12 8.5 12S21 15.47 21 8.25Z" />
                         </svg>
@@ -94,7 +94,7 @@
             <div>
                 <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Account</p>
                 <div class="space-y-1">
-                    <a href="{{ $settingsLink }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl {{ $isProfileRoute ? 'text-amber-600 bg-amber-50 font-semibold' : 'text-gray-600 hover:text-amber-600 hover:bg-amber-50/70' }} transition-colors">
+                    <a href="{{ $settingsLink }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl {{ $isProfileRoute ? 'text-amber-600 bg-amber-50 font-semibold border-l-amber-600 border-l-3' : 'text-gray-600 hover:text-amber-600 hover:bg-amber-50/70' }} transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                         </svg>
@@ -106,7 +106,7 @@
             <div>
                 <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">Support</p>
                 <div class="space-y-1">
-                    <a href="{{ route('support.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl {{ request()->routeIs('support.*') ? 'text-amber-600 bg-amber-50 font-semibold' : 'text-gray-600 hover:text-amber-600 hover:bg-amber-50/70' }} transition-colors">
+                    <a href="{{ route('support.index') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-xl {{ request()->routeIs('support.*') ? 'text-amber-600 bg-amber-50 font-semibold border-l-amber-600 border-l-3' : 'text-gray-600 hover:text-amber-600 hover:bg-amber-50/70' }} transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.742-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.035.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.966-1.584A6.062 6.062 0 0 1 6 18.75m12-6.75a6 6 0 0 0-12 0v.75a6 6 0 0 0 12 0V12Z" />
                         </svg>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\OrderPlacedMail;
 use App\Models\InventoryLog;
 use App\Models\Order;
+use App\Models\PromoClaim;
 use App\Models\Product;
 use App\Services\PaymongoService;
 use Illuminate\Http\Request;
@@ -78,6 +79,7 @@ class PaymentController extends Controller
         }
 
         if ($order->status === 'awaiting_payment' && $order->payment_status === 'pending') {
+            $this->releasePromoClaimForOrder($order);
             $order->items()->delete();
             $order->delete();
 
@@ -163,6 +165,7 @@ class PaymentController extends Controller
             }
         } elseif (str_contains($eventType, 'failed')) {
             if ($order->status === 'awaiting_payment') {
+                $this->releasePromoClaimForOrder($order);
                 $order->items()->delete();
                 $order->delete();
             } else {
@@ -170,6 +173,7 @@ class PaymentController extends Controller
             }
         } elseif (str_contains($eventType, 'canceled') || str_contains($eventType, 'expired')) {
             if ($order->status === 'awaiting_payment') {
+                $this->releasePromoClaimForOrder($order);
                 $order->items()->delete();
                 $order->delete();
             } else {
@@ -313,5 +317,37 @@ class PaymentController extends Controller
         }
 
         return null;
+    }
+
+    private function releasePromoClaimForOrder(Order $order): void
+    {
+        if (!$order->promo_id) {
+            return;
+        }
+
+        $claim = PromoClaim::query()
+            ->with('promo')
+            ->where('order_id', $order->id)
+            ->where('user_id', $order->user_id)
+            ->first();
+
+        if (!$claim) {
+            return;
+        }
+
+        $nextExpiry = now()->addMinutes(60);
+        if ($claim->promo && $claim->promo->expires_at) {
+            $promoExpiry = $claim->promo->expires_at;
+            if ($promoExpiry->isBefore($nextExpiry)) {
+                $nextExpiry = $promoExpiry;
+            }
+        }
+
+        $claim->forceFill([
+            'used_at' => null,
+            'order_id' => null,
+            'claimed_at' => now(),
+            'expires_at' => $nextExpiry,
+        ])->save();
     }
 }

@@ -43,9 +43,12 @@ class Order extends Model
     protected $fillable = [
         'order_number',
         'user_id',
+        'promo_id',
         'total_price',
         'points_used',
         'discount_amount',
+        'promo_code',
+        'promo_discount_percent',
         'status',
         'tracking_number',
         'courier_name',
@@ -144,6 +147,11 @@ class Order extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function promo(): BelongsTo
+    {
+        return $this->belongsTo(Promo::class);
     }
 
     public function items(): HasMany

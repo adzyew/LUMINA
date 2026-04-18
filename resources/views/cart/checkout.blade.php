@@ -18,10 +18,16 @@
     @if(session('error'))
         <div class="mb-6 bg-red-100 text-red-800 p-4 rounded-lg">{{ session('error') }}</div>
     @endif
+    @if(session('success'))
+        <div class="mb-6 bg-green-100 text-green-800 p-4 rounded-lg">{{ session('success') }}</div>
+    @endif
+    @if(session('info'))
+        <div class="mb-6 bg-blue-100 text-blue-800 p-4 rounded-lg">{{ session('info') }}</div>
+    @endif
 
     @php
         $errorKeys = $errors->keys();
-        $initialCheckoutStep = collect($errorKeys)->contains(fn ($key) => str_starts_with((string) $key, 'payment_')) ? 3 : 1;
+        $initialCheckoutStep = collect($errorKeys)->contains(fn ($key) => str_starts_with((string) $key, 'payment_') || str_starts_with((string) $key, 'promo_')) ? 3 : 1;
     @endphp
 
     <div id="checkout-stepper" class="mb-6 rounded-2xl border border-amber-100 bg-white p-4 sm:p-5 shadow-sm">
@@ -96,6 +102,13 @@
                     </div>
                 </div>
             @endforeach
+            @php
+                $promoHas = (bool) data_get($promoView ?? [], 'hasPromo', false);
+                $promoCode = data_get($promoView ?? [], 'code');
+                $promoPercent = (float) data_get($promoView ?? [], 'discount_percent', 0);
+                $promoAmount = (float) data_get($promoView ?? [], 'discount_amount', 0);
+                $grandTotal = max(0, $total - $promoAmount);
+            @endphp
             <div class="mt-4 space-y-2 border-t border-gray-100 pt-4">
                 <div class="flex justify-between text-base text-gray-700">
                     <span>Subtotal</span>
@@ -105,12 +118,18 @@
                     <span>Shipping</span>
                     <span class="text-amber-600 font-medium">Free</span>
                 </div>
+                @if($promoHas)
+                    <div class="flex justify-between text-base text-gray-700">
+                        <span>Promo <span class="font-medium text-amber-600">({{ $promoCode }} - {{ number_format($promoPercent, 0) }}%)</span></span>
+                        <span class="text-green-600">-P{{ number_format($promoAmount, 2) }}</span>
+                    </div>
+                @endif
             </div>
             <div class="flex items-end justify-between mt-4">
                 <span class="text-2xl font-bold text-gray-900">Total</span>
                 <div class="text-right">
                     <span class="text-base text-gray-500 mr-1">PHP</span>
-                    <span class="text-2xl font-bold text-amber-600">P{{ number_format($total, 2) }}</span>
+                    <span class="text-2xl font-bold text-amber-600">P{{ number_format($grandTotal, 2) }}</span>
                 </div>
             </div>
         </div>
@@ -210,7 +229,10 @@
                 </div>
                 <div class="rounded-lg border border-gray-200 bg-white p-4">
                     <p class="text-xs uppercase tracking-wide text-gray-500 mb-2">Order Total</p>
-                    <p class="text-lg font-bold text-amber-600">P{{ number_format($total, 2) }}</p>
+                    <p class="text-lg font-bold text-amber-600">P{{ number_format($grandTotal, 2) }}</p>
+                    @if($promoHas)
+                        <p class="text-sm text-green-600 mt-1">Promo {{ $promoCode }} applied ({{ number_format($promoPercent, 0) }}% off)</p>
+                    @endif
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-2">
@@ -221,6 +243,8 @@
 
             <div class="space-y-3 p-4 rounded-xl bg-gray-50 border border-gray-200 hidden" data-step-panel="3">
                 <h3 class="text-lg font-semibold text-gray-900">Payment Method</h3>
+
+                
 
                 <label for="payment_cod" class="flex items-start gap-3 p-4 border border-gray-200 rounded-lg bg-white cursor-pointer has-checked:border-amber-400 has-checked:ring-2 has-checked:ring-amber-100 transition">
                     <input id="payment_cod" type="radio" name="payment_method" value="cod" {{ old('payment_method', 'cod') === 'cod' ? 'checked' : '' }} class="mt-1 h-4 w-4 text-amber-500 border-gray-300 focus:ring-amber-400">
@@ -238,6 +262,48 @@
                     </span>
                 </label>
                 @error('payment_method')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
+
+                <div class="rounded-lg border border-amber-200 bg-amber-50 p-4">
+                    <p class="text-xs uppercase tracking-wide text-amber-700 mb-2">Promo Code</p>
+                    @if($promoHas)
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <p class="text-sm text-gray-900">
+                                <span class="font-semibold text-amber-700">{{ $promoCode }}</span> applied
+                                ({{ number_format($promoPercent, 0) }}% off, -P{{ number_format($promoAmount, 2) }})
+                            </p>
+                            <button
+                                type="submit"
+                                formaction="{{ route('checkout.promo.remove') }}"
+                                formmethod="POST"
+                                formnovalidate
+                                class="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100 text-sm font-semibold text-gray-800 transition-colors"
+                            >
+                                Remove
+                            </button>
+                        </div>
+                    @else
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input
+                                type="text"
+                                name="promo_code"
+                                maxlength="50"
+                                class="flex-1 bg-white border border-amber-200 rounded-lg p-2.5 text-gray-900 focus:border-amber-400 outline-none"
+                                placeholder="Enter promo code"
+                            >
+                            <button
+                                type="submit"
+                                formaction="{{ route('checkout.promo.apply') }}"
+                                formmethod="POST"
+                                formnovalidate
+                                class="px-4 py-2.5 rounded-lg bg-amber-400 hover:bg-amber-500 text-black font-semibold transition-colors"
+                            >
+                                Apply
+                            </button>
+                        </div>
+                        @error('promo_code')<p class="text-red-500 text-xs mt-2">{{ $message }}</p>@enderror
+                        <p class="text-xs text-gray-500 mt-2">Codes are single-use per user and expire quickly after claim.</p>
+                    @endif
+                </div>
 
                 @if(auth()->user()->points_balance > 0)
                 <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -390,8 +456,8 @@ document.addEventListener('DOMContentLoaded', function() {
         "City of Makati": "1200",
         "City of Taguig": "1630",
         "City of Pasig": "1600",
-        "City of Parañaque": "1700",
-        "City of Las Piñas": "1740",
+        "City of ParaÃ±aque": "1700",
+        "City of Las PiÃ±as": "1740",
         "City of Mandaluyong": "1550",
         "City of Marikina": "1800",
         "City of Navotas": "1485",

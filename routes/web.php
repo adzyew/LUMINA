@@ -77,6 +77,8 @@ Route::middleware('customer')->group(function () {
     // Authenticated customer-only routes
     Route::middleware('auth')->group(function () {
         Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
+        Route::post('/checkout/promo/apply', [CartController::class, 'applyPromo'])->name('checkout.promo.apply');
+        Route::post('/checkout/promo/remove', [CartController::class, 'removePromo'])->name('checkout.promo.remove');
         Route::get('/checkout/confirmation/{order}', [CartController::class, 'confirmation'])->name('checkout.confirmation');
         Route::post('/place-order', [CartController::class, 'placeOrder'])->name('place.order');
         Route::get('/payments/paymongo/success', [PaymentController::class, 'paymongoSuccess'])->name('payments.paymongo.success');
