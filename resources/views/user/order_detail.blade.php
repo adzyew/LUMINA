@@ -223,10 +223,15 @@
                             <span>Payment:</span>
                             <span>{{ $order->payment_display }}</span>
                         </div>
-                        <div class="border-t border-gray-100 pt-3 mt-3 flex justify-between font-bold text-base">
+                        <div class="flex justify-between text-gray-600">
+                            <span class="text-gray-900">Discount: {{ $order->discount_percentage }}%</span>
+                            <span class="text-amber-600">- Php {{ number_format($order->discount_amount, 2) }}</span>
+                        </div>
+                        <div class="border-t border-gray-100 pt-3 mt-3 flex justify-between font-bold text-lg">
                             <span class="text-gray-900">Total Amount</span>
                             <span class="text-amber-600">Php {{ number_format($order->total_price, 2) }}</span>
                         </div>
+                        
                     </div>
                 </div>
 

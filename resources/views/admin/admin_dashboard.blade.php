@@ -9,8 +9,8 @@
         'welcomeMessage' => 'Welcome back, Admin!',
     ])
 
-    <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-        <article class="rounded-3xl border border-amber-200 bg-linear-to-br from-amber-50 to-white p-6 shadow-sm">
+    <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <article class="rounded-xl border border-amber-200 bg-linear-to-br from-amber-50 to-white p-6 shadow-sm">
             <div class="flex items-center justify-between">
                 <p class="text-sm font-semibold uppercase tracking-wide text-amber-700">Total Revenue</p>
                 <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
@@ -25,7 +25,7 @@
             </p>
         </article>
 
-        <article class="rounded-3xl border border-blue-200 bg-linear-to-br from-blue-50 to-white p-6 shadow-sm">
+        <article class="rounded-xl border border-blue-200 bg-linear-to-br from-blue-50 to-white p-6 shadow-sm">
             <div class="flex items-center justify-between">
                 <p class="text-sm font-semibold uppercase tracking-wide text-blue-700">Total Orders</p>
                 <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-100 text-blue-700">
@@ -35,7 +35,7 @@
             <p class="mt-5 text-4xl font-bold text-gray-900">{{ number_format($totalOrders ?? 0) }}</p>
         </article>
 
-        <article class="rounded-3xl border border-emerald-200 bg-linear-to-br from-emerald-50 to-white p-6 shadow-sm">
+        <article class="rounded-xl border border-emerald-200 bg-linear-to-br from-emerald-50 to-white p-6 shadow-sm">
             <div class="flex items-center justify-between">
                 <p class="text-sm font-semibold uppercase tracking-wide text-emerald-700">Products</p>
                 <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
@@ -45,7 +45,7 @@
             <p class="mt-5 text-4xl font-bold text-gray-900">{{ number_format($totalProducts ?? 0) }}</p>
         </article>
 
-        <article class="rounded-3xl border border-violet-200 bg-linear-to-br from-violet-50 to-white p-6 shadow-sm">
+        <article class="rounded-xl border border-violet-200 bg-linear-to-br from-violet-50 to-white p-6 shadow-sm">
             <div class="flex items-center justify-between">
                 <p class="text-sm font-semibold uppercase tracking-wide text-violet-700">Users</p>
                 <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-100 text-violet-700">
@@ -56,14 +56,14 @@
         </article>
     </section>
 
-    <section class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+    <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <div class="mb-4 flex items-center justify-between gap-3">
             <h2 class="text-2xl font-bold text-gray-900">Order Status Overview</h2>
             <a href="{{ route('admin.orders.index') }}" class="text-sm font-semibold text-amber-600 hover:text-amber-700">Manage Orders</a>
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+            <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
                 <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Pending</p>
                 <p class="mt-2 text-3xl font-bold text-amber-700">{{ $salesStatuses['pending'] ?? 0 }}</p>
             </div>
@@ -71,19 +71,19 @@
                 <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">Confirmed</p>
                 <p class="mt-2 text-3xl font-bold text-blue-700">{{ $salesStatuses['confirmed'] ?? 0 }}</p>
             </div>
-            <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-4">
+            <div class="rounded-xl border border-indigo-200 bg-indigo-50 p-4">
                 <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">Processing</p>
                 <p class="mt-2 text-3xl font-bold text-indigo-700">{{ $salesStatuses['processing'] ?? 0 }}</p>
             </div>
-            <div class="rounded-2xl border border-purple-200 bg-purple-50 p-4">
+            <div class="rounded-xl border border-purple-200 bg-purple-50 p-4">
                 <p class="text-xs font-semibold uppercase tracking-wide text-purple-700">Shipped</p>
                 <p class="mt-2 text-3xl font-bold text-purple-700">{{ $salesStatuses['shipped'] ?? 0 }}</p>
             </div>
-            <div class="rounded-2xl border border-green-200 bg-green-50 p-4">
+            <div class="rounded-xl border border-green-200 bg-green-50 p-4">
                 <p class="text-xs font-semibold uppercase tracking-wide text-green-700">Delivered</p>
                 <p class="mt-2 text-3xl font-bold text-green-700">{{ $salesStatuses['delivered'] ?? 0 }}</p>
             </div>
-            <div class="rounded-2xl border border-red-200 bg-red-50 p-4">
+            <div class="rounded-xl border border-red-200 bg-red-50 p-4">
                 <p class="text-xs font-semibold uppercase tracking-wide text-red-700">Cancelled</p>
                 <p class="mt-2 text-3xl font-bold text-red-700">{{ $salesStatuses['cancelled'] ?? 0 }}</p>
             </div>
@@ -91,22 +91,22 @@
     </section>
 
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <article class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+        <article class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <h3 class="text-lg font-bold text-gray-900 mb-3">Inventory Status</h3>
             <div id="inventoryChart"></div>
         </article>
-        <article class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+        <article class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <h3 class="text-lg font-bold text-gray-900 mb-3">Sales Status</h3>
             <div id="salesStatusChart"></div>
         </article>
-        <article class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+        <article class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <h3 class="text-lg font-bold text-gray-900 mb-3">Delivery Status</h3>
             <div id="deliveryChart"></div>
         </article>
     </section>
 
     <section class="grid grid-cols-1 xl:grid-cols-3 gap-5">
-        <article class="xl:col-span-2 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+        <article class="xl:col-span-2 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <div class="mb-4 flex items-center justify-between">
                 <h2 class="text-2xl font-bold text-gray-900">Recent Orders</h2>
                 <a href="{{ route('admin.orders.index') }}" class="text-sm font-semibold text-amber-600 hover:text-amber-700">View All</a>
@@ -152,7 +152,7 @@
             </div>
         </article>
 
-        <article class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+        <article class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <h3 class="text-xl font-bold text-gray-900 mb-4">Team Snapshot</h3>
             <div class="space-y-3 text-sm">
                 <div class="flex items-center justify-between rounded-xl bg-gray-50 border border-gray-100 px-4 py-3">

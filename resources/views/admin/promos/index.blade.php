@@ -15,40 +15,40 @@
 </header>
 
 <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-    <div class="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <p class="text-sm uppercase tracking-wide text-gray-500 font-semibold">Total Promos</p>
         <p class="mt-2 text-4xl font-bold text-gray-900">{{ $stats['total'] }}</p>
     </div>
-    <div class="rounded-3xl border border-green-200 bg-green-50 p-5 shadow-sm">
+    <div class="rounded-xl border border-green-200 bg-green-50 p-5 shadow-sm">
         <p class="text-sm uppercase tracking-wide text-green-700 font-semibold">Active</p>
         <p class="mt-2 text-4xl font-bold text-green-700">{{ $stats['active'] }}</p>
     </div>
-    <div class="rounded-3xl border border-red-200 bg-red-50 p-5 shadow-sm">
+    <div class="rounded-xl border border-red-200 bg-red-50 p-5 shadow-sm">
         <p class="text-sm uppercase tracking-wide text-red-700 font-semibold">Expired</p>
         <p class="mt-2 text-4xl font-bold text-red-700">{{ $stats['expired'] }}</p>
     </div>
-    <div class="rounded-3xl border border-gray-200 bg-gray-50 p-5 shadow-sm">
+    <div class="rounded-xl border border-gray-200 bg-gray-50 p-5 shadow-sm">
         <p class="text-sm uppercase tracking-wide text-gray-600 font-semibold">Inactive</p>
         <p class="mt-2 text-4xl font-bold text-gray-700">{{ $stats['inactive'] }}</p>
     </div>
 </section>
 
-<section class="bg-white border border-gray-200 rounded-3xl p-4 mb-6">
+<section class="bg-white border border-gray-200 rounded-xl p-4 mb-6">
     <form method="GET" action="{{ route('admin.promos.index') }}" class="js-admin-auto-filter grid grid-cols-1 md:grid-cols-[minmax(0,1.4fr)_minmax(200px,0.8fr)_auto] gap-3" data-autofilter-container="#promos-autofilter-content">
-        <input type="text" name="search" value="{{ $search }}" placeholder="Search promo code or name" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 outline-none">
-        <select name="status" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 outline-none">
+        <input type="text" name="search" value="{{ $search }}" placeholder="Search promo code or name" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 outline-none">
+        <select name="status" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 outline-none">
             <option value="all" {{ $status === 'all' ? 'selected' : '' }}>All Status</option>
             <option value="active" {{ $status === 'active' ? 'selected' : '' }}>Active</option>
             <option value="inactive" {{ $status === 'inactive' ? 'selected' : '' }}>Inactive</option>
             <option value="expired" {{ $status === 'expired' ? 'selected' : '' }}>Expired</option>
         </select>
         <div class="flex gap-2">
-            <a href="{{ route('admin.promos.index') }}" data-autofilter-reset="1" data-autofilter-container="#promos-autofilter-content" class="px-5 py-3 bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-semibold rounded-xl transition-colors">Reset</a>
+            <a href="{{ route('admin.promos.index') }}" data-autofilter-reset="1" data-autofilter-container="#promos-autofilter-content" class="px-5 py-3 bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-semibold rounded-lg transition-colors">Reset</a>
         </div>
     </form>
 </section>
 
-<section class="bg-white border border-gray-200 rounded-3xl overflow-hidden">
+<section class="bg-white border border-gray-200 rounded-xl overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>

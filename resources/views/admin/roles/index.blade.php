@@ -159,13 +159,13 @@
 {{-- Filter Tabs --}}
 <div class="flex gap-2 mb-6">
     <a href="{{ route('admin.roles.index', ['tab' => 'active']) }}"
-       class="px-5 py-2 rounded-xl font-semibold text-sm transition-colors
+       class="px-5 py-2 rounded-lg font-semibold text-sm transition-colors
               {{ $tab !== 'archived' ? 'bg-amber-400 text-black shadow' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-gray-200' }}">
         Active
         <span class="ml-1.5 px-2 py-0.5 rounded-full text-xs {{ $tab !== 'archived' ? 'bg-amber-600/20' : 'bg-gray-200' }}">{{ $activeRoles->count() }}</span>
     </a>
     <a href="{{ route('admin.roles.index', ['tab' => 'archived']) }}"
-       class="px-5 py-2 rounded-xl font-semibold text-sm transition-colors
+       class="px-5 py-2 rounded-lg font-semibold text-sm transition-colors
               {{ $tab === 'archived' ? 'bg-amber-400 text-black shadow' : 'bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200 border border-gray-200' }}">
         Archived
         <span class="ml-1.5 px-2 py-0.5 rounded-full text-xs {{ $tab === 'archived' ? 'bg-amber-600/20' : 'bg-gray-200' }}">{{ $archivedRoles->count() }}</span>
@@ -195,13 +195,13 @@
                     <td class="p-4">
                         <span class="font-bold text-gray-900 capitalize">{{ Str::headline($role->name) }}</span>
                         @if(strtolower($role->name) === 'admin')
-                            <span class="ml-2 px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/10 text-sm rounded-full font-semibold">System</span>
+                            <span class="ml-2 px-2 py-0.5 bg-amber-500/10 text-amber-300 border border-amber-500/10 text-sm rounded-lg font-semibold">System</span>
                         @endif
                     </td>
                     <td class="p-4">
                         <div class="flex flex-wrap gap-2">
                             @forelse($role->permissions as $permission)
-                                <span class="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-amber-500/10 text-amber-400 border border-amber-500/1">{{ $permission->name }}</span>
+                                <span class="inline-flex px-3 py-1 rounded-lg text-sm font-medium bg-amber-500/10 text-amber-300 border border-amber-500/1">{{ $permission->name }}</span>
                             @empty
                                 <span class="text-gray-500 text-sm">No permissions assigned</span>
                             @endforelse

@@ -9,30 +9,30 @@
     </header>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm">
+        <div class="rounded-xl border border-blue-200 bg-linear-to-br from-blue-50 to-white p-5 shadow-sm">
             <p class="text-xs uppercase tracking-wide text-blue-700 font-semibold">Total Orders</p>
             <p class="text-3xl font-bold text-gray-900 mt-2">{{ number_format($totalOrders ?? 0) }}</p>
         </div>
-        <div class="rounded-3xl border border-green-200 bg-gradient-to-br from-green-50 to-white p-5 shadow-sm">
+        <div class="rounded-xl border border-green-200 bg-linear-to-br from-green-50 to-white p-5 shadow-sm">
             <p class="text-xs uppercase tracking-wide text-green-700 font-semibold">Completed Orders</p>
             <p class="text-3xl font-bold text-green-700 mt-2">{{ number_format($completedOrders ?? 0) }}</p>
         </div>
-        <div class="rounded-3xl border border-red-200 bg-gradient-to-br from-red-50 to-white p-5 shadow-sm">
+        <div class="rounded-xl border border-red-200 bg-linear-to-br from-red-50 to-white p-5 shadow-sm">
             <p class="text-xs uppercase tracking-wide text-red-700 font-semibold">Cancelled Orders</p>
             <p class="text-3xl font-bold text-red-700 mt-2">{{ number_format($cancelledOrders ?? 0) }}</p>
         </div>
     </div>
 
     <div class="flex flex-wrap gap-2">
-        <a href="{{ route('admin.orders.index') }}" class="px-4 py-2 rounded-xl text-sm font-semibold transition-colors {{ !request('status') ? 'bg-amber-300 text-black shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300' }}">All</a>
+        <a href="{{ route('admin.orders.index') }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ !request('status') ? 'bg-amber-300 text-black shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300' }}">All</a>
         @foreach(['pending','confirmed','processing','shipped','delivered','cancelled'] as $s)
-            <a href="{{ route('admin.orders.index', ['status' => $s]) }}" class="px-4 py-2 rounded-xl text-sm font-semibold transition-colors {{ request('status') === $s ? 'bg-amber-300 text-black shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300' }}">{{ ucfirst($s) }}</a>
+            <a href="{{ route('admin.orders.index', ['status' => $s]) }}" class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ request('status') === $s ? 'bg-amber-300 text-black shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300' }}">{{ ucfirst($s) }}</a>
         @endforeach
     </div>
 
-    <div class="bg-white rounded-3xl overflow-hidden border border-gray-200 shadow-sm">
+    <div class="bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm">
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse min-w-[900px]">
+            <table class="w-full text-left border-collapse min-w-255">
                 <thead>
                     <tr class="bg-gray-50 text-gray-700 border-b border-gray-200 text-sm  tracking-wide">
                         <th class="p-4 font-semibold">Order ID</th>
