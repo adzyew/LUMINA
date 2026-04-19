@@ -13,55 +13,27 @@
 
         <div class="p-6 max-h-[70vh] overflow-y-auto bg-white text-gray-800" id="termsModalBody">
             <div id="termsContent">
-                {{-- Replace with real Terms content or include file --}}
                 <h4 class="font-semibold mb-2">Terms of Service</h4>
-                <p class="text-sm text-gray-600">Welcome to Lumina. <br>We respect your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, use, and safeguard your information when you visit our website and use our services.</p>
-                <p class="mt-3 text-sm text-gray-600"><b>1. Information We Collect</b> <br> When you create an account, place an order, or interact with our platform, we may collect the following information:</p>
-                <ul class="list-disc pl-5 space-y-1">
-                    <li><p class="mt-3 text-sm text-gray-600"><b>Registration Data:</b> Personal Identification Information: Full name, email address, phone number, and delivery address.</p></li>
-                    <li><p class="mt-3 text-sm text-gray-600"><b>Profile Data:</b> Profile photos (uploaded securely via our third-party provider, Cloudinary) and account passwords.</p></li>
-                    <li><p class="mt-3 text-sm text-gray-600"><b>Transaction Data:</b> Details about payments, orders, returns, and items in your cart or wishlist.</p></li>
-                </ul>
-                <p class="mt-3 text-sm text-gray-600"><b>2. How We Use Your Information</b><br> We use the collected information for the following purposes:</p>
-                <ul class="list-disc pl-5 space-y-1">
-                    <li><p class="mt-3 text-sm text-gray-600">To process and deliver your orders, including managing payments and returns.</p></li>
-                    <li><p class="mt-3 text-sm text-gray-600">To manage and maintain your Lumina user account.</p></li>
-                    <li><p class="mt-3 text-sm text-gray-600">To communicate with you regarding your orders, account updates, or customer support inquiries.</p></li>
-                    <li><p class="mt-3 text-sm text-gray-600">To personalize your shopping experience and improve our website's functionality.</p></li>
-                </ul>
-                <p class="mt-3 text-sm text-gray-600"><b>3. Information Sharing</b> <br> We do not sell your personal data. We may share your information with trusted third parties solely for operating our business, such as:</p>
-                <ul class="list-disc pl-5 space-y-1">
-                    <li><p class="mt-3 text-sm text-gray-600">Payment gateways to process secure transactions.</p></li>
-                    <li><p class="mt-3 text-sm text-gray-600">Delivery and logistics partners to ship your orders.</p></li>
-                    <li><p class="mt-3 text-sm text-gray-600">Cloud storage providers (e.g., Cloudinary) to host your profile and product images.</p></li>
-                </ul>
-                <p class="mt-3 text-sm text-gray-600"><b>4. Data Security</b> <br>We implement industry-standard security measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure.</p>
-                <p class="mt-3 text-sm text-gray-600"><b>5. Your Rights</b> <br> You have the right to access, correct, or update your personal information at any time through your Lumina Dashboard. You may also request the deletion of your account and associated data by contacting our support team.</p>
-
+                <p class="text-sm text-gray-600">By using Lumina, you agree to our service rules for orders, payments, returns, and account usage.</p>
+                <p class="mt-3 text-sm text-gray-600"><b>Applicable Law</b><br>These terms are governed by Philippine laws, including RA 7394 (Consumer Act) and RA 8792 (E-Commerce Act).</p>
+                <p class="mt-3 text-sm text-gray-600"><b>Customer Rights</b><br>Customers are entitled to clear product information, fair complaint handling, and return/refund processing under applicable policies and law.</p>
+                <p class="mt-3 text-sm text-gray-600"><b>Orders and Returns</b><br>Orders may be reviewed for stock, pricing, and fraud checks. Returns and refunds are subject to the posted return conditions.</p>
+                <p class="mt-4 text-xs text-gray-500">
+                    Read the complete Terms:
+                    <a href="{{ route('legal.terms') }}" target="_blank" rel="noopener" class="text-amber-600 underline">Terms of Service</a>
+                </p>
             </div>
 
             <div id="privacyContent" class="hidden">
                 <h4 class="font-semibold mb-2">Privacy Policy</h4>
-                <p class="text-sm text-gray-600">Welcome to Lumina. <br>By accessing our website and creating an account, you agree to comply with and be bound by the following Terms of Service.</p>
-                <p class="mt-3 text-sm text-gray-600"><b>1. User Accounts</b></p>
-                <ul class="list-disc pl-5 space-y-1">
-                    <li><p class="mt-3 text-sm text-gray-600"><b>Eligibility:</b> You must provide accurate, current, and complete information (including your name, email, phone number, and delivery address) during the registration process.</p></li>
-                    <li><p class="mt-3 text-sm text-gray-600"><b>Account Security:</b> You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You must notify us immediately of any unauthorized use of your account.</p></li>
-                </ul>
-                <p class="mt-3 text-sm text-gray-600"><b>2. Products and Pricing</b></p>
-                <ul class="list-disc pl-5 space-y-1">
-                    <li><p class="mt-3 text-sm text-gray-600"><b>Product Descriptions:</b> We strive to ensure that all descriptions, images, and prices of our jewelry (rings, necklaces, earrings, bracelets, watches) are accurate. However, we do not warrant that product descriptions or other content are error-free.</p></li>
-                    <li><p class="mt-3 text-sm text-gray-600"><b>Pricing:</b> All prices are subject to change without notice. We reserve the right to modify or discontinue products at any time.</p></li>
-                </ul>
-                <p class="mt-3 text-sm text-gray-600"><b>3. Orders and Payments</b></p>
-                <ul class="list-disc pl-5 space-y-1">
-                    <li><p class="mt-3 text-sm text-gray-600"><b>Order Acceptance:</b> We reserve the right to refuse or cancel any order for any reason, including limitations on available stock, inaccuracies in product or pricing information, or suspected fraud.</p></li>
-                    <li><p class="mt-3 text-sm text-gray-600"><b>Shipping and Delivery:</b> Delivery times are estimates. Lumina is not liable for delays caused by third-party logistics providers.</p></li>
-                </ul>
-                <p class="mt-3 text-sm text-gray-600"><b>4. Returns and Refunds</b> <br> We want you to be satisfied with your Lumina purchase. Return requests must be submitted through your user dashboard within 7 days of receiving your item. Items must be unworn, in their original condition, and include all original packaging. Approved returns will be processed according to our standard refund procedures.</p>
-                <p class="mt-3 text-sm text-gray-600"><b>5. Intellectual Property</b> <br> All content on this website, including logos, text, graphics, and images, is the property of Lumina and is protected by intellectual property laws. You may not reproduce, distribute, or create derivative works from our content without explicit permission.</p>
-                <p class="mt-3 text-sm text-gray-600"><b>6. Changes to Terms</b> <br> We reserve the right to update these Terms of Service at any time. Changes will take effect immediately upon posting to the website. Your continued use of the platform constitutes your acceptance of the revised terms.</p>
-
+                <p class="text-sm text-gray-600">Lumina collects and processes personal data needed to provide your account, checkout, delivery, and support services.</p>
+                <p class="mt-3 text-sm text-gray-600"><b>Applicable Law</b><br>Personal data is processed in line with RA 10173 (Data Privacy Act of 2012), its IRR, and NPC issuances.</p>
+                <p class="mt-3 text-sm text-gray-600"><b>Your Privacy Rights</b><br>You have rights such as the right to be informed, access, correct, object, erase/block (when applicable), and data portability.</p>
+                <p class="mt-3 text-sm text-gray-600"><b>Data Sharing</b><br>We do not sell your personal data. Limited sharing is done only with service providers like payment and delivery partners to complete transactions.</p>
+                <p class="mt-4 text-xs text-gray-500">
+                    Read the complete Privacy Policy:
+                    <a href="{{ route('legal.privacy') }}" target="_blank" rel="noopener" class="text-amber-600 underline">Privacy Policy</a>
+                </p>
             </div>
         </div>
 
