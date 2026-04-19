@@ -12,8 +12,8 @@
 
         <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-gray-200 pb-6">
             <div>
-                <h1 class="text-2xl md:text-4xl font-playfair font-medium text-gray-900 mb-2">Dashboard</h1>
-                <p class="text-gray-600">Welcome back, {{ Auth::user()->first_name }}!</p>
+                <h1 class="text-xl md:text-2xl font-playfair font-medium text-gray-700">Welcome back, {{ Auth::user()->first_name }}!</h1>
+                <p class="text-gray-600"></p>
             </div>
             <a href="{{ route('products.index') }}" class="mt-4 md:mt-0 text-amber-500 hover:text-amber-600   rounded-full transition-colors text-sm font-semibold flex items-center ">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-chevron-right-icon lucide-circle-chevron-right size-10">

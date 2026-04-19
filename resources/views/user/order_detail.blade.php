@@ -113,6 +113,9 @@
         ];
 
         $isPendingRefund = (bool) ($refundRequest && $refundRequest->status === 'pending');
+        $isApprovedRefund = (bool) ($refundRequest && $refundRequest->status === 'approved');
+        $isRejectedRefund = (bool) ($refundRequest && $refundRequest->status === 'rejected');
+        $canSubmitRefund = !$refundRequest || $isRejectedRefund;
         $existingReason = $refundRequest->reason ?? '';
         $isExistingOtherReason = $existingReason !== '' && !in_array($existingReason, array_slice($reasonOptions, 0, 5), true);
         $selectedRefundReason = old('reason', $isExistingOtherReason ? 'Other' : $existingReason);
@@ -142,12 +145,18 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
                     </a>
-                    @else
-                    <button id="openRefundRequestModal" type="button" title="Request Refund" class="inline-flex items-center px-4 py-2 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold transition-colors">
+                    @elseif($canSubmitRefund)
+                    <button id="openRefundRequestModal" type="button" title="{{ $isRejectedRefund ? 'Resubmit Refund Request' : 'Request Refund' }}" class="inline-flex items-center px-4 py-2 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9.75h4.875a2.625 2.625 0 0 1 0 5.25H12M8.25 9.75 10.5 7.5M8.25 9.75 10.5 12m9-7.243V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185Z" />
                         </svg>
                     </button>
+                    @else
+                    <a title="View Refund Status" href="#refund-status" class="inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9.75h4.875a2.625 2.625 0 0 1 0 5.25H12M8.25 9.75 10.5 7.5M8.25 9.75 10.5 12m9-7.243V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185Z" />
+                        </svg>
+                    </a>
                     @endif
                     @endif
                 </div>
@@ -161,6 +170,69 @@
                 {{ $order->status === 'cancelled'  ? 'bg-red-100 text-red-700 border border-red-200' : '' }}
             ">{{ str_replace('_', ' ', $order->status) }}</span>
         </div>
+
+        @php
+            $progressSteps = [
+                ['key' => 'processed', 'label' => 'Order Processed'],
+                ['key' => 'shipped', 'label' => 'Order Shipped'],
+                ['key' => 'en_route', 'label' => 'Order En Route'],
+                ['key' => 'arrived', 'label' => 'Order Arrived'],
+            ];
+
+            $statusToStep = [
+                'pending' => 1,
+                'confirmed' => 1,
+                'processing' => 2,
+                'shipped' => 3,
+                'delivered' => 4,
+                'cancelled' => 1,
+                'awaiting_payment' => 0,
+            ];
+
+            $currentStep = $statusToStep[$order->status] ?? 0;
+            $isCancelled = $order->status === 'cancelled';
+        @endphp
+
+        <section class="mb-6 bg-white rounded-2xl border border-gray-200 shadow-sm p-5 sm:p-6">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-5">
+                <h2 class="text-sm sm:text-base font-bold text-gray-900 tracking-wide">Order Progress</h2>
+                <p class="text-xs sm:text-sm text-gray-500">Order #{{ $order->display_order_number }}</p>
+            </div>
+
+            <div class="relative">
+                <div class="absolute left-0 right-0 top-5 h-1 rounded-full bg-gray-200"></div>
+                <div class="absolute left-0 top-5 h-1 rounded-full {{ $isCancelled ? 'bg-red-400' : 'bg-indigo-500' }}"
+                     style="width: {{ max(0, min(100, (($currentStep - 1) / 3) * 100)) }}%;"></div>
+
+                <div class="grid grid-cols-4 gap-2 relative z-10">
+                    @foreach($progressSteps as $index => $step)
+                        @php
+                            $stepNumber = $index + 1;
+                            $isDone = $stepNumber <= $currentStep;
+                            $dotClass = $isDone
+                                ? ($isCancelled ? 'bg-red-500 border-red-500 text-white' : 'bg-indigo-500 border-indigo-500 text-white')
+                                : 'bg-white border-gray-300 text-gray-400';
+                        @endphp
+                        <div class="flex flex-col items-center text-center">
+                            <span class="w-10 h-10 rounded-full border-2 inline-flex items-center justify-center {{ $dotClass }}">
+                                @if($isDone)
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                @else
+                                    <span class="text-xs font-semibold">{{ $stepNumber }}</span>
+                                @endif
+                            </span>
+                            <p class="mt-2 text-[11px] sm:text-xs font-semibold text-gray-700 leading-tight">{{ $step['label'] }}</p>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            @if($isCancelled)
+                <p class="mt-4 text-xs sm:text-sm font-semibold text-red-600">This order was cancelled.</p>
+            @endif
+        </section>
 
         <div class="space-y-5">
             <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
@@ -327,7 +399,7 @@
         </div>
     </div>
 
-    @if($order->status === 'delivered' && !$isPendingRefund)
+    @if($order->status === 'delivered' && $canSubmitRefund)
         <div id="refundRequestModal" class="fixed inset-0 z-[80] hidden" role="dialog" aria-modal="true" aria-labelledby="refund-request-title">
             <div class="absolute inset-0 bg-black/60" data-close-refund-modal></div>
             <div class="absolute inset-0 p-4 sm:p-6 flex items-center justify-center">
