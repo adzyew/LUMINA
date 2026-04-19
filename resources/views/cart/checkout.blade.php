@@ -139,6 +139,7 @@
 
             <input type="hidden" name="shipping_region" value="National Capital Region (NCR)">
             <input type="hidden" name="shipping_province" value="Metro Manila">
+            <input type="hidden" name="shipping_country" value="Philippines">
 
             <div class="space-y-4 p-4 rounded-xl bg-gray-50 border border-gray-200" data-step-panel="1">
                 <h3 class="text-xl font-bold text-gray-900">Contact Information</h3>
