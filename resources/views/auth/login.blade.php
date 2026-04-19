@@ -285,7 +285,7 @@
 
                                 <!-- First Name -->
                                 <div class="floating-group">
-                                    <input type="text" pattern="^[A-Za-z\s]+$" name="first_name" id="first_name" value="{{ old('first_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30" inputmode="text" autocomplete="given-name" title="First name must contain letters only.">
+                                    <input type="text" pattern="^(?=.*[A-Za-z])(?!.*-.*-)(?!-)(?!.*-$)[A-Za-z\s-]+$" name="first_name" id="first_name" value="{{ old('first_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30" inputmode="text" autocomplete="given-name" title="First name may contain letters, spaces, and one hyphen only.">
                                     <label for="first_name" class="floating-label no-icon">
                                         First Name
                                     </label>
@@ -299,7 +299,7 @@
 
                                 <!-- Middle Name (Optional) -->
                                 <div class="floating-group">
-                                    <input type="text" pattern="^[A-Za-z\s]*$" name="middle_name" id="middle_name" value="{{ old('middle_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30" inputmode="text" autocomplete="additional-name" title="Middle name must contain letters only.">
+                                    <input type="text" pattern="^$|^(?=.*[A-Za-z])(?!.*-.*-)(?!-)(?!.*-$)[A-Za-z\s-]+$" name="middle_name" id="middle_name" value="{{ old('middle_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30" inputmode="text" autocomplete="additional-name" title="Middle name may contain letters, spaces, and one hyphen only.">
                                     <label for="middle_name" class="floating-label no-icon">
                                         Middle Name (Optional)
                                     </label>
@@ -313,7 +313,7 @@
 
                                 <!-- Last Name -->
                                 <div class="floating-group">
-                                    <input type="text" pattern="^[A-Za-z\s]+$" name="last_name" id="last_name" value="{{ old('last_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30" inputmode="text" autocomplete="family-name" title="Last name must contain letters only.">
+                                    <input type="text" pattern="^(?=.*[A-Za-z])(?!.*-.*-)(?!-)(?!.*-$)[A-Za-z\s-]+$" name="last_name" id="last_name" value="{{ old('last_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30" inputmode="text" autocomplete="family-name" title="Last name may contain letters, spaces, and one hyphen only.">
                                     <label for="last_name" class="floating-label no-icon">
                                         Last Name
                                     </label>
@@ -595,9 +595,15 @@
                 return normalized.replace(/\D/g, '').slice(0, 10);
             };
 
-            const sanitizeNameInput = (value) => (value || '')
-                .replace(/[^A-Za-z\s]/g, '')
-                .replace(/\s{2,}/g, ' ');
+            const sanitizeNameInput = (value) => {
+                let cleaned = (value || '').replace(/[^A-Za-z\s-]/g, '');
+                const firstHyphenIndex = cleaned.indexOf('-');
+                if (firstHyphenIndex !== -1) {
+                    cleaned = cleaned.slice(0, firstHyphenIndex + 1) + cleaned.slice(firstHyphenIndex + 1).replace(/-/g, '');
+                }
+                cleaned = cleaned.replace(/^\s+/, '').replace(/\s{2,}/g, ' ');
+                return cleaned;
+            };
 
             const sanitizeSuffixInput = (value) => (value || '')
                 .replace(/[^A-Za-z0-9.\-\s]/g, '')

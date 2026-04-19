@@ -375,9 +375,9 @@ class AuthController extends Controller
     public function registerPost(Request $request)
     {
         $request->validate([
-            'first_name' => ['required', 'string', 'max:30', 'regex:/^[\pL\s]+$/u'],
-            'middle_name' => ['nullable', 'string', 'max:30', 'regex:/^[\pL\s]+$/u'],
-            'last_name' => ['required', 'string', 'max:30', 'regex:/^[\pL\s]+$/u'],
+            'first_name' => ['required', 'string', 'max:30', 'regex:/^(?=.*\pL)(?!.*-.*-)(?!-)(?!.*-$)[\pL\s-]+$/u'],
+            'middle_name' => ['nullable', 'string', 'max:30', 'regex:/^(?=.*\pL)(?!.*-.*-)(?!-)(?!.*-$)[\pL\s-]+$/u'],
+            'last_name' => ['required', 'string', 'max:30', 'regex:/^(?=.*\pL)(?!.*-.*-)(?!-)(?!.*-$)[\pL\s-]+$/u'],
             'suffix' => ['nullable', 'string', 'max:20', 'regex:/^[\pL\pN\s\.\-]+$/u'],
             'phone' => ['required', 'regex:/^(?:\\+63|0)?9\\d{9}$/'],
             'email' => 'required|email|unique:users',
@@ -394,9 +394,9 @@ class AuthController extends Controller
             ],
             'terms' => 'accepted',
         ], [
-            'first_name.regex' => 'First name must contain letters only.',
-            'middle_name.regex' => 'Middle name must contain letters only.',
-            'last_name.regex' => 'Last name must contain letters only.',
+            'first_name.regex' => 'First name may contain letters, spaces, and one hyphen only.',
+            'middle_name.regex' => 'Middle name may contain letters, spaces, and one hyphen only.',
+            'last_name.regex' => 'Last name may contain letters, spaces, and one hyphen only.',
             'suffix.regex' => 'Suffix contains invalid characters.',
             'password.min' => 'Password must be at least 8 characters.',
             'password.max' => 'Password must not exceed 10 characters.',
@@ -676,9 +676,9 @@ class AuthController extends Controller
 
         $validated = $request->validate([
             'active_tab' => 'nullable|string',
-            'first_name' => ['required', 'string', 'max:80', 'regex:/^[\pL\s]+$/u'],
-            'middle_name' => ['nullable', 'string', 'max:80', 'regex:/^[\pL\s]+$/u'],
-            'last_name' => ['required', 'string', 'max:80', 'regex:/^[\pL\s]+$/u'],
+            'first_name' => ['required', 'string', 'max:80', 'regex:/^(?=.*\pL)(?!.*-.*-)(?!-)(?!.*-$)[\pL\s-]+$/u'],
+            'middle_name' => ['nullable', 'string', 'max:80', 'regex:/^(?=.*\pL)(?!.*-.*-)(?!-)(?!.*-$)[\pL\s-]+$/u'],
+            'last_name' => ['required', 'string', 'max:80', 'regex:/^(?=.*\pL)(?!.*-.*-)(?!-)(?!.*-$)[\pL\s-]+$/u'],
             'suffix' => ['nullable', 'string', 'max:20', 'regex:/^[\pL\pN\s\.\-]+$/u'],
             'phone' => ['required', 'regex:/^(?:\\+63|0)9\\d{9}$/'],
             'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
@@ -706,9 +706,9 @@ class AuthController extends Controller
             'notify_promotions' => 'nullable|boolean',
             'notify_loyalty' => 'nullable|boolean',
         ], [
-            'first_name.regex' => 'First name must contain letters only.',
-            'middle_name.regex' => 'Middle name must contain letters only.',
-            'last_name.regex' => 'Last name must contain letters only.',
+            'first_name.regex' => 'First name may contain letters, spaces, and one hyphen only.',
+            'middle_name.regex' => 'Middle name may contain letters, spaces, and one hyphen only.',
+            'last_name.regex' => 'Last name may contain letters, spaces, and one hyphen only.',
             'suffix.regex' => 'Suffix contains invalid characters.',
             'phone.regex' => 'Please enter a valid Philippine mobile number (e.g. +639171234567 or 09171234567).',
             'new_password.min' => 'Password must be at least 8 characters.',

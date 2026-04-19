@@ -60,15 +60,15 @@
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
                                             <label class="block text-sm font-medium text-gray-600 mb-2">First Name</label>
-                                            <input type="text" name="first_name" value="{{ $firstName }}" required pattern="^[A-Za-z\s]+$" title="First name must contain letters only." class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                                            <input type="text" name="first_name" value="{{ $firstName }}" required pattern="^(?=.*[A-Za-z])(?!.*-.*-)(?!-)(?!.*-$)[A-Za-z\s-]+$" title="First name may contain letters, spaces, and one hyphen only." class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-600 mb-2">Middle Name (Optional)</label>
-                                            <input type="text" name="middle_name" value="{{ $middleName }}" pattern="^[A-Za-z\s]*$" title="Middle name must contain letters only." class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                                            <input type="text" name="middle_name" value="{{ $middleName }}" pattern="^$|^(?=.*[A-Za-z])(?!.*-.*-)(?!-)(?!.*-$)[A-Za-z\s-]+$" title="Middle name may contain letters, spaces, and one hyphen only." class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-600 mb-2">Last Name</label>
-                                            <input type="text" name="last_name" value="{{ $lastName }}" required pattern="^[A-Za-z\s]+$" title="Last name must contain letters only." class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                                            <input type="text" name="last_name" value="{{ $lastName }}" required pattern="^(?=.*[A-Za-z])(?!.*-.*-)(?!-)(?!.*-$)[A-Za-z\s-]+$" title="Last name may contain letters, spaces, and one hyphen only." class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-600 mb-2">Suffix (Optional)</label>
@@ -379,9 +379,15 @@ function togglePasswordField(inputId, eyeOpenId, eyeClosedId) {
         $errors->has('new_password_confirmation')
     );
 
-    const sanitizeNameInput = (value) => (value || '')
-        .replace(/[^A-Za-z\s]/g, '')
-        .replace(/\s{2,}/g, ' ');
+    const sanitizeNameInput = (value) => {
+        let cleaned = (value || '').replace(/[^A-Za-z\s-]/g, '');
+        const firstHyphenIndex = cleaned.indexOf('-');
+        if (firstHyphenIndex !== -1) {
+            cleaned = cleaned.slice(0, firstHyphenIndex + 1) + cleaned.slice(firstHyphenIndex + 1).replace(/-/g, '');
+        }
+        cleaned = cleaned.replace(/^\s+/, '').replace(/\s{2,}/g, ' ');
+        return cleaned;
+    };
 
     const sanitizeSuffixInput = (value) => (value || '')
         .replace(/[^A-Za-z0-9.\-\s]/g, '')
