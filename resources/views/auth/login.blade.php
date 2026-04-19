@@ -285,7 +285,7 @@
 
                                 <!-- First Name -->
                                 <div class="floating-group">
-                                    <input type="text" pattern="^[A-Za-z\s]+$" name="first_name" id="first_name" value="{{ old('first_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30" inputmode="text" autocomplete="given-name" title="First name must contain letters only.">
+                                    <input type="text" pattern="^(?=.*[A-Za-z])(?!.*-.*-)(?!-)(?!.*-$)[A-Za-z\s-]+$" name="first_name" id="first_name" value="{{ old('first_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30" inputmode="text" autocomplete="given-name" title="First name may contain letters, spaces, and one hyphen only.">
                                     <label for="first_name" class="floating-label no-icon">
                                         First Name
                                     </label>
@@ -299,7 +299,7 @@
 
                                 <!-- Middle Name (Optional) -->
                                 <div class="floating-group">
-                                    <input type="text" pattern="^[A-Za-z\s]*$" name="middle_name" id="middle_name" value="{{ old('middle_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30" inputmode="text" autocomplete="additional-name" title="Middle name must contain letters only.">
+                                    <input type="text" pattern="^$|^(?=.*[A-Za-z])(?!.*-.*-)(?!-)(?!.*-$)[A-Za-z\s-]+$" name="middle_name" id="middle_name" value="{{ old('middle_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30" inputmode="text" autocomplete="additional-name" title="Middle name may contain letters, spaces, and one hyphen only.">
                                     <label for="middle_name" class="floating-label no-icon">
                                         Middle Name (Optional)
                                     </label>
@@ -313,7 +313,7 @@
 
                                 <!-- Last Name -->
                                 <div class="floating-group">
-                                    <input type="text" pattern="^[A-Za-z\s]+$" name="last_name" id="last_name" value="{{ old('last_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30" inputmode="text" autocomplete="family-name" title="Last name must contain letters only.">
+                                    <input type="text" pattern="^(?=.*[A-Za-z])(?!.*-.*-)(?!-)(?!.*-$)[A-Za-z\s-]+$" name="last_name" id="last_name" value="{{ old('last_name') }}" placeholder=" " class="floating-input pl-4 pr-4 py-4" maxlength="30" inputmode="text" autocomplete="family-name" title="Last name may contain letters, spaces, and one hyphen only.">
                                     <label for="last_name" class="floating-label no-icon">
                                         Last Name
                                     </label>
@@ -388,7 +388,7 @@
                                             </svg>
                                         </span>
 
-                                        <input id="register-password" type="password" name="password" placeholder=" " class="floating-input pl-12 pr-12 py-4" minlength="8" autocomplete="new-password" maxlength="15">
+                            <input id="register-password" type="password" name="password" placeholder=" " class="floating-input pl-12 pr-12 py-4" minlength="8" autocomplete="new-password" maxlength="10">
                                         <label for="register-password" class="floating-label">Create Password</label>
 
                                         <button type="button" onclick="togglePasswordField('register-password', 'register-eye-open', 'register-eye-closed')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none z-10">
@@ -409,7 +409,7 @@
                                     @enderror
 
                                     <p id="register-password-strength" class="hidden text-xs mt-2 text-gray-500">Password strength: Weak</p>
-                                    <p id="register-password-rules" class="hidden text-xs mt-1 text-gray-500">Use at least 8 characters with uppercase, lowercase, and a number.</p>
+                            <p id="register-password-rules" class="hidden text-xs mt-1 text-gray-500">Use 8 to 10 characters with uppercase, lowercase, and a number.</p>
                                 </div>
 
                                 <!-- Confirm Password -->
@@ -421,7 +421,7 @@
                                             </svg>
                                         </span>
 
-                                        <input id="register-password-confirm" type="password" name="password_confirmation" placeholder=" " class="floating-input pl-12 pr-12 py-4" maxlength="15">
+                            <input id="register-password-confirm" type="password" name="password_confirmation" placeholder=" " class="floating-input pl-12 pr-12 py-4" maxlength="10">
                                         <label for="register-password-confirm" class="floating-label">Confirm Password</label>
 
                                         <button type="button" onclick="togglePasswordField('register-password-confirm', 'confirm-eye-open', 'confirm-eye-closed')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none z-10">
@@ -595,9 +595,15 @@
                 return normalized.replace(/\D/g, '').slice(0, 10);
             };
 
-            const sanitizeNameInput = (value) => (value || '')
-                .replace(/[^A-Za-z\s]/g, '')
-                .replace(/\s{2,}/g, ' ');
+            const sanitizeNameInput = (value) => {
+                let cleaned = (value || '').replace(/[^A-Za-z\s-]/g, '');
+                const firstHyphenIndex = cleaned.indexOf('-');
+                if (firstHyphenIndex !== -1) {
+                    cleaned = cleaned.slice(0, firstHyphenIndex + 1) + cleaned.slice(firstHyphenIndex + 1).replace(/-/g, '');
+                }
+                cleaned = cleaned.replace(/^\s+/, '').replace(/\s{2,}/g, ' ');
+                return cleaned;
+            };
 
             const sanitizeSuffixInput = (value) => (value || '')
                 .replace(/[^A-Za-z0-9.\-\s]/g, '')
@@ -650,10 +656,11 @@
 
                 const value = registerPassword.value || '';
                 const hasMinLength = value.length >= 8;
+                const hasMaxLength = value.length <= 10;
                 const hasLower = /[a-z]/.test(value);
                 const hasUpper = /[A-Z]/.test(value);
                 const hasNumber = /\d/.test(value);
-                const isStrong = hasMinLength && hasLower && hasUpper && hasNumber;
+                const isStrong = hasMinLength && hasMaxLength && hasLower && hasUpper && hasNumber;
 
                 if (value.length === 0) {
                     strengthLabel.classList.add('hidden');
@@ -667,12 +674,12 @@
                 if (isStrong) {
                     strengthLabel.textContent = 'Password strength: Strong';
                     strengthLabel.className = 'text-xs mt-2 text-green-600';
-                    rulesLabel.textContent = 'Use at least 8 characters with uppercase, lowercase, and a number.';
+                    rulesLabel.textContent = 'Use 8 to 10 characters with uppercase, lowercase, and a number.';
                     rulesLabel.className = 'text-xs mt-1 text-gray-500';
                 } else {
                     strengthLabel.textContent = 'Password strength: Weak';
                     strengthLabel.className = 'text-xs mt-2 text-red-500';
-                    rulesLabel.textContent = 'Missing requirement: 8+ chars, uppercase, lowercase, and number.';
+                    rulesLabel.textContent = 'Missing requirement: 8-10 chars, uppercase, lowercase, and number.';
                     rulesLabel.className = 'text-xs mt-1 text-red-500';
                 }
             }

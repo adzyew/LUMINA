@@ -58,28 +58,28 @@ class ProfileController extends Controller
 
         $validated = $request->validate([
             'name' => 'nullable|string|max:255',
-            'first_name' => ['required', 'string', 'max:80', 'regex:/^[\pL\s]+$/u'],
-            'middle_name' => ['nullable', 'string', 'max:80', 'regex:/^[\pL\s]+$/u'],
-            'last_name' => ['required', 'string', 'max:80', 'regex:/^[\pL\s]+$/u'],
+            'first_name' => ['required', 'string', 'max:80', 'regex:/^(?=.*\pL)(?!.*-.*-)(?!-)(?!.*-$)[\pL\s-]+$/u'],
+            'middle_name' => ['nullable', 'string', 'max:80', 'regex:/^(?=.*\pL)(?!.*-.*-)(?!-)(?!.*-$)[\pL\s-]+$/u'],
+            'last_name' => ['required', 'string', 'max:80', 'regex:/^(?=.*\pL)(?!.*-.*-)(?!-)(?!.*-$)[\pL\s-]+$/u'],
             'suffix' => ['nullable', 'string', 'max:20', 'regex:/^[\pL\pN\s\.\-]+$/u'],
             'current_password' => 'nullable|required_with:new_password|string',
             'new_password' => [
                 'nullable',
                 'string',
                 'min:8',
-                'max:72',
+                'max:10',
                 'regex:/[a-z]/',
                 'regex:/[A-Z]/',
                 'regex:/[0-9]/',
                 'confirmed',
             ],
         ], [
-            'first_name.regex' => 'First name must contain letters only.',
-            'middle_name.regex' => 'Middle name must contain letters only.',
-            'last_name.regex' => 'Last name must contain letters only.',
+            'first_name.regex' => 'First name may contain letters, spaces, and one hyphen only.',
+            'middle_name.regex' => 'Middle name may contain letters, spaces, and one hyphen only.',
+            'last_name.regex' => 'Last name may contain letters, spaces, and one hyphen only.',
             'suffix.regex' => 'Suffix contains invalid characters.',
             'new_password.min' => 'Password must be at least 8 characters.',
-            'new_password.max' => 'Password cannot exceed 72 characters.',
+            'new_password.max' => 'Password cannot exceed 10 characters.',
             'new_password.regex' => 'Password must include uppercase, lowercase, and a number.',
         ]);
 

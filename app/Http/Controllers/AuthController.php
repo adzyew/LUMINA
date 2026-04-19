@@ -375,9 +375,9 @@ class AuthController extends Controller
     public function registerPost(Request $request)
     {
         $request->validate([
-            'first_name' => ['required', 'string', 'max:30', 'regex:/^[\pL\s]+$/u'],
-            'middle_name' => ['nullable', 'string', 'max:30', 'regex:/^[\pL\s]+$/u'],
-            'last_name' => ['required', 'string', 'max:30', 'regex:/^[\pL\s]+$/u'],
+            'first_name' => ['required', 'string', 'max:30', 'regex:/^(?=.*\pL)(?!.*-.*-)(?!-)(?!.*-$)[\pL\s-]+$/u'],
+            'middle_name' => ['nullable', 'string', 'max:30', 'regex:/^(?=.*\pL)(?!.*-.*-)(?!-)(?!.*-$)[\pL\s-]+$/u'],
+            'last_name' => ['required', 'string', 'max:30', 'regex:/^(?=.*\pL)(?!.*-.*-)(?!-)(?!.*-$)[\pL\s-]+$/u'],
             'suffix' => ['nullable', 'string', 'max:20', 'regex:/^[\pL\pN\s\.\-]+$/u'],
             'phone' => ['required', 'regex:/^(?:\\+63|0)?9\\d{9}$/'],
             'email' => 'required|email|unique:users',
@@ -386,6 +386,7 @@ class AuthController extends Controller
                 'required',
                 'string',
                 'min:8',
+                'max:10',
                 'regex:/[a-z]/',
                 'regex:/[A-Z]/',
                 'regex:/[0-9]/',
@@ -393,11 +394,12 @@ class AuthController extends Controller
             ],
             'terms' => 'accepted',
         ], [
-            'first_name.regex' => 'First name must contain letters only.',
-            'middle_name.regex' => 'Middle name must contain letters only.',
-            'last_name.regex' => 'Last name must contain letters only.',
+            'first_name.regex' => 'First name may contain letters, spaces, and one hyphen only.',
+            'middle_name.regex' => 'Middle name may contain letters, spaces, and one hyphen only.',
+            'last_name.regex' => 'Last name may contain letters, spaces, and one hyphen only.',
             'suffix.regex' => 'Suffix contains invalid characters.',
             'password.min' => 'Password must be at least 8 characters.',
+            'password.max' => 'Password must not exceed 10 characters.',
             'password.regex' => 'Password must include uppercase, lowercase, and a number.',
             'phone.regex' => 'Please enter a valid Philippine mobile number (e.g. 9171234567).',
         ]);
@@ -669,14 +671,14 @@ class AuthController extends Controller
         $isGoogleWithoutPassword = strtolower((string) ($user->provider_name ?? '')) === 'google'
             && empty($user->password);
         $currentPasswordRule = $isGoogleWithoutPassword
-            ? 'nullable|string|max:72'
-            : 'nullable|required_with:new_password,new_password_confirmation|string|max:72';
+            ? 'nullable|string|max:10'
+            : 'nullable|required_with:new_password,new_password_confirmation|string|max:10';
 
         $validated = $request->validate([
             'active_tab' => 'nullable|string',
-            'first_name' => ['required', 'string', 'max:80', 'regex:/^[\pL\s]+$/u'],
-            'middle_name' => ['nullable', 'string', 'max:80', 'regex:/^[\pL\s]+$/u'],
-            'last_name' => ['required', 'string', 'max:80', 'regex:/^[\pL\s]+$/u'],
+            'first_name' => ['required', 'string', 'max:80', 'regex:/^(?=.*\pL)(?!.*-.*-)(?!-)(?!.*-$)[\pL\s-]+$/u'],
+            'middle_name' => ['nullable', 'string', 'max:80', 'regex:/^(?=.*\pL)(?!.*-.*-)(?!-)(?!.*-$)[\pL\s-]+$/u'],
+            'last_name' => ['required', 'string', 'max:80', 'regex:/^(?=.*\pL)(?!.*-.*-)(?!-)(?!.*-$)[\pL\s-]+$/u'],
             'suffix' => ['nullable', 'string', 'max:20', 'regex:/^[\pL\pN\s\.\-]+$/u'],
             'phone' => ['required', 'regex:/^(?:\\+63|0)9\\d{9}$/'],
             'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
@@ -686,14 +688,14 @@ class AuthController extends Controller
                 'required_with:new_password_confirmation',
                 'string',
                 'min:8',
-                'max:72',
+                'max:10',
                 'regex:/[a-z]/',
                 'regex:/[A-Z]/',
                 'regex:/[0-9]/',
                 'different:current_password',
                 'confirmed',
             ],
-            'new_password_confirmation' => 'nullable|required_with:current_password,new_password|string|max:72',
+            'new_password_confirmation' => 'nullable|required_with:current_password,new_password|string|max:10',
             'shipping_street' => 'nullable|string|max:255',
             'shipping_secondary_address' => 'nullable|string|max:255',
             'shipping_city' => 'nullable|string|max:100',
@@ -704,18 +706,18 @@ class AuthController extends Controller
             'notify_promotions' => 'nullable|boolean',
             'notify_loyalty' => 'nullable|boolean',
         ], [
-            'first_name.regex' => 'First name must contain letters only.',
-            'middle_name.regex' => 'Middle name must contain letters only.',
-            'last_name.regex' => 'Last name must contain letters only.',
+            'first_name.regex' => 'First name may contain letters, spaces, and one hyphen only.',
+            'middle_name.regex' => 'Middle name may contain letters, spaces, and one hyphen only.',
+            'last_name.regex' => 'Last name may contain letters, spaces, and one hyphen only.',
             'suffix.regex' => 'Suffix contains invalid characters.',
             'phone.regex' => 'Please enter a valid Philippine mobile number (e.g. +639171234567 or 09171234567).',
             'new_password.min' => 'Password must be at least 8 characters.',
-            'new_password.max' => 'Password cannot exceed 72 characters.',
-            'current_password.max' => 'Current password cannot exceed 72 characters.',
+            'new_password.max' => 'Password cannot exceed 10 characters.',
+            'current_password.max' => 'Current password cannot exceed 10 characters.',
             'current_password.required_with' => 'Current password is required to change your password.',
             'new_password.required_with' => 'New password is required when changing your password.',
             'new_password_confirmation.required_with' => 'Please confirm your new password.',
-            'new_password_confirmation.max' => 'Password confirmation cannot exceed 72 characters.',
+            'new_password_confirmation.max' => 'Password confirmation cannot exceed 10 characters.',
             'new_password.regex' => 'Password must include uppercase, lowercase, and a number.',
             'new_password.different' => 'New password must be different from your current password.',
             'new_password.confirmed' => 'New password confirmation does not match.',
@@ -1506,6 +1508,7 @@ public function loginPost(Request $request)
                 'required',
                 'string',
                 'min:8',
+                'max:10',
                 'regex:/[a-z]/',
                 'regex:/[A-Z]/',
                 'regex:/[0-9]/',
@@ -1513,6 +1516,7 @@ public function loginPost(Request $request)
             ],
         ], [
             'password.min' => 'Password must be at least 8 characters.',
+            'password.max' => 'Password must not exceed 10 characters.',
             'password.regex' => 'Password must include uppercase, lowercase, and a number.',
         ]);
 

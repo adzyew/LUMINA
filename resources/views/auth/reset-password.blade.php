@@ -39,7 +39,7 @@
                 <div>
                     <label for="password" class="block text-gray-700 text-sm font-medium mb-2">New Password</label>
                     <div class="relative">
-                        <input type="password" name="password" id="password" required minlength="8"
+                        <input type="password" name="password" id="password" required minlength="8" maxlength="10"
                             class="w-full px-4 py-3 pr-11 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                             placeholder="Use uppercase, lowercase, number"
                             autocomplete="new-password">
@@ -54,12 +54,12 @@
                         </button>
                     </div>
                     <p id="reset-password-strength" class="hidden text-xs mt-2 text-gray-500">Password strength: Weak</p>
-                    <p id="reset-password-rules" class="hidden text-xs mt-1 text-gray-500">Use at least 8 characters with uppercase, lowercase, and a number.</p>
+                    <p id="reset-password-rules" class="hidden text-xs mt-1 text-gray-500">Use 8 to 10 characters with uppercase, lowercase, and a number.</p>
                 </div>
                 <div>
                     <label for="password_confirmation" class="block text-gray-700 text-sm font-medium mb-2">Confirm Password</label>
                     <div class="relative">
-                        <input type="password" name="password_confirmation" id="password_confirmation" required minlength="8"
+                        <input type="password" name="password_confirmation" id="password_confirmation" required minlength="8" maxlength="10"
                             class="w-full px-4 py-3 pr-11 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                             placeholder="Confirm your password"
                             autocomplete="new-password">
@@ -115,10 +115,11 @@
             function updatePasswordStrength(showOutput = false) {
                 const value = password ? (password.value || '') : '';
                 const hasMinLength = value.length >= 8;
+                const hasMaxLength = value.length <= 10;
                 const hasLower = /[a-z]/.test(value);
                 const hasUpper = /[A-Z]/.test(value);
                 const hasNumber = /\d/.test(value);
-                const isStrong = hasMinLength && hasLower && hasUpper && hasNumber;
+                const isStrong = hasMinLength && hasMaxLength && hasLower && hasUpper && hasNumber;
 
                 if (!strengthLabel || !rulesLabel) {
                     return;
@@ -129,7 +130,7 @@
                     rulesLabel.classList.add('hidden');
                     strengthLabel.textContent = 'Password strength: Weak';
                     strengthLabel.className = 'hidden text-xs mt-2 text-gray-500';
-                    rulesLabel.textContent = 'Use at least 8 characters with uppercase, lowercase, and a number.';
+                    rulesLabel.textContent = 'Use 8 to 10 characters with uppercase, lowercase, and a number.';
                     rulesLabel.className = 'hidden text-xs mt-1 text-gray-500';
                     return;
                 }
@@ -145,7 +146,7 @@
                 } else {
                     strengthLabel.textContent = 'Password strength: Weak';
                     strengthLabel.className = 'text-xs mt-2 text-red-500';
-                    rulesLabel.textContent = 'Missing requirement: 8+ chars, uppercase, lowercase, and number.';
+                    rulesLabel.textContent = 'Missing requirement: 8-10 chars, uppercase, lowercase, and number.';
                     rulesLabel.className = 'text-xs mt-1 text-red-500';
                 }
             }

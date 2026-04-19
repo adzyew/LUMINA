@@ -143,7 +143,7 @@
                                 <section class="rounded-xl border border-gray-200 bg-gray-50 p-4">
                                     <div class="relative">
                                         <div class="absolute left-0 right-0 top-4 h-1 rounded-full bg-gray-200"></div>
-                                        <div class="absolute left-0 top-4 h-1 rounded-full {{ $modalCancelled ? 'bg-red-400' : 'bg-indigo-500' }}"
+                                        <div class="absolute left-0 top-4 h-1 rounded-full {{ $modalCancelled ? 'bg-red-400' : 'bg-amber-300' }}"
                                              style="width: {{ max(0, min(100, (($modalCurrentStep - 1) / 3) * 100)) }}%;"></div>
 
                                         <div class="grid grid-cols-4 gap-2 relative z-10">
@@ -152,7 +152,7 @@
                                                     $step = $index + 1;
                                                     $done = $step <= $modalCurrentStep;
                                                     $dotClass = $done
-                                                        ? ($modalCancelled ? 'bg-red-500 border-red-500 text-white' : 'bg-indigo-500 border-indigo-500 text-white')
+                                                        ? ($modalCancelled ? 'bg-red-500 border-red-500 text-white' : 'bg-amber-300 border-amber-400 text-white')
                                                         : 'bg-white border-gray-300 text-gray-400';
                                                 @endphp
                                                 <div class="flex flex-col items-center text-center">
@@ -245,9 +245,6 @@
                 <div class="text-center py-16 bg-amber-50 rounded-2xl border border-amber-100">
                     <p class="text-gray-900 font-bold text-lg mb-2">No orders yet</p>
                     <p class="text-gray-600 mb-6">Start shopping to see your order history here.</p>
-                    <a href="{{ route('products.index') }}" class="px-6 py-3 bg-amber-300 text-black font-bold rounded-full hover:bg-amber-400 transition-colors">
-                        Browse Collection
-                    </a>
                 </div>
             @endforelse
         </div>

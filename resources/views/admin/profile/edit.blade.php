@@ -45,6 +45,8 @@
                         type="text"
                         name="first_name"
                         value="{{ $firstName }}"
+                        pattern="^(?=.*[A-Za-z])(?!.*-.*-)(?!-)(?!.*-$)[A-Za-z\s-]+$"
+                        title="First name may contain letters, spaces, and one hyphen only."
                         required
                         class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-amber-400"
                     >
@@ -57,6 +59,8 @@
                         type="text"
                         name="middle_name"
                         value="{{ $middleName }}"
+                        pattern="^$|^(?=.*[A-Za-z])(?!.*-.*-)(?!-)(?!.*-$)[A-Za-z\s-]+$"
+                        title="Middle name may contain letters, spaces, and one hyphen only."
                         class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-amber-400"
                     >
                 </div>
@@ -68,6 +72,8 @@
                         type="text"
                         name="last_name"
                         value="{{ $lastName }}"
+                        pattern="^(?=.*[A-Za-z])(?!.*-.*-)(?!-)(?!.*-$)[A-Za-z\s-]+$"
+                        title="Last name may contain letters, spaces, and one hyphen only."
                         required
                         class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-amber-400"
                     >

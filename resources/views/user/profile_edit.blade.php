@@ -60,15 +60,15 @@
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
                                             <label class="block text-sm font-medium text-gray-600 mb-2">First Name</label>
-                                            <input type="text" name="first_name" value="{{ $firstName }}" required pattern="^[A-Za-z\s]+$" title="First name must contain letters only." class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                                            <input type="text" name="first_name" value="{{ $firstName }}" required pattern="^(?=.*[A-Za-z])(?!.*-.*-)(?!-)(?!.*-$)[A-Za-z\s-]+$" title="First name may contain letters, spaces, and one hyphen only." class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-600 mb-2">Middle Name (Optional)</label>
-                                            <input type="text" name="middle_name" value="{{ $middleName }}" pattern="^[A-Za-z\s]*$" title="Middle name must contain letters only." class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                                            <input type="text" name="middle_name" value="{{ $middleName }}" pattern="^$|^(?=.*[A-Za-z])(?!.*-.*-)(?!-)(?!.*-$)[A-Za-z\s-]+$" title="Middle name may contain letters, spaces, and one hyphen only." class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-600 mb-2">Last Name</label>
-                                            <input type="text" name="last_name" value="{{ $lastName }}" required pattern="^[A-Za-z\s]+$" title="Last name must contain letters only." class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                                            <input type="text" name="last_name" value="{{ $lastName }}" required pattern="^(?=.*[A-Za-z])(?!.*-.*-)(?!-)(?!.*-$)[A-Za-z\s-]+$" title="Last name may contain letters, spaces, and one hyphen only." class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-600 mb-2">Suffix (Optional)</label>
@@ -210,7 +210,7 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-600 mb-2">Current Password</label>
                                         <div class="relative">
-                                            <input id="profile-current-password" type="password" name="current_password" autocomplete="current-password" maxlength="72" class="w-full px-4 py-3 pr-11 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                                            <input id="profile-current-password" type="password" name="current_password" autocomplete="current-password" maxlength="10" class="w-full px-4 py-3 pr-11 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
                                             <button type="button" onclick="togglePasswordField('profile-current-password', 'profile-current-eye-open', 'profile-current-eye-closed')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="Toggle password visibility" data-edit-only>
                                                 <svg id="profile-current-eye-open" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 0 1 6 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                 <svg id="profile-current-eye-closed" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 0 1 1.563-3.029m5.858.908a3 3 0 1 1 4.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532 3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0 1 12 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 0 1-4.132 5.411m0 0L21 21" /></svg>
@@ -227,19 +227,19 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-600 mb-2">{{ $isGoogleAccount ? 'Create Password' : 'New Password' }}</label>
                                         <div class="relative">
-                                            <input id="profile-new-password" type="password" name="new_password" autocomplete="new-password" maxlength="72" minlength="8" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,72}" title="Use 8 to 72 characters with uppercase, lowercase, and a number." class="w-full px-4 py-3 pr-11 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                                            <input id="profile-new-password" type="password" name="new_password" autocomplete="new-password" maxlength="10" minlength="8" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,10}" title="Use 8 to 10 characters with uppercase, lowercase, and a number." class="w-full px-4 py-3 pr-11 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
                                             <button type="button" onclick="togglePasswordField('profile-new-password', 'profile-new-eye-open', 'profile-new-eye-closed')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="Toggle password visibility" data-edit-only>
                                                 <svg id="profile-new-eye-open" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 0 1 6 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                 <svg id="profile-new-eye-closed" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 0 1 1.563-3.029m5.858.908a3 3 0 1 1 4.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532 3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0 1 12 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 0 1-4.132 5.411m0 0L21 21" /></svg>
                                             </button>
                                         </div>
                                         <p id="profile-password-strength" class="hidden text-xs mt-2 text-gray-500">Password strength: Weak</p>
-                                        <p id="profile-password-rules" class="hidden text-xs mt-1 text-gray-500">Use 8 to 72 characters with uppercase, lowercase, and a number.</p>
+                                        <p id="profile-password-rules" class="hidden text-xs mt-1 text-gray-500">Use 8 to 10 characters with uppercase, lowercase, and a number.</p>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-600 mb-2">Confirm New Password</label>
                                         <div class="relative">
-                                            <input id="profile-confirm-password" type="password" name="new_password_confirmation" autocomplete="new-password" maxlength="72" minlength="8" class="w-full px-4 py-3 pr-11 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
+                                            <input id="profile-confirm-password" type="password" name="new_password_confirmation" autocomplete="new-password" maxlength="10" minlength="8" class="w-full px-4 py-3 pr-11 bg-white border border-gray-300 rounded-xl text-gray-900 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-colors">
                                             <button type="button" onclick="togglePasswordField('profile-confirm-password', 'profile-confirm-eye-open', 'profile-confirm-eye-closed')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="Toggle password visibility" data-edit-only>
                                                 <svg id="profile-confirm-eye-open" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 0 1 6 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                                 <svg id="profile-confirm-eye-closed" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.875 18.825A10.05 10.05 0 0 1 12 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 0 1 1.563-3.029m5.858.908a3 3 0 1 1 4.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532 3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0 1 12 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 0 1-4.132 5.411m0 0L21 21" /></svg>
@@ -379,9 +379,15 @@ function togglePasswordField(inputId, eyeOpenId, eyeClosedId) {
         $errors->has('new_password_confirmation')
     );
 
-    const sanitizeNameInput = (value) => (value || '')
-        .replace(/[^A-Za-z\s]/g, '')
-        .replace(/\s{2,}/g, ' ');
+    const sanitizeNameInput = (value) => {
+        let cleaned = (value || '').replace(/[^A-Za-z\s-]/g, '');
+        const firstHyphenIndex = cleaned.indexOf('-');
+        if (firstHyphenIndex !== -1) {
+            cleaned = cleaned.slice(0, firstHyphenIndex + 1) + cleaned.slice(firstHyphenIndex + 1).replace(/-/g, '');
+        }
+        cleaned = cleaned.replace(/^\s+/, '').replace(/\s{2,}/g, ' ');
+        return cleaned;
+    };
 
     const sanitizeSuffixInput = (value) => (value || '')
         .replace(/[^A-Za-z0-9.\-\s]/g, '')
@@ -647,7 +653,7 @@ function togglePasswordField(inputId, eyeOpenId, eyeClosedId) {
         if (!newPassword || !strengthLabel || !rulesLabel) return;
 
         const value = newPassword.value || '';
-        const hasMaxLength = value.length <= 72;
+        const hasMaxLength = value.length <= 10;
         const hasMinLength = value.length >= 8;
         const hasLower = /[a-z]/.test(value);
         const hasUpper = /[A-Z]/.test(value);
@@ -673,9 +679,9 @@ function togglePasswordField(inputId, eyeOpenId, eyeClosedId) {
         } else {
             strengthLabel.textContent = 'Password strength: Weak';
             strengthLabel.className = 'text-xs mt-2 text-red-500';
-            rulesLabel.textContent = 'Missing requirement: 8-72 chars, uppercase, lowercase, and number.';
+            rulesLabel.textContent = 'Missing requirement: 8-10 chars, uppercase, lowercase, and number.';
             rulesLabel.className = 'text-xs mt-1 text-red-500';
-            newPassword.setCustomValidity('Please use 8 to 72 characters with uppercase, lowercase, and a number.');
+            newPassword.setCustomValidity('Please use 8 to 10 characters with uppercase, lowercase, and a number.');
         }
     }
 

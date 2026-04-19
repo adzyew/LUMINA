@@ -219,7 +219,7 @@
                         <form id="adminLogoutForm" method="POST" action="{{ route('logout') }}" class="m-0">
                             @csrf
                             <button id="adminLogoutSubmitButton" type="submit" class="inline-flex w-full justify-center rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto transition-colors disabled:opacity-70 disabled:cursor-not-allowed">
-                                Confirm
+                                Logout
                             </button>
                         </form>
                         <button type="button" onclick="hideLogoutModal()" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto transition-colors">
