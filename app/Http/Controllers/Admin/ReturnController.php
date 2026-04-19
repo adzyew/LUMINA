@@ -20,7 +20,7 @@ class ReturnController extends Controller
             ->latest();
 
         $status = strtolower((string) $request->query('status', ''));
-        if (in_array($status, ['pending', 'approved', 'rejected'], true)) {
+        if (in_array($status, [ReturnRequest::STATUS_PENDING, ReturnRequest::STATUS_APPROVED, ReturnRequest::STATUS_REJECTED], true)) {
             $query->where('status', $status);
         }
 
@@ -43,9 +43,9 @@ class ReturnController extends Controller
 
         $stats = [
             'total' => ReturnRequest::count(),
-            'pending' => ReturnRequest::where('status', 'pending')->count(),
-            'approved' => ReturnRequest::where('status', 'approved')->count(),
-            'rejected' => ReturnRequest::where('status', 'rejected')->count(),
+            'pending' => ReturnRequest::where('status', ReturnRequest::STATUS_PENDING)->count(),
+            'approved' => ReturnRequest::where('status', ReturnRequest::STATUS_APPROVED)->count(),
+            'rejected' => ReturnRequest::where('status', ReturnRequest::STATUS_REJECTED)->count(),
         ];
 
         return view('admin.return_management.index', compact('returnRequests', 'stats'));
@@ -53,7 +53,7 @@ class ReturnController extends Controller
 
     public function approve(Request $request, ReturnRequest $returnRequest): RedirectResponse
     {
-        if ($returnRequest->status !== 'pending') {
+        if (!$returnRequest->isPending()) {
             return back()
                 ->with('toast_type', 'error')
                 ->with('toast_message', 'This refund request has already been resolved.');
@@ -64,7 +64,7 @@ class ReturnController extends Controller
         ]);
 
         $returnRequest->update([
-            'status' => 'approved',
+            'status' => ReturnRequest::STATUS_APPROVED,
             'admin_notes' => $validated['admin_notes'] ?? null,
             'resolved_at' => now(),
         ]);
@@ -82,7 +82,7 @@ class ReturnController extends Controller
 
     public function reject(Request $request, ReturnRequest $returnRequest): RedirectResponse
     {
-        if ($returnRequest->status !== 'pending') {
+        if (!$returnRequest->isPending()) {
             return back()
                 ->with('toast_type', 'error')
                 ->with('toast_message', 'This refund request has already been resolved.');
@@ -93,7 +93,7 @@ class ReturnController extends Controller
         ]);
 
         $returnRequest->update([
-            'status' => 'rejected',
+            'status' => ReturnRequest::STATUS_REJECTED,
             'admin_notes' => $validated['admin_notes'],
             'resolved_at' => now(),
         ]);

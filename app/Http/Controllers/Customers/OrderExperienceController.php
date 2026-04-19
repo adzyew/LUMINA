@@ -9,10 +9,18 @@ use App\Models\ReturnRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class OrderExperienceController extends Controller
 {
+    private const REFUND_REASON_OPTIONS = [
+        'Damaged item',
+        'Wrong item received',
+        'Missing item/part',
+        'Item not as described',
+        'Late delivery',
+        'Other',
+    ];
+
     private function ensureOwnedOrder(Order $order): void
     {
         $user = Auth::user();
@@ -38,11 +46,18 @@ class OrderExperienceController extends Controller
             ->latest()
             ->first();
 
-        if ($refundRequest && $refundRequest->status === 'pending') {
+        if ($refundRequest && $refundRequest->isPending()) {
             return redirect()
                 ->route('orders.show', $order)
                 ->with('toast_type', 'error')
                 ->with('toast_message', 'You already have a pending refund request. You can track its status in your order details.');
+        }
+
+        if ($refundRequest && $refundRequest->isApproved()) {
+            return redirect()
+                ->route('orders.show', $order)
+                ->with('toast_type', 'info')
+                ->with('toast_message', 'Your refund request for this order is already approved.');
         }
 
         return view('user.refund_request', compact('order', 'refundRequest'));
@@ -64,15 +79,22 @@ class OrderExperienceController extends Controller
             ->latest()
             ->first();
 
-        if ($existingRequest && $existingRequest->status === 'pending') {
+        if ($existingRequest && $existingRequest->isPending()) {
             return redirect()
                 ->route('orders.show', $order)
                 ->with('toast_type', 'error')
                 ->with('toast_message', 'You already have a pending refund request for this order. Please wait for an update.');
         }
 
+        if ($existingRequest && $existingRequest->isApproved()) {
+            return redirect()
+                ->route('orders.show', $order)
+                ->with('toast_type', 'info')
+                ->with('toast_message', 'This order already has an approved refund request.');
+        }
+
         $validated = $request->validate([
-            'reason' => 'required|string|max:120',
+            'reason' => 'required|string|in:' . implode(',', self::REFUND_REASON_OPTIONS),
             'other_reason' => 'required_if:reason,Other|nullable|string|max:120',
             'details' => 'nullable|string|max:2000',
             'proof_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
@@ -85,30 +107,28 @@ class OrderExperienceController extends Controller
             ? trim((string) ($validated['other_reason'] ?? ''))
             : $validated['reason'];
 
-        $proofImagePath = $existingRequest?->proof_image_path;
-        if ($request->hasFile('proof_image')) {
-            if (!empty($proofImagePath)) {
-                Storage::disk('public')->delete($proofImagePath);
-            }
+        if ($finalReason === '') {
+            return back()
+                ->withInput()
+                ->withErrors(['other_reason' => 'Please specify your reason when selecting Others.']);
+        }
 
+        $proofImagePath = null;
+        if ($request->hasFile('proof_image')) {
             $proofImagePath = $request->file('proof_image')->store('refund-proofs', 'public');
         }
 
-        ReturnRequest::updateOrCreate(
-            [
-                'order_id' => $order->id,
-                'user_id' => Auth::id(),
-            ],
-            [
-                'reason' => $finalReason,
-                'details' => $validated['details'] ?? null,
-                'proof_image_path' => $proofImagePath,
-                'requested_amount' => $order->total_price,
-                'status' => 'pending',
-                'admin_notes' => null,
-                'resolved_at' => null,
-            ]
-        );
+        ReturnRequest::create([
+            'order_id' => $order->id,
+            'user_id' => Auth::id(),
+            'reason' => $finalReason,
+            'details' => $validated['details'] ?? null,
+            'proof_image_path' => $proofImagePath,
+            'requested_amount' => (float) $order->total_price,
+            'status' => ReturnRequest::STATUS_PENDING,
+            'admin_notes' => null,
+            'resolved_at' => null,
+        ]);
 
         return redirect()
             ->route('orders.show', $order)

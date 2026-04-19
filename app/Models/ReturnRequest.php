@@ -8,6 +8,10 @@ use Illuminate\Support\Str;
 
 class ReturnRequest extends Model
 {
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_REJECTED = 'rejected';
+
     protected static function booted(): void
     {
         static::creating(function (ReturnRequest $request): void {
@@ -43,6 +47,21 @@ class ReturnRequest extends Model
         'requested_amount' => 'decimal:2',
         'resolved_at' => 'datetime',
     ];
+
+    public function isPending(): bool
+    {
+        return $this->status === self::STATUS_PENDING;
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->status === self::STATUS_APPROVED;
+    }
+
+    public function isRejected(): bool
+    {
+        return $this->status === self::STATUS_REJECTED;
+    }
 
     public function getDisplayRequestNumberAttribute(): string
     {
