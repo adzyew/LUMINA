@@ -26,6 +26,9 @@
                         <table class="w-full text-left min-w-[620px]">
                             <thead class="bg-amber-50 text-gray-900 text-lg font-bold tracking-wider border-b border-amber-200">
                                 <tr>
+                                    <th class="p-4 sm:p-6 w-10 text-center">
+                                        <input id="select-all-cart-items" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-400" checked>
+                                    </th>
                                     <th class="p-4 sm:p-6">Product</th>
                                     <th class="p-4 sm:p-6 hidden sm:table-cell">Price</th>
                                     <th class="p-4 sm:p-6 text-center">Quantity</th>
@@ -35,9 +38,18 @@
                             </thead>
                             <tbody class="divide-y divide-gray-200">
                                 @php $total = 0; @endphp
+                                @php $selectedCheckoutItems = session('checkout_selected_items', array_keys(session('cart', []))); @endphp
                                 @foreach(session('cart') as $id => $details)
                                     @php $total += $details['price'] * $details['quantity']; @endphp
-                                    <tr id="cart-row-{{ $id }}" class="bg-white hover:bg-amber-50/50 transition-colors">
+                                    <tr id="cart-row-{{ $id }}" class="bg-white hover:bg-amber-50/50 transition-colors" data-item-id="{{ $id }}">
+                                        <td class="p-4 sm:p-6 text-center align-middle">
+                                            <input
+                                                type="checkbox"
+                                                class="cart-item-checkbox h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-400"
+                                                value="{{ $id }}"
+                                                {{ in_array((string) $id, array_map('strval', (array) $selectedCheckoutItems), true) ? 'checked' : '' }}
+                                            >
+                                        </td>
                                         
                                         <td class="p-4 sm:p-6">
                                             <div class="flex items-center gap-4">
@@ -100,6 +112,7 @@
                 <div class="lg:w-1/4">
                     <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-md sticky top-24">
                         <h3 class="font-playfair font-bold text-xl text-gray-900 mb-6">Order Summary</h3>
+                        <p id="selectedItemsHint" class="mb-4 text-xs text-gray-500">Selected items: 0</p>
 
                         <div class="space-y-3 text-sm border-b border-gray-200 pb-6 mb-6">
                             <div class="flex justify-between text-gray-400">
@@ -118,9 +131,13 @@
                         </div>
 
                         @auth
-                        <a href="{{ route('checkout') }}" class="block w-full py-4 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-300/20 text-center">
+                        <button id="proceedCheckoutBtn" type="button" class="block w-full py-4 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-300/20 text-center disabled:opacity-60 disabled:cursor-not-allowed">
                             Proceed to Checkout
-                        </a>
+                        </button>
+                        <form id="checkout-selection-form" action="{{ route('checkout.select') }}" method="POST" class="hidden">
+                            @csrf
+                            <div id="checkout-selection-inputs"></div>
+                        </form>
                         @else
                         <a href="{{ route('login') }}" class="block w-full py-4 bg-amber-300 text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-300/20 text-center">
                             Login to Checkout
@@ -179,6 +196,11 @@
             const removeCancelBtn = document.getElementById('removeConfirmCancelBtn');
             const toast = document.getElementById('cartActionToast');
             const toastMessage = document.getElementById('cartActionToastMessage');
+            const selectAllCheckbox = document.getElementById('select-all-cart-items');
+            const proceedCheckoutBtn = document.getElementById('proceedCheckoutBtn');
+            const selectedItemsHint = document.getElementById('selectedItemsHint');
+            const checkoutSelectionForm = document.getElementById('checkout-selection-form');
+            const checkoutSelectionInputs = document.getElementById('checkout-selection-inputs');
             let modalResolver = null;
             let toastTimer = null;
 
@@ -190,11 +212,59 @@
                 badge.classList.toggle('hidden', parsed <= 0);
             }
 
+            function normalizeAmount(text) {
+                return Number(String(text || '').replace(/[^0-9.]/g, '')) || 0;
+            }
+
+            function collectItemCheckboxes() {
+                return Array.from(document.querySelectorAll('.cart-item-checkbox'));
+            }
+
+            function selectedItemIds() {
+                return collectItemCheckboxes()
+                    .filter(function (checkbox) { return checkbox.checked; })
+                    .map(function (checkbox) { return checkbox.value; });
+            }
+
+            function selectedCartTotal() {
+                let total = 0;
+                selectedItemIds().forEach(function (id) {
+                    const subtotalEl = document.querySelector('.item-subtotal[data-id="' + id + '"]');
+                    if (subtotalEl) {
+                        total += normalizeAmount(subtotalEl.textContent);
+                    }
+                });
+                return total;
+            }
+
             function updateTotals(totalValue) {
                 const subtotalEl = document.getElementById('cartSubtotalValue');
                 const totalEl = document.getElementById('cartTotalValue');
-                if (subtotalEl) subtotalEl.textContent = '\u20B1' + totalValue;
-                if (totalEl) totalEl.textContent = '\u20B1' + totalValue;
+                const formatted = Number(totalValue || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                if (subtotalEl) subtotalEl.textContent = '\u20B1' + formatted;
+                if (totalEl) totalEl.textContent = '\u20B1' + formatted;
+            }
+
+            function refreshSelectAllState() {
+                const checkboxes = collectItemCheckboxes();
+                if (!selectAllCheckbox || !checkboxes.length) return;
+                const checkedCount = checkboxes.filter(function (checkbox) { return checkbox.checked; }).length;
+                selectAllCheckbox.checked = checkedCount === checkboxes.length;
+                selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+            }
+
+            function refreshSelectionUi() {
+                const selectedCount = selectedItemIds().length;
+                const total = selectedCartTotal();
+                updateTotals(total);
+                refreshSelectAllState();
+
+                if (selectedItemsHint) {
+                    selectedItemsHint.textContent = 'Selected items: ' + selectedCount;
+                }
+                if (proceedCheckoutBtn) {
+                    proceedCheckoutBtn.disabled = selectedCount === 0;
+                }
             }
 
             function showToast(message, tone) {
@@ -265,6 +335,42 @@
                 }
             });
 
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function () {
+                    collectItemCheckboxes().forEach(function (checkbox) {
+                        checkbox.checked = selectAllCheckbox.checked;
+                    });
+                    refreshSelectionUi();
+                });
+            }
+
+            document.addEventListener('change', function (event) {
+                if (event.target && event.target.classList.contains('cart-item-checkbox')) {
+                    refreshSelectionUi();
+                }
+            });
+
+            if (proceedCheckoutBtn && checkoutSelectionForm && checkoutSelectionInputs) {
+                proceedCheckoutBtn.addEventListener('click', function () {
+                    const ids = selectedItemIds();
+                    if (!ids.length) {
+                        showToast('Please select at least one item to checkout.', 'error');
+                        return;
+                    }
+
+                    checkoutSelectionInputs.innerHTML = '';
+                    ids.forEach(function (id) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'selected_items[]';
+                        input.value = id;
+                        checkoutSelectionInputs.appendChild(input);
+                    });
+
+                    checkoutSelectionForm.submit();
+                });
+            }
+
             document.querySelectorAll('.cart-update-form').forEach(function (form) {
                 form.addEventListener('submit', async function (event) {
                     event.preventDefault();
@@ -288,7 +394,7 @@
                             return;
                         }
 
-                        const id = fd.get('id');
+                        const id = String(fd.get('id'));
                         if (data.removed) {
                             const row = document.getElementById('cart-row-' + id);
                             if (row) row.remove();
@@ -318,10 +424,10 @@
                             }
                         }
 
-                        updateTotals(data.total);
                         if (typeof data.cart_count !== 'undefined') {
                             updateNavbarCartCount(data.cart_count);
                         }
+                        refreshSelectionUi();
                     } catch (error) {
                         showToast('Failed to update cart.', 'error');
                     }
@@ -348,20 +454,22 @@
                             return;
                         }
 
-                        const id = fd.get('id');
+                        const id = String(fd.get('id'));
                         const row = document.getElementById('cart-row-' + id);
                         if (row) row.remove();
                         showToast(data.message || 'Item removed from cart.', 'success');
 
-                        updateTotals(data.total);
                         if (typeof data.cart_count !== 'undefined') {
                             updateNavbarCartCount(data.cart_count);
                         }
+                        refreshSelectionUi();
                     } catch (error) {
                         showToast('Failed to remove item.', 'error');
                     }
                 });
             });
+
+            refreshSelectionUi();
         })();
     </script>
 
@@ -369,7 +477,4 @@
 
 </body>
 </html>
-
-
-
 

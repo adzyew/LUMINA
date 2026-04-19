@@ -26,6 +26,7 @@ class CartController extends Controller
     private const CART_CACHE_TTL_DAYS = 30;
     private const PROMO_MIN_DISCOUNT_PERCENT = 5.00;
     private const PROMO_CLAIM_WINDOW_MINUTES = 60;
+    private const CHECKOUT_SELECTED_SESSION_KEY = 'checkout_selected_items';
 
     private function cartCacheKey(int $userId): string
     {
@@ -58,6 +59,98 @@ class CartController extends Controller
         }
 
         Cache::forget($this->cartCacheKey($userId));
+    }
+
+    private function clearSelectedCheckoutItems(): void
+    {
+        session()->forget(self::CHECKOUT_SELECTED_SESSION_KEY);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function sanitizedSelectedIds(array $cart): array
+    {
+        $selected = session(self::CHECKOUT_SELECTED_SESSION_KEY, []);
+        if (!is_array($selected)) {
+            $this->clearSelectedCheckoutItems();
+            return [];
+        }
+
+        $cartKeys = array_map(static fn ($key) => (string) $key, array_keys($cart));
+        $selectedIds = array_values(array_unique(array_map(static fn ($id) => (string) $id, $selected)));
+        $selectedIds = array_values(array_filter($selectedIds, static fn ($id) => in_array($id, $cartKeys, true)));
+
+        if (empty($selectedIds)) {
+            $this->clearSelectedCheckoutItems();
+            return [];
+        }
+
+        session([self::CHECKOUT_SELECTED_SESSION_KEY => $selectedIds]);
+        return $selectedIds;
+    }
+
+    private function pruneSelectedCheckoutItems(array $cart): void
+    {
+        $selectedIds = $this->sanitizedSelectedIds($cart);
+        if (empty($selectedIds)) {
+            $this->clearSelectedCheckoutItems();
+        }
+    }
+
+    /**
+     * @return array<string|int, array<string, mixed>>
+     */
+    private function selectedCheckoutCart(array $cart): array
+    {
+        $selectedIds = $this->sanitizedSelectedIds($cart);
+        if (empty($selectedIds)) {
+            return [];
+        }
+
+        $selectedCart = [];
+        foreach ($selectedIds as $id) {
+            if (isset($cart[$id])) {
+                $selectedCart[$id] = $cart[$id];
+                continue;
+            }
+
+            $intId = (int) $id;
+            if (isset($cart[$intId])) {
+                $selectedCart[$intId] = $cart[$intId];
+            }
+        }
+
+        return $selectedCart;
+    }
+
+    /**
+     * @param array<int|string> $productIds
+     */
+    private function removeProductsFromCart(array $productIds): void
+    {
+        $cart = session()->get('cart', []);
+        if (!is_array($cart) || empty($cart)) {
+            $this->clearSelectedCheckoutItems();
+            return;
+        }
+
+        foreach ($productIds as $productId) {
+            unset($cart[$productId]);
+            unset($cart[(string) $productId]);
+            unset($cart[(int) $productId]);
+        }
+
+        if (empty($cart)) {
+            session()->forget('cart');
+            $this->clearPersistentCart();
+            $this->clearSelectedCheckoutItems();
+            return;
+        }
+
+        session()->put('cart', $cart);
+        $this->syncPersistentCart($cart);
+        $this->pruneSelectedCheckoutItems($cart);
     }
 
     private function activePromoSessionClaimId(): ?int
@@ -142,7 +235,40 @@ class CartController extends Controller
     // 1. SHOW CART PAGE (This fixes the error)
     public function index()
     {
+        $cart = session()->get('cart', []);
+        if (is_array($cart)) {
+            $this->pruneSelectedCheckoutItems($cart);
+        }
+
         return view('cart.shoppingcart');
+    }
+
+    public function selectForCheckout(Request $request)
+    {
+        $validated = $request->validate([
+            'selected_items' => ['required', 'array', 'min:1'],
+            'selected_items.*' => ['required'],
+        ]);
+
+        $cart = session()->get('cart', []);
+        if (empty($cart)) {
+            return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
+        }
+
+        $cartKeys = array_map(static fn ($key) => (string) $key, array_keys($cart));
+        $selectedIds = array_values(array_unique(array_map(
+            static fn ($id) => (string) $id,
+            (array) ($validated['selected_items'] ?? [])
+        )));
+        $selectedIds = array_values(array_filter($selectedIds, static fn ($id) => in_array($id, $cartKeys, true)));
+
+        if (empty($selectedIds)) {
+            return redirect()->route('cart.index')->with('error', 'Please select at least one product to checkout.');
+        }
+
+        session([self::CHECKOUT_SELECTED_SESSION_KEY => $selectedIds]);
+
+        return redirect()->route('checkout');
     }
 
     // 2. ADD TO CART
@@ -189,6 +315,7 @@ class CartController extends Controller
                 unset($cart[$request->id]);
                 session()->put('cart', $cart);
                 $this->syncPersistentCart($cart);
+                $this->pruneSelectedCheckoutItems($cart);
             }
             if ($request->ajax() || $request->wantsJson()) {
                 $total = 0;
@@ -235,6 +362,7 @@ class CartController extends Controller
             unset($cart[$id]);
             session()->put('cart', $cart);
             $this->syncPersistentCart($cart);
+            $this->pruneSelectedCheckoutItems($cart);
             if ($request->ajax() || $request->wantsJson()) {
                 $total = 0;
                 foreach ($cart as $item) {
@@ -257,6 +385,7 @@ class CartController extends Controller
         $cart[$id]['quantity'] = $quantity;
         session()->put('cart', $cart);
         $this->syncPersistentCart($cart);
+        $this->pruneSelectedCheckoutItems($cart);
 
         if ($request->ajax() || $request->wantsJson()) {
             $itemSubtotal = $cart[$id]['price'] * $cart[$id]['quantity'];
@@ -361,11 +490,16 @@ class CartController extends Controller
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
 
+        $checkoutCart = $this->selectedCheckoutCart($cart);
+        if (empty($checkoutCart)) {
+            return redirect()->route('cart.index')->with('error', 'Please select at least one product to checkout.');
+        }
+
         /** @var \App\Models\User|null $user */
         $user = Auth::user();
         $userId = $user ? (int) $user->id : 0;
 
-        $subtotal = $this->calculateSubtotal($cart);
+        $subtotal = $this->calculateSubtotal($checkoutCart);
         $shippingFee = 0.0;
         $discountableTotal = $subtotal + $shippingFee;
         $promoClaim = $userId > 0 ? $this->getSessionPromoClaimForUser($userId) : null;
@@ -374,6 +508,7 @@ class CartController extends Controller
         return view('cart.checkout', [
             'shippingRates' => $this->shippingRates(),
             'promoView' => $promoView,
+            'checkoutCart' => $checkoutCart,
         ]);
     }
 
@@ -392,9 +527,14 @@ class CartController extends Controller
 
     public function placeOrder(Request $request, PaymongoService $paymongoService)
     {
-        $cart = session()->get('cart', []);
-        if (empty($cart)) {
+        $sessionCart = session()->get('cart', []);
+        if (empty($sessionCart)) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
+        }
+
+        $cart = $this->selectedCheckoutCart($sessionCart);
+        if (empty($cart)) {
+            return redirect()->route('cart.index')->with('error', 'Please select at least one product to checkout.');
         }
 
         // Keep checkout resilient across environments if hidden fields are not posted.
@@ -549,8 +689,8 @@ class CartController extends Controller
                 return redirect()->away($checkoutUrl);
             }
 
-            session()->forget('cart');
-            $this->clearPersistentCart();
+            $this->removeProductsFromCart(array_keys($cart));
+            $this->clearSelectedCheckoutItems();
 
             // Send email outside the transaction so order persistence is never rolled back by mail failure.
             try {

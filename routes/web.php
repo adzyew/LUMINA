@@ -76,6 +76,7 @@ Route::middleware('customer')->group(function () {
 
     // Authenticated customer-only routes
     Route::middleware('auth')->group(function () {
+        Route::post('/checkout/select', [CartController::class, 'selectForCheckout'])->name('checkout.select');
         Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
         Route::post('/checkout/promo/apply', [CartController::class, 'applyPromo'])->name('checkout.promo.apply');
         Route::post('/checkout/promo/remove', [CartController::class, 'removePromo'])->name('checkout.promo.remove');

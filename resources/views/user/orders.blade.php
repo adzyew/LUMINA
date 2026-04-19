@@ -42,6 +42,17 @@
                     $primaryProduct = $primaryItem?->product;
                     $totalQuantity = (int) $order->items->sum('quantity');
                     $modalId = 'order-modal-' . $order->id;
+                    $modalStatusToStep = [
+                        'pending' => 1,
+                        'confirmed' => 1,
+                        'processing' => 2,
+                        'shipped' => 3,
+                        'delivered' => 4,
+                        'cancelled' => 1,
+                        'awaiting_payment' => 0,
+                    ];
+                    $modalCurrentStep = $modalStatusToStep[$order->status] ?? 0;
+                    $modalCancelled = $order->status === 'cancelled';
                 @endphp
 
                 <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
@@ -129,6 +140,42 @@
                             </div>
 
                             <div class="p-5 space-y-4">
+                                <section class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                                    <div class="relative">
+                                        <div class="absolute left-0 right-0 top-4 h-1 rounded-full bg-gray-200"></div>
+                                        <div class="absolute left-0 top-4 h-1 rounded-full {{ $modalCancelled ? 'bg-red-400' : 'bg-indigo-500' }}"
+                                             style="width: {{ max(0, min(100, (($modalCurrentStep - 1) / 3) * 100)) }}%;"></div>
+
+                                        <div class="grid grid-cols-4 gap-2 relative z-10">
+                                            @foreach(['Order Processed', 'Order Shipped', 'Order En Route', 'Order Arrived'] as $index => $label)
+                                                @php
+                                                    $step = $index + 1;
+                                                    $done = $step <= $modalCurrentStep;
+                                                    $dotClass = $done
+                                                        ? ($modalCancelled ? 'bg-red-500 border-red-500 text-white' : 'bg-indigo-500 border-indigo-500 text-white')
+                                                        : 'bg-white border-gray-300 text-gray-400';
+                                                @endphp
+                                                <div class="flex flex-col items-center text-center">
+                                                    <span class="w-8 h-8 rounded-full border-2 inline-flex items-center justify-center {{ $dotClass }}">
+                                                        @if($done)
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                        @else
+                                                            <span class="text-[10px] font-semibold">{{ $step }}</span>
+                                                        @endif
+                                                    </span>
+                                                    <p class="mt-1 text-[10px] sm:text-[11px] font-semibold text-gray-700 leading-tight">{{ $label }}</p>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                    @if($modalCancelled)
+                                        <p class="mt-3 text-xs font-semibold text-red-600">This order was cancelled.</p>
+                                    @endif
+                                </section>
+
                                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-sm">
                                     <div>
                                         <p class="text-gray-500">Items</p>

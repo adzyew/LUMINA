@@ -82,7 +82,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1.65fr)_minmax(320px,1fr)] gap-6 items-start">
         <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm lg:order-2 lg:sticky lg:top-28">
             @php $total = 0; @endphp
-            @foreach(session('cart') as $id => $item)
+            @foreach(($checkoutCart ?? []) as $id => $item)
                 @php $total += $item['price'] * $item['quantity']; @endphp
                 <div class="py-3 border-b border-gray-100">
                     <div class="flex items-start justify-between gap-3">
