@@ -388,7 +388,7 @@
                                             </svg>
                                         </span>
 
-                                        <input id="register-password" type="password" name="password" placeholder=" " class="floating-input pl-12 pr-12 py-4" minlength="8" autocomplete="new-password" maxlength="15">
+                            <input id="register-password" type="password" name="password" placeholder=" " class="floating-input pl-12 pr-12 py-4" minlength="8" autocomplete="new-password" maxlength="10">
                                         <label for="register-password" class="floating-label">Create Password</label>
 
                                         <button type="button" onclick="togglePasswordField('register-password', 'register-eye-open', 'register-eye-closed')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none z-10">
@@ -409,7 +409,7 @@
                                     @enderror
 
                                     <p id="register-password-strength" class="hidden text-xs mt-2 text-gray-500">Password strength: Weak</p>
-                                    <p id="register-password-rules" class="hidden text-xs mt-1 text-gray-500">Use at least 8 characters with uppercase, lowercase, and a number.</p>
+                            <p id="register-password-rules" class="hidden text-xs mt-1 text-gray-500">Use 8 to 10 characters with uppercase, lowercase, and a number.</p>
                                 </div>
 
                                 <!-- Confirm Password -->
@@ -421,7 +421,7 @@
                                             </svg>
                                         </span>
 
-                                        <input id="register-password-confirm" type="password" name="password_confirmation" placeholder=" " class="floating-input pl-12 pr-12 py-4" maxlength="15">
+                            <input id="register-password-confirm" type="password" name="password_confirmation" placeholder=" " class="floating-input pl-12 pr-12 py-4" maxlength="10">
                                         <label for="register-password-confirm" class="floating-label">Confirm Password</label>
 
                                         <button type="button" onclick="togglePasswordField('register-password-confirm', 'confirm-eye-open', 'confirm-eye-closed')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none z-10">
@@ -650,10 +650,11 @@
 
                 const value = registerPassword.value || '';
                 const hasMinLength = value.length >= 8;
+                const hasMaxLength = value.length <= 10;
                 const hasLower = /[a-z]/.test(value);
                 const hasUpper = /[A-Z]/.test(value);
                 const hasNumber = /\d/.test(value);
-                const isStrong = hasMinLength && hasLower && hasUpper && hasNumber;
+                const isStrong = hasMinLength && hasMaxLength && hasLower && hasUpper && hasNumber;
 
                 if (value.length === 0) {
                     strengthLabel.classList.add('hidden');
@@ -667,12 +668,12 @@
                 if (isStrong) {
                     strengthLabel.textContent = 'Password strength: Strong';
                     strengthLabel.className = 'text-xs mt-2 text-green-600';
-                    rulesLabel.textContent = 'Use at least 8 characters with uppercase, lowercase, and a number.';
+                    rulesLabel.textContent = 'Use 8 to 10 characters with uppercase, lowercase, and a number.';
                     rulesLabel.className = 'text-xs mt-1 text-gray-500';
                 } else {
                     strengthLabel.textContent = 'Password strength: Weak';
                     strengthLabel.className = 'text-xs mt-2 text-red-500';
-                    rulesLabel.textContent = 'Missing requirement: 8+ chars, uppercase, lowercase, and number.';
+                    rulesLabel.textContent = 'Missing requirement: 8-10 chars, uppercase, lowercase, and number.';
                     rulesLabel.className = 'text-xs mt-1 text-red-500';
                 }
             }

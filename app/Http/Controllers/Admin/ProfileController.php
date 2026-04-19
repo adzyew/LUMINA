@@ -67,7 +67,7 @@ class ProfileController extends Controller
                 'nullable',
                 'string',
                 'min:8',
-                'max:72',
+                'max:10',
                 'regex:/[a-z]/',
                 'regex:/[A-Z]/',
                 'regex:/[0-9]/',
@@ -79,7 +79,7 @@ class ProfileController extends Controller
             'last_name.regex' => 'Last name must contain letters only.',
             'suffix.regex' => 'Suffix contains invalid characters.',
             'new_password.min' => 'Password must be at least 8 characters.',
-            'new_password.max' => 'Password cannot exceed 72 characters.',
+            'new_password.max' => 'Password cannot exceed 10 characters.',
             'new_password.regex' => 'Password must include uppercase, lowercase, and a number.',
         ]);
 
