@@ -397,6 +397,12 @@ class CartController extends Controller
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
 
+        // Keep checkout resilient across environments if hidden fields are not posted.
+        $request->merge([
+            'shipping_province' => $request->input('shipping_province') ?: 'Metro Manila',
+            'shipping_country' => $request->input('shipping_country') ?: 'Philippines',
+        ]);
+
         $request->validate([
             'contact_phone' => 'required|string|max:20',
             'contact_email' => 'required|email|max:255',
@@ -578,7 +584,14 @@ class CartController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Checkout Failed: ' . $e->getMessage());
-            return redirect()->route('cart.index')->with('error', 'There was an issue processing your order. Please try again.');
+
+            // Keep user on checkout payment step with a clear, field-scoped error.
+            return redirect()
+                ->route('checkout')
+                ->withInput()
+                ->withErrors([
+                    'payment_method' => 'Unable to initialize PayMongo checkout right now. Please try again.',
+                ]);
         }
     }
 
