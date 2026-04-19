@@ -19,6 +19,41 @@ use RuntimeException;
 
 class PaymentController extends Controller
 {
+    private const CHECKOUT_SELECTED_SESSION_KEY = 'checkout_selected_items';
+
+    private function removeOrderedItemsFromCartSession(Order $order): void
+    {
+        $order->loadMissing('items');
+
+        $cart = session()->get('cart', []);
+        if (!is_array($cart)) {
+            session()->forget(self::CHECKOUT_SELECTED_SESSION_KEY);
+            return;
+        }
+
+        foreach ($order->items as $item) {
+            $productId = $item->product_id;
+            unset($cart[$productId]);
+            unset($cart[(string) $productId]);
+            unset($cart[(int) $productId]);
+        }
+
+        if (empty($cart)) {
+            session()->forget('cart');
+            session()->forget(self::CHECKOUT_SELECTED_SESSION_KEY);
+            if (Auth::check()) {
+                Cache::forget('cart_user_' . (int) Auth::id());
+            }
+            return;
+        }
+
+        session()->put('cart', $cart);
+        session()->forget(self::CHECKOUT_SELECTED_SESSION_KEY);
+        if (Auth::check()) {
+            Cache::put('cart_user_' . (int) Auth::id(), $cart, now()->addDays(30));
+        }
+    }
+
     public function paymongoSuccess(Request $request, PaymongoService $paymongoService)
     {
         $orderId = (int) $request->query('order');
@@ -56,10 +91,7 @@ class PaymentController extends Controller
             : 'Payment is being processed for Order #' . $order->display_order_number . '. We will update your order shortly.';
 
         if ($order->payment_status === 'paid') {
-            $request->session()->forget('cart');
-            if (Auth::check()) {
-                Cache::forget('cart_user_' . (int) Auth::id());
-            }
+            $this->removeOrderedItemsFromCartSession($order);
         }
 
         return redirect()
