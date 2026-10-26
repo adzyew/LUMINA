@@ -16,7 +16,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(RolePermissionSeeder::class);
+        $this->call([
+            RolePermissionSeeder::class,
+            FeatureSeeder::class,
+            ProductSeeder::class,
+        ]);
 
         $admin = User::firstOrCreate(
             ['email' => 'admin@lumina.local'],
@@ -30,9 +34,14 @@ class DatabaseSeeder extends Seeder
         );
         $admin->assignRole('admin');
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Test User',
+                'password' => Hash::make('Password@12345'),
+                'email_verified_at' => now(),
+                'is_verified' => true,
+            ]
+        );
     }
 }
