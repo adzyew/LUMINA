@@ -17,11 +17,12 @@ FROM php:8.3-cli-bookworm AS composer-deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git unzip libicu-dev libzip-dev libpng-dev \
     libjpeg62-turbo-dev libfreetype6-dev \
+    libcurl4-openssl-dev \
     libxml2-dev libonig-dev \
     && docker-php-ext-configure gd \
        --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" \
-       bcmath exif gd intl mbstring pdo_mysql \
+       bcmath curl exif gd intl mbstring pdo_mysql \
        pcntl opcache zip \
     && rm -rf /var/lib/apt/lists/*
 
@@ -50,14 +51,20 @@ ENV APP_ENV=production
 ENV APP_DEBUG=false
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    nginx supervisor \
-    libicu72 libzip4 libpng16-16 \
-    libjpeg62-turbo libfreetype6 \
-    libxml2 libonig5 \
+    nginx \
+    supervisor \
+    libicu-dev \
+    libzip-dev \
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    libxml2-dev \
+    libonig-dev \
+    libcurl4-openssl-dev \
     && docker-php-ext-configure gd \
        --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" \
-       bcmath exif gd intl mbstring pdo_mysql \
+       bcmath curl exif gd intl mbstring pdo_mysql \
        pcntl opcache zip \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /run/nginx /var/log/supervisor
