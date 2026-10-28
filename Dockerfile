@@ -88,4 +88,4 @@ RUN chmod +x /usr/local/bin/entrypoint.sh \
 
 EXPOSE 10000
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "/usr/local/bin/entrypoint.sh"]
